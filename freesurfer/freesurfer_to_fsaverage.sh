@@ -5,8 +5,8 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 export PYTHONPATH="$REPO_ROOT:$PYTHONPATH"
 BASE="${DMRI_MICRO_ROOT:-$(python3 -c "import sys; sys.path.insert(0, \"$REPO_ROOT\"); from lib.paths import project_root; print(project_root())")}"
 
-group="penn_controls"
-sub="sub-RID0505"
+group="${1:-penn_controls}"
+sub="${2:?Usage: $0 <group> <subject_id>}"
 
 freesurfer_dir=$BASE/derivatives/freesurfer/${group}
 output_dir=$BASE/derivatives/freesurfer/${group}/${sub}/surf

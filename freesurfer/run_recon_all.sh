@@ -9,7 +9,7 @@ group=hcpaging
 
 qsiprep_dir=$BASE/derivatives/qsiprep/${group}
 freesurfer_dir=$BASE/derivatives/freesurfer/${group}
-logs_dir=$BASE/code/freesurfer/logs
+logs_dir=$REPO_ROOT/freesurfer/logs
 
 # Make parent freesurfer directory if it doesn't exist
 if [[ ! -d ${freesurfer_dir} ]]; then
@@ -19,11 +19,6 @@ fi
 # Iterate over subdirectories in qsiprep_dir
 for sub_dir in ${qsiprep_dir}/sub-*; do
     sub=$(basename ${sub_dir})
-
-    # Skip subjects except for sub-RID0505
-    #if [[ ${sub} != "sub-RID0505" ]]; then
-    #    continue
-    #fi
 
     if [[ -d ${sub_dir} ]]; then
 

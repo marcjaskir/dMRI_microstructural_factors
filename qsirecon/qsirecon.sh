@@ -10,7 +10,7 @@ BASE="${DMRI_MICRO_ROOT:-$(python3 -c "import sys; sys.path.insert(0, \"$REPO_RO
 
 SUBJ=${1}
 GROUP=${2}
-# SUBJ=sub-RID0505
+# SUBJ=sub-EXAMPLE
 
 # Specify temp directory for apptainer
 export APPTAINER_TMPDIR=/home/mjaskir/software/apptainer/apptainer_tmp

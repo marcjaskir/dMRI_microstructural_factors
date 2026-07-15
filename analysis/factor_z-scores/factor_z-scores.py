@@ -6644,7 +6644,7 @@ def compute_average_factor_scores_controls(
         matching_subjects = available_subjects.intersection(control_subjects_set)
         
         if len(matching_subjects) == 0:
-            # Try to match with different format (e.g., "sub-RID0505" vs "RID0505")
+            # Try to match with different format (e.g., "sub-XXXX" vs "XXXX")
             # Check if control_subjects have "sub-" prefix but factor_scores don't, or vice versa
             if control_subjects and len(control_subjects) > 0:
                 # Try removing "sub-" prefix from control_subjects
