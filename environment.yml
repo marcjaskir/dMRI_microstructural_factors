@@ -1,0 +1,28 @@
+# Conda environment for dMRI microstructural factor analysis.
+# Create with: conda env create -f environment.yml
+#
+# This is a minimal pin; the full lab environment includes FSL, qsiprep,
+# qsirecon, trekker, and R packages for CovBat/GAM. Export your local env with:
+#   conda env export -n structural_tractometry --no-builds > environment.yml
+
+name: dmri_microstructural_factors
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.10
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - pyyaml
+  - h5py
+  - nibabel
+  - nilearn
+  - pytest
+  - pip
+  - pip:
+    - brainspace
+    - neuromaps

@@ -1,0 +1,41 @@
+
+```{r}
+#remotes::install_github("andy1764/ComBatFamily@dev", force = TRUE,build_vignettes = TRUE)
+#library(ComBatFamily)
+#vignette("covfam")
+```
+
+```{r}
+# n x p data frame or matrix of observations where p is the number of features and n is the number of subjects.
+data <-
+  
+# Factor indicating batch (often equivalent to site or scanner)
+bat <- 
+
+# Data frame or matrix of covariates supplied to model
+covar <- 
+
+# Model function. ComBat Family supports any models that take arguments formula and data, but are limited to models fitting with identity link (e.g. family = gaussian(link = "identity")). This includes lm, gam, gamlss, rq, lmer, and more
+model <- "gam"
+
+# Formula for model starting with ⁠y ~⁠ where y represents each feature
+formula <- 
+
+```
+
+
+Assuming you have 2 samples called sample1 and sample2, and you want to fit CovBat-GAM in sample 1 and apply it to sample 2:
+```{r}
+covbat_sample1 <- covfam(data = data_sample1, 
+                         bat = batch_sample1, 
+                         covar = covar_df_sample1, 
+                         gam, 
+                         y ~ s(age, k = k, fx = T) + sex)
+
+covbat_sample2 <- predict(covbat_sample1,
+                          newdata = data_sample2,
+                          newbat = batch_sample2,
+                          newcovar = covar_df_sample2)
+```
+
+Andrew included a short description of the new functionality here: [https://github.com/andy1764/ComBatFamily/tree/dev?tab=readme-ov-file#3-additional-features](https://github.com/andy1764/ComBatFamily/tree/dev?tab=readme-ov-file#3-additional-features)

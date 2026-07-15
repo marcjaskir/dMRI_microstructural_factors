@@ -1,0 +1,31 @@
+# Copy to config.yaml and set project_root to your data workspace.
+# All pipeline and analysis scripts resolve paths through this file.
+
+project_root: /path/to/structural_tractometry
+data_dir: ${project_root}/data
+derivatives_dir: ${project_root}/derivatives
+results_dir: ${project_root}/results
+
+# Subdirectory under results_dir for inclusion CSVs (use "1_inclusion" for legacy layouts)
+inclusion_subdir: inclusion
+
+# Optional runtime overrides (null = use system defaults)
+singularity_tmpdir: null
+conda_env: null
+
+cohorts:
+  - penn_epilepsy
+  - penn_controls
+  - hcpya
+  - hcpaging
+
+# External subject metadata (not shipped in this repo)
+subject_outcome_csv: ${results_dir}/subject_outcomes.csv
+
+# Site-specific external paths (set locally; never commit config.yaml with real paths)
+penn_bids_dir: null
+freesurfer_image: null
+itksnap_c3d: null
+scilpy_conda_env: null
+datalad_conda_env: null
+freesurfer_subjects_dir: null

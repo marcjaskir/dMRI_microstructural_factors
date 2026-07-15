@@ -1,0 +1,44 @@
+# Local config with machine-specific paths
+config.yaml
+
+# Data and outputs (never commit)
+data/
+derivatives/
+results/
+
+# Logs and caches
+**/logs/
+**/__pycache__/
+**/.ipynb_checkpoints/
+**/.ipyniivue_cache/
+*.pyc
+*.pyo
+
+# Singularity images
+*.sif
+
+# Golden test baselines (local checkpoints)
+tests/golden/baseline/
+tests/golden/output/
+
+# OS / editor
+.DS_Store
+._*
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Work directories
+**/work/
+**/work_*/
+
+# Licenses / secrets (obtain FreeSurfer license separately)
+**/license.txt
+**/license.txt
+
+# Binary images / data (code-only repo)
+*.png
+*.nii
+*.nii.gz
+*.mat

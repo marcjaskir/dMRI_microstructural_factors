@@ -1,0 +1,19 @@
+anatomical:
+- mrtrix_5tt_hsvs
+name: hcp_postproc
+nodes:
+-   action: estimate
+    input: qsirecon
+    name: tortoise_dtmapmri
+    parameters:
+        big_delta: null
+        estimate_mapmri:
+            map_order: 4
+        estimate_tensor:
+            bval_cutoff: 1700
+            write_cs: true
+        estimate_tensor_separately: true
+        small_delta: null
+    qsirecon_suffix: TORTOISE_model-MAPMRI
+    software: TORTOISE
+space: T1w

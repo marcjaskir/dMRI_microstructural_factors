@@ -1,0 +1,56 @@
+import sys
+from pathlib import Path
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+from lib.paths import project_root, data_dir, derivatives_dir, results_dir
+PROJECT_ROOT = project_root()
+import os
+import json
+import csv
+import glob
+
+# Define paths
+base_dir = "{project_root()}/data/hcpaging"
+output_file = "{project_root()}/derivatives/metadata/scanner_ids_hcpaging.csv"
+
+# Create output directory if it doesn't exist
+os.makedirs(os.path.dirname(output_file), exist_ok=True)
+
+# Initialize results list
+results = []
+
+# Iterate through subject directories
+for sub_dir in os.listdir(base_dir):
+    sub_path = os.path.join(base_dir, sub_dir)
+    
+    # Skip if not a directory
+    if not os.path.isdir(sub_path):
+        continue
+        
+    # Look for T1w json file in anat directory
+    t1_jsons = glob.glob(os.path.join(sub_path, "anat", "*_T1w.json"))
+    
+    if t1_jsons:
+        # Get first matching json file
+        json_file = t1_jsons[0]
+        
+        # Read the json and extract scanner ID
+        with open(json_file) as f:
+            metadata = json.load(f)
+            scanner_id = metadata.get('DeviceSerialNumber')
+            
+            if scanner_id:
+                results.append({
+                    'sub': sub_dir,
+                    'scanner_id': scanner_id
+                })
+
+# Sort results by subject ID
+results.sort(key=lambda x: x['sub'])
+
+# Write results to CSV
+with open(output_file, 'w', newline='') as f:
+    writer = csv.DictWriter(f, fieldnames=['sub', 'scanner_id'])
+    writer.writeheader()
+    writer.writerows(results)

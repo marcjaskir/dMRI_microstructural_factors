@@ -1,0 +1,2 @@
+neuromaps>=0.0.7
+brainsmash>=0.1.0
