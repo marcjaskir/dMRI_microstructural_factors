@@ -1,8 +1,19 @@
 # dMRI Microstructural Factors
 
-Code accompanying the publication on diffusion MRI microstructural factor analysis and temporal lobe epilepsy asymmetry.
+Code and data layout accompanying the publication on diffusion MRI microstructural
+factor analysis and temporal lobe epilepsy asymmetry.
 
-This repository contains **code only**. Imaging data, derivatives, and subject metadata are kept outside the git tree and configured via [`config.yaml`](config.yaml).
+## Repository layout
+
+```
+dMRI_microstructural_factors/
+  code/                 # All pipelines and analyses
+  data/
+    open/               # Tier 1 — publishable post-GAM products (no age/sex/IDs)
+    controlled/         # Tier 2 — pre-CovBat inputs (gitignored; DUA only)
+  config.example.yaml
+  README.md
+```
 
 ## Quick start
 
@@ -10,28 +21,48 @@ This repository contains **code only**. Imaging data, derivatives, and subject m
 git clone git@github.com:marcjaskir/dMRI_microstructural_factors.git
 cd dMRI_microstructural_factors
 cp config.example.yaml config.yaml
-# Edit config.yaml: set project_root to your data workspace
+# Edit config.yaml: set workspace_root; point controlled roots at local data
 
 conda env create -f environment.yml
 conda activate dmri_microstructural_factors
 
-python tests/golden/run_golden_tests.py
+export PYTHONPATH="$PWD/code:$PYTHONPATH"
+python code/tests/golden/run_golden_tests.py
 ```
 
 ## Configuration
 
-All filesystem roots are defined in [`config.yaml`](config.yaml) (see [`config.example.yaml`](config.example.yaml)):
+All filesystem roots are defined in [`config.yaml`](config.yaml) (see
+[`config.example.yaml`](config.example.yaml)):
 
 | Key | Purpose |
 |-----|---------|
-| `project_root` | Root of data workspace (`data/`, `derivatives/`, `results/`) |
-| `data_dir` | BIDS inputs, atlases, metadata JSON |
-| `derivatives_dir` | Pipeline and analysis outputs |
-| `results_dir` | Inclusion tables and curated summaries |
-| `inclusion_subdir` | Subfolder under `results_dir` for inclusion CSVs |
-| `subject_outcome_csv` | External surgical outcome table (not in repo) |
+| `workspace_root` | This repository root |
+| `code_dir` | `code/` (scripts) |
+| `data_open_dir` | Tier 1 open products |
+| `data_controlled_dir` | Tier 2 controlled inputs |
+| `gam_dir` | Post-GAM residual z-scores |
+| `analysis_dir` | Factor / asymmetry / gradient outputs |
+| `atlas_dir` | Atlas metadata (labels, tract tables) |
+| `inclusion_dir` | Cohort inclusion tables |
+| `controlled_derivatives_dir` | Early pipeline + pre-GAM derivatives |
+| `controlled_metadata_dir` | Age/sex/scanner/clinical (controlled) |
 
-Python scripts import [`lib/paths.py`](lib/paths.py). Shell scripts resolve `$BASE` from the same config.
+Python scripts import [`code/lib/paths.py`](code/lib/paths.py). Shell scripts
+resolve `$CODE_ROOT` / `$BASE` from the same config.
+
+## Data tiers (Nature Neuroscience)
+
+**Tier 1 (`data/open/`)** — minimum open dataset to reproduce manuscript figures
+from GAM z-scores onward: anonymized GAM CSVs, factor/asymmetry products, atlas
+metadata, inclusion with `laterality`/`lobe` only. No age, sex, or real IDs.
+
+**Tier 2 (`data/controlled/`)** — pre-CovBat/GAM features and covariates (age,
+sex, scanner). Gitignored; share under controlled access / DUA if recomputing
+harmonization from scratch.
+
+See [`data/open/README.md`](data/open/README.md) and
+[`data/controlled/README.md`](data/controlled/README.md).
 
 ## Pipeline overview
 
@@ -42,30 +73,24 @@ BIDS / HCP-YA  →  qsiprep  →  freesurfer  →  qsirecon
                               ↓
               trekker  →  bundleseg  →  pyafq / mni_micro
                               ↓
-                         covbat  →  gam
+                    [Tier 2] covbat  →  gam
                               ↓
+                         [Tier 1 open products]
               factor_analysis  →  factor_z-scores  →  gradients
                               ↓
          tract/region asymmetry  →  microstructural asymmetry reports
 ```
 
-See [docs/pipeline.md](docs/pipeline.md) and [docs/analysis.md](docs/analysis.md) for details.
+Docs: [`code/docs/pipeline.md`](code/docs/pipeline.md),
+[`code/docs/analysis.md`](code/docs/analysis.md),
+[`code/docs/reproducibility.md`](code/docs/reproducibility.md).
 
 ## Privacy
 
-No subject identifiers, demographics, or clinical outcomes are stored in this repository. Inclusion lists and outcome labels must be provided locally via `config.yaml`.
-
-## Documentation
-
-- [docs/index.md](docs/index.md) — GitHub Pages home
-- [docs/reproducibility.md](docs/reproducibility.md) — golden tests and data layout
-
-Each top-level folder and `analysis/` subfolder has its own `README.md`.
+No subject identifiers, demographics, or clinical outcomes are stored in open
+source or `data/open/`. Controlled metadata stay in `data/controlled/` (local /
+DUA only).
 
 ## Citation
 
 > *[Publication citation to be added]*
-
-## License
-
-See repository license file (to be added upon public release).

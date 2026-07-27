@@ -1,17 +1,30 @@
-# Copy to config.yaml and set project_root to your data workspace.
+# Copy to config.yaml and set workspace_root / controlled roots for your machine.
 # All pipeline and analysis scripts resolve paths through this file.
 
-project_root: /path/to/structural_tractometry
-data_dir: ${project_root}/data
-derivatives_dir: ${project_root}/derivatives
-results_dir: ${project_root}/results
+# Workspace = this git repository root
+workspace_root: /path/to/dMRI_microstructural_factors
+code_dir: ${workspace_root}/code
+data_open_dir: ${workspace_root}/data/open
+data_controlled_dir: ${workspace_root}/data/controlled
 
-# Subdirectory under results_dir for inclusion CSVs (use "1_inclusion" for legacy layouts)
-inclusion_subdir: inclusion
+# Tier 1 product roots (default for manuscript reproduction)
+gam_dir: ${data_open_dir}/gam
+analysis_dir: ${data_open_dir}/analysis
+atlas_dir: ${data_open_dir}/atlases
+open_metadata_dir: ${data_open_dir}/metadata
+inclusion_dir: ${data_open_dir}/inclusion
 
-# Optional runtime overrides (null = use system defaults)
-singularity_tmpdir: null
-conda_env: null
+# Tier 2 roots (CovBat/GAM recompute and early imaging pipeline)
+controlled_derivatives_dir: ${data_controlled_dir}/derivatives
+controlled_metadata_dir: ${data_controlled_dir}/metadata
+controlled_inclusion_dir: ${data_controlled_dir}/inclusion
+subject_outcome_csv: ${data_controlled_dir}/subject_outcomes.csv
+
+# Compatibility aliases (early pipeline still uses these names)
+project_root: ${workspace_root}
+data_dir: ${data_controlled_dir}
+derivatives_dir: ${controlled_derivatives_dir}
+results_dir: ${data_open_dir}
 
 cohorts:
   - penn_epilepsy
@@ -19,8 +32,9 @@ cohorts:
   - hcpya
   - hcpaging
 
-# External subject metadata (not shipped in this repo)
-subject_outcome_csv: ${results_dir}/subject_outcomes.csv
+# Optional runtime overrides (null = use system defaults)
+singularity_tmpdir: null
+conda_env: null
 
 # Site-specific external paths (set locally; never commit config.yaml with real paths)
 penn_bids_dir: null
