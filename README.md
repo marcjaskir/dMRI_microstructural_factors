@@ -57,6 +57,15 @@ resolve `$CODE_ROOT` / `$BASE` from the same config.
 from GAM z-scores onward: anonymized GAM CSVs, factor/asymmetry products, atlas
 metadata, inclusion with `laterality`/`lobe` only. No age, sex, or real IDs.
 
+Populate from a local controlled workspace with:
+
+```bash
+python -u code/lib/export_tier1_open.py
+```
+
+Small products (`atlases/`, `metadata/`, `inclusion/`) ship in-repo. Large trees
+(`gam/`, `analysis/`) are gitignored — keep them local or deposit on Zenodo.
+
 **Tier 2 (`data/controlled/`)** — pre-CovBat/GAM features and covariates (age,
 sex, scanner). Gitignored; share under controlled access / DUA if recomputing
 harmonization from scratch.
@@ -66,8 +75,14 @@ See [`data/open/README.md`](data/open/README.md) and
 
 ## Pipeline overview
 
+Cohort-specific ingress differs before the shared tractography path:
+
+- **Penn + HCP-Aging:** BIDS → qsiprep → freesurfer → qsirecon
+- **HCP-YA:** → qsirecon (skip qsiprep/freesurfer; use existing HCP derivatives)
+
 ```
-BIDS / HCP-YA  →  qsiprep  →  freesurfer  →  qsirecon
+Penn / HCP-Aging:  BIDS  →  qsiprep  →  freesurfer  →  qsirecon
+HCP-YA:                                     →  qsirecon
                               ↓
                          acpc_mni_xfm
                               ↓
@@ -80,6 +95,9 @@ BIDS / HCP-YA  →  qsiprep  →  freesurfer  →  qsirecon
                               ↓
          tract/region asymmetry  →  microstructural asymmetry reports
 ```
+
+HCP Young Adult / Aging BIDS conversion uses
+[HCPLifespan2BIDS](https://github.com/ellisdg/HCPLifespan2BIDS) (not vendored here).
 
 Docs: [`code/docs/pipeline.md`](code/docs/pipeline.md),
 [`code/docs/analysis.md`](code/docs/analysis.md),

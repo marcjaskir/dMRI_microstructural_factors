@@ -1,0 +1,361 @@
+index	label	cifti_label	community_yeo	community_mesulam	community_economo
+1	Left_V1	L_V1_ROI	visual	paralimbic	sensory 2
+2	Left_MST	L_MST_ROI	visual	unimodal	sensory 1
+3	Left_V6	L_V6_ROI	visual	unimodal	sensory 1
+4	Left_V2	L_V2_ROI	visual	paralimbic	sensory 1
+5	Left_V3	L_V3_ROI	visual	paralimbic	sensory 1
+6	Left_V4	L_V4_ROI	visual	unimodal	sensory 1
+7	Left_V8	L_V8_ROI	visual	unimodal	association 1
+8	Left_4	L_4_ROI	somatosensory	paralimbic	motor
+9	Left_3b	L_3b_ROI	somatosensory	paralimbic	sensory 2
+10	Left_FEF	L_FEF_ROI	dorsal attention	paralimbic	motor
+11	Left_PEF	L_PEF_ROI	dorsal attention	paralimbic	motor
+12	Left_55b	L_55b_ROI	ventral attention	paralimbic	motor
+13	Left_V3A	L_V3A_ROI	visual	unimodal	association 1
+14	Left_RSC	L_RSC_ROI	default mode	idiotypic	limbic
+15	Left_POS2	L_POS2_ROI	frontoparietal	heteromodal	association 1
+16	Left_V7	L_V7_ROI	visual	unimodal	association 1
+17	Left_IPS1	L_IPS1_ROI	dorsal attention	heteromodal	association 1
+18	Left_FFC	L_FFC_ROI	visual	unimodal	association 1
+19	Left_V3B	L_V3B_ROI	visual	unimodal	association 1
+20	Left_LO1	L_LO1_ROI	visual	unimodal	sensory 1
+21	Left_LO2	L_LO2_ROI	visual	unimodal	sensory 1
+22	Left_PIT	L_PIT_ROI	visual	unimodal	sensory 1
+23	Left_MT	L_MT_ROI	visual	unimodal	sensory 1
+24	Left_A1	L_A1_ROI	somatosensory	unimodal	sensory 2
+25	Left_PSL	L_PSL_ROI	ventral attention	unimodal	association 2
+26	Left_SFL	L_SFL_ROI	default mode	unimodal	association 1
+27	Left_PCV	L_PCV_ROI	dorsal attention	heteromodal	association 1
+28	Left_STV	L_STV_ROI	ventral attention	unimodal	association 2
+29	Left_7Pm	L_7Pm_ROI	frontoparietal	heteromodal	association 1
+30	Left_7m	L_7m_ROI	default mode	heteromodal	association 1
+31	Left_POS1	L_POS1_ROI	default mode	heteromodal	association 1
+32	Left_23d	L_23d_ROI	default mode	idiotypic	limbic
+33	Left_v23ab	L_v23ab_ROI	default mode	idiotypic	association 1
+34	Left_d23ab	L_d23ab_ROI	default mode	idiotypic	limbic
+35	Left_31pv	L_31pv_ROI	default mode	idiotypic	association 1
+36	Left_5m	L_5m_ROI	somatosensory	paralimbic	motor
+37	Left_5mv	L_5mv_ROI	ventral attention	unimodal	motor
+38	Left_23c	L_23c_ROI	ventral attention	unimodal	association 1
+39	Left_5L	L_5L_ROI	somatosensory	unimodal	motor
+40	Left_24dd	L_24dd_ROI	somatosensory	paralimbic	motor
+41	Left_24dv	L_24dv_ROI	somatosensory	unimodal	association 1
+42	Left_7AL	L_7AL_ROI	dorsal attention	heteromodal	association 1
+43	Left_SCEF	L_SCEF_ROI	ventral attention	unimodal	association 1
+44	Left_6ma	L_6ma_ROI	ventral attention	unimodal	association 1
+45	Left_7Am	L_7Am_ROI	dorsal attention	heteromodal	association 1
+46	Left_7PL	L_7PL_ROI	dorsal attention	heteromodal	association 1
+47	Left_7PC	L_7PC_ROI	dorsal attention	heteromodal	association 1
+48	Left_LIPv	L_LIPv_ROI	dorsal attention	heteromodal	association 1
+49	Left_VIP	L_VIP_ROI	dorsal attention	heteromodal	association 1
+50	Left_MIP	L_MIP_ROI	dorsal attention	heteromodal	association 1
+51	Left_1	L_1_ROI	somatosensory	paralimbic	sensory 2
+52	Left_2	L_2_ROI	somatosensory	unimodal	sensory 2
+53	Left_3a	L_3a_ROI	somatosensory	paralimbic	sensory 2
+54	Left_6d	L_6d_ROI	somatosensory	paralimbic	motor
+55	Left_6mp	L_6mp_ROI	somatosensory	paralimbic	motor
+56	Left_6v	L_6v_ROI	somatosensory	paralimbic	motor
+57	Left_p24pr	L_p24pr_ROI	ventral attention	idiotypic	limbic
+58	Left_33pr	L_33pr_ROI	ventral attention	idiotypic	limbic
+59	Left_a24pr	L_a24pr_ROI	ventral attention	idiotypic	limbic
+60	Left_p32pr	L_p32pr_ROI	ventral attention	unimodal	association 1
+61	Left_a24	L_a24_ROI	default mode	idiotypic	limbic
+62	Left_d32	L_d32_ROI	default mode	heteromodal	association 1
+63	Left_8BM	L_8BM_ROI	frontoparietal	heteromodal	association 1
+64	Left_p32	L_p32_ROI	default mode	heteromodal	sensory 1
+65	Left_10r	L_10r_ROI	default mode	heteromodal	sensory 1
+66	Left_47m	L_47m_ROI	default mode	idiotypic	sensory 1
+67	Left_8Av	L_8Av_ROI	frontoparietal	unimodal	association 1
+68	Left_8Ad	L_8Ad_ROI	default mode	heteromodal	association 1
+69	Left_9m	L_9m_ROI	default mode	heteromodal	association 1
+70	Left_8BL	L_8BL_ROI	default mode	heteromodal	association 1
+71	Left_9p	L_9p_ROI	default mode	heteromodal	association 1
+72	Left_10d	L_10d_ROI	default mode	heteromodal	association 1
+73	Left_8C	L_8C_ROI	frontoparietal	heteromodal	association 1
+74	Left_44	L_44_ROI	frontoparietal	heteromodal	association 1
+75	Left_45	L_45_ROI	default mode	heteromodal	association 1
+76	Left_47l	L_47l_ROI	default mode	heteromodal	sensory 1
+77	Left_a47r	L_a47r_ROI	frontoparietal	heteromodal	sensory 1
+78	Left_6r	L_6r_ROI	ventral attention	paralimbic	motor
+79	Left_IFJa	L_IFJa_ROI	frontoparietal	heteromodal	association 1
+80	Left_IFJp	L_IFJp_ROI	dorsal attention	unimodal	association 1
+81	Left_IFSp	L_IFSp_ROI	frontoparietal	heteromodal	association 1
+82	Left_IFSa	L_IFSa_ROI	frontoparietal	heteromodal	association 1
+83	Left_p9-46v	L_p9-46v_ROI	frontoparietal	heteromodal	association 2
+84	Left_46	L_46_ROI	frontoparietal	heteromodal	association 2
+85	Left_a9-46v	L_a9-46v_ROI	frontoparietal	heteromodal	association 2
+86	Left_9-46d	L_9-46d_ROI	frontoparietal	heteromodal	association 2
+87	Left_9a	L_9a_ROI	default mode	heteromodal	association 2
+88	Left_10v	L_10v_ROI	limbic	heteromodal	sensory 1
+89	Left_a10p	L_a10p_ROI	frontoparietal	heteromodal	association 2
+90	Left_10pp	L_10pp_ROI	limbic	heteromodal	association 2
+91	Left_11l	L_11l_ROI	frontoparietal	heteromodal	sensory 1
+92	Left_13l	L_13l_ROI	limbic	idiotypic	sensory 1
+93	Left_OFC	L_OFC_ROI	limbic	idiotypic	sensory 1
+94	Left_47s	L_47s_ROI	default mode	idiotypic	sensory 1
+95	Left_LIPd	L_LIPd_ROI	dorsal attention	heteromodal	association 1
+96	Left_6a	L_6a_ROI	dorsal attention	paralimbic	motor
+97	Left_i6-8	L_i6-8_ROI	frontoparietal	unimodal	association 1
+98	Left_s6-8	L_s6-8_ROI	frontoparietal	unimodal	association 1
+99	Left_43	L_43_ROI	somatosensory	unimodal	motor
+100	Left_OP4	L_OP4_ROI	somatosensory	unimodal	sensory 2
+101	Left_OP1	L_OP1_ROI	somatosensory	heteromodal	association 2
+102	Left_OP2-3	L_OP2-3_ROI	somatosensory	heteromodal	insula
+103	Left_52	L_52_ROI	somatosensory	idiotypic	insula
+104	Left_RI	L_RI_ROI	somatosensory	unimodal	association 2
+105	Left_PFcm	L_PFcm_ROI	somatosensory	unimodal	association 2
+106	Left_PoI2	L_PoI2_ROI	ventral attention	idiotypic	insula
+107	Left_TA2	L_TA2_ROI	somatosensory	unimodal	association 2
+108	Left_FOP4	L_FOP4_ROI	ventral attention	heteromodal	association 1
+109	Left_MI	L_MI_ROI	ventral attention	idiotypic	insula
+110	Left_Pir	L_Pir_ROI	ventral attention	idiotypic	insula
+111	Left_AVI	L_AVI_ROI	frontoparietal	idiotypic	sensory 1
+112	Left_AAIC	L_AAIC_ROI	ventral attention	idiotypic	insula
+113	Left_FOP1	L_FOP1_ROI	ventral attention	unimodal	motor
+114	Left_FOP3	L_FOP3_ROI	ventral attention	idiotypic	insula
+115	Left_FOP2	L_FOP2_ROI	somatosensory	unimodal	motor
+116	Left_PFt	L_PFt_ROI	dorsal attention	heteromodal	association 2
+117	Left_AIP	L_AIP_ROI	dorsal attention	heteromodal	association 1
+118	Left_EC	L_EC_ROI	limbic	idiotypic	limbic
+119	Left_PreS	L_PreS_ROI	visual	idiotypic	limbic
+120	Left_H	L_H_ROI	limbic	idiotypic	limbic
+121	Left_ProS	L_ProS_ROI	visual	paralimbic	sensory 1
+122	Left_PeEc	L_PeEc_ROI	limbic	idiotypic	limbic
+123	Left_STGa	L_STGa_ROI	default mode	idiotypic	association 2
+124	Left_PBelt	L_PBelt_ROI	somatosensory	unimodal	association 2
+125	Left_A5	L_A5_ROI	somatosensory	unimodal	association 2
+126	Left_PHA1	L_PHA1_ROI	visual	idiotypic	limbic
+127	Left_PHA3	L_PHA3_ROI	visual	heteromodal	association 1
+128	Left_STSda	L_STSda_ROI	default mode	unimodal	association 2
+129	Left_STSdp	L_STSdp_ROI	default mode	unimodal	association 2
+130	Left_STSvp	L_STSvp_ROI	default mode	heteromodal	association 1
+131	Left_TGd	L_TGd_ROI	limbic	idiotypic	association 1
+132	Left_TE1a	L_TE1a_ROI	default mode	heteromodal	association 1
+133	Left_TE1p	L_TE1p_ROI	frontoparietal	heteromodal	association 1
+134	Left_TE2a	L_TE2a_ROI	limbic	unimodal	association 1
+135	Left_TF	L_TF_ROI	limbic	unimodal	association 1
+136	Left_TE2p	L_TE2p_ROI	dorsal attention	unimodal	association 1
+137	Left_PHT	L_PHT_ROI	dorsal attention	heteromodal	association 1
+138	Left_PH	L_PH_ROI	dorsal attention	unimodal	association 1
+139	Left_TPOJ1	L_TPOJ1_ROI	ventral attention	unimodal	association 2
+140	Left_TPOJ2	L_TPOJ2_ROI	dorsal attention	heteromodal	association 2
+141	Left_TPOJ3	L_TPOJ3_ROI	dorsal attention	unimodal	association 2
+142	Left_DVT	L_DVT_ROI	visual	unimodal	association 1
+143	Left_PGp	L_PGp_ROI	dorsal attention	unimodal	association 2
+144	Left_IP2	L_IP2_ROI	frontoparietal	heteromodal	association 2
+145	Left_IP1	L_IP1_ROI	frontoparietal	heteromodal	association 2
+146	Left_IP0	L_IP0_ROI	dorsal attention	unimodal	association 2
+147	Left_PFop	L_PFop_ROI	ventral attention	unimodal	association 2
+148	Left_PF	L_PF_ROI	ventral attention	heteromodal	association 2
+149	Left_PFm	L_PFm_ROI	frontoparietal	heteromodal	association 2
+150	Left_PGi	L_PGi_ROI	default mode	heteromodal	association 2
+151	Left_PGs	L_PGs_ROI	default mode	heteromodal	association 2
+152	Left_V6A	L_V6A_ROI	visual	unimodal	association 1
+153	Left_VMV1	L_VMV1_ROI	visual	paralimbic	sensory 1
+154	Left_VMV3	L_VMV3_ROI	visual	unimodal	association 1
+155	Left_PHA2	L_PHA2_ROI	visual	heteromodal	limbic
+156	Left_V4t	L_V4t_ROI	visual	unimodal	sensory 1
+157	Left_FST	L_FST_ROI	dorsal attention	unimodal	association 1
+158	Left_V3CD	L_V3CD_ROI	visual	unimodal	sensory 1
+159	Left_LO3	L_LO3_ROI	visual	unimodal	sensory 1
+160	Left_VMV2	L_VMV2_ROI	visual	paralimbic	sensory 1
+161	Left_31pd	L_31pd_ROI	default mode	heteromodal	association 1
+162	Left_31a	L_31a_ROI	frontoparietal	heteromodal	association 1
+163	Left_VVC	L_VVC_ROI	visual	unimodal	association 1
+164	Left_25	L_25_ROI	limbic	idiotypic	sensory 1
+165	Left_s32	L_s32_ROI	default mode	idiotypic	sensory 1
+166	Left_pOFC	L_pOFC_ROI	limbic	idiotypic	sensory 1
+167	Left_PoI1	L_PoI1_ROI	ventral attention	idiotypic	insula
+168	Left_Ig	L_Ig_ROI	somatosensory	idiotypic	insula
+169	Left_FOP5	L_FOP5_ROI	ventral attention	idiotypic	association 1
+170	Left_p10p	L_p10p_ROI	frontoparietal	heteromodal	association 2
+171	Left_p47r	L_p47r_ROI	frontoparietal	heteromodal	sensory 1
+172	Left_TGv	L_TGv_ROI	limbic	idiotypic	association 1
+173	Left_MBelt	L_MBelt_ROI	somatosensory	unimodal	sensory 2
+174	Left_LBelt	L_LBelt_ROI	somatosensory	paralimbic	association 2
+175	Left_A4	L_A4_ROI	somatosensory	unimodal	association 2
+176	Left_STSva	L_STSva_ROI	default mode	unimodal	association 1
+177	Left_TE1m	L_TE1m_ROI	default mode	heteromodal	association 1
+178	Left_PI	L_PI_ROI	ventral attention	idiotypic	association 2
+179	Left_a32pr	L_a32pr_ROI	frontoparietal	heteromodal	association 1
+180	Left_p24	L_p24_ROI	default mode	idiotypic	limbic
+1001	Right_V1	R_V1_ROI	visual	paralimbic	sensory 2
+1002	Right_MST	R_MST_ROI	dorsal attention	unimodal	sensory 1
+1003	Right_V6	R_V6_ROI	visual	unimodal	sensory 1
+1004	Right_V2	R_V2_ROI	visual	paralimbic	sensory 1
+1005	Right_V3	R_V3_ROI	visual	paralimbic	sensory 1
+1006	Right_V4	R_V4_ROI	visual	unimodal	sensory 1
+1007	Right_V8	R_V8_ROI	visual	unimodal	association 1
+1008	Right_4	R_4_ROI	somatosensory	paralimbic	motor
+1009	Right_3b	R_3b_ROI	somatosensory	paralimbic	sensory 2
+1010	Right_FEF	R_FEF_ROI	dorsal attention	paralimbic	motor
+1011	Right_PEF	R_PEF_ROI	dorsal attention	paralimbic	motor
+1012	Right_55b	R_55b_ROI	somatosensory	paralimbic	motor
+1013	Right_V3A	R_V3A_ROI	visual	unimodal	association 1
+1014	Right_RSC	R_RSC_ROI	default mode	idiotypic	limbic
+1015	Right_POS2	R_POS2_ROI	default mode	heteromodal	association 1
+1016	Right_V7	R_V7_ROI	visual	unimodal	association 1
+1017	Right_IPS1	R_IPS1_ROI	dorsal attention	unimodal	association 1
+1018	Right_FFC	R_FFC_ROI	visual	unimodal	association 1
+1019	Right_V3B	R_V3B_ROI	visual	unimodal	association 1
+1020	Right_LO1	R_LO1_ROI	visual	unimodal	sensory 1
+1021	Right_LO2	R_LO2_ROI	visual	unimodal	sensory 1
+1022	Right_PIT	R_PIT_ROI	visual	unimodal	sensory 1
+1023	Right_MT	R_MT_ROI	visual	unimodal	sensory 1
+1024	Right_A1	R_A1_ROI	somatosensory	paralimbic	sensory 2
+1025	Right_PSL	R_PSL_ROI	ventral attention	unimodal	association 2
+1026	Right_SFL	R_SFL_ROI	default mode	unimodal	association 1
+1027	Right_PCV	R_PCV_ROI	default mode	heteromodal	association 1
+1028	Right_STV	R_STV_ROI	default mode	unimodal	association 2
+1029	Right_7Pm	R_7Pm_ROI	frontoparietal	heteromodal	association 1
+1030	Right_7m	R_7m_ROI	default mode	heteromodal	association 1
+1031	Right_POS1	R_POS1_ROI	default mode	heteromodal	association 1
+1032	Right_23d	R_23d_ROI	default mode	idiotypic	limbic
+1033	Right_v23ab	R_v23ab_ROI	default mode	heteromodal	association 1
+1034	Right_d23ab	R_d23ab_ROI	default mode	idiotypic	limbic
+1035	Right_31pv	R_31pv_ROI	default mode	heteromodal	association 1
+1036	Right_5m	R_5m_ROI	somatosensory	paralimbic	motor
+1037	Right_5mv	R_5mv_ROI	ventral attention	paralimbic	motor
+1038	Right_23c	R_23c_ROI	ventral attention	paralimbic	association 1
+1039	Right_5L	R_5L_ROI	somatosensory	unimodal	motor
+1040	Right_24dd	R_24dd_ROI	somatosensory	paralimbic	motor
+1041	Right_24dv	R_24dv_ROI	somatosensory	unimodal	association 1
+1042	Right_7AL	R_7AL_ROI	dorsal attention	heteromodal	association 1
+1043	Right_SCEF	R_SCEF_ROI	ventral attention	unimodal	association 1
+1044	Right_6ma	R_6ma_ROI	ventral attention	unimodal	association 1
+1045	Right_7Am	R_7Am_ROI	dorsal attention	heteromodal	association 1
+1046	Right_7PL	R_7PL_ROI	dorsal attention	heteromodal	association 1
+1047	Right_7PC	R_7PC_ROI	dorsal attention	heteromodal	association 1
+1048	Right_LIPv	R_LIPv_ROI	dorsal attention	heteromodal	association 1
+1049	Right_VIP	R_VIP_ROI	dorsal attention	heteromodal	association 1
+1050	Right_MIP	R_MIP_ROI	dorsal attention	heteromodal	association 1
+1051	Right_1	R_1_ROI	somatosensory	paralimbic	sensory 2
+1052	Right_2	R_2_ROI	somatosensory	unimodal	sensory 2
+1053	Right_3a	R_3a_ROI	somatosensory	paralimbic	sensory 2
+1054	Right_6d	R_6d_ROI	somatosensory	paralimbic	motor
+1055	Right_6mp	R_6mp_ROI	somatosensory	paralimbic	motor
+1056	Right_6v	R_6v_ROI	somatosensory	paralimbic	motor
+1057	Right_p24pr	R_p24pr_ROI	ventral attention	idiotypic	limbic
+1058	Right_33pr	R_33pr_ROI	frontoparietal	idiotypic	limbic
+1059	Right_a24pr	R_a24pr_ROI	ventral attention	idiotypic	limbic
+1060	Right_p32pr	R_p32pr_ROI	ventral attention	idiotypic	association 1
+1061	Right_a24	R_a24_ROI	default mode	idiotypic	limbic
+1062	Right_d32	R_d32_ROI	default mode	heteromodal	association 1
+1063	Right_8BM	R_8BM_ROI	frontoparietal	heteromodal	association 1
+1064	Right_p32	R_p32_ROI	default mode	idiotypic	sensory 1
+1065	Right_10r	R_10r_ROI	default mode	heteromodal	sensory 1
+1066	Right_47m	R_47m_ROI	default mode	idiotypic	sensory 1
+1067	Right_8Av	R_8Av_ROI	default mode	unimodal	association 1
+1068	Right_8Ad	R_8Ad_ROI	default mode	heteromodal	association 1
+1069	Right_9m	R_9m_ROI	default mode	heteromodal	association 1
+1070	Right_8BL	R_8BL_ROI	default mode	heteromodal	association 1
+1071	Right_9p	R_9p_ROI	default mode	heteromodal	association 1
+1072	Right_10d	R_10d_ROI	default mode	heteromodal	association 1
+1073	Right_8C	R_8C_ROI	frontoparietal	unimodal	association 1
+1074	Right_44	R_44_ROI	default mode	unimodal	association 1
+1075	Right_45	R_45_ROI	default mode	heteromodal	association 1
+1076	Right_47l	R_47l_ROI	default mode	heteromodal	sensory 1
+1077	Right_a47r	R_a47r_ROI	default mode	heteromodal	sensory 1
+1078	Right_6r	R_6r_ROI	ventral attention	paralimbic	motor
+1079	Right_IFJa	R_IFJa_ROI	frontoparietal	unimodal	association 1
+1080	Right_IFJp	R_IFJp_ROI	dorsal attention	unimodal	association 1
+1081	Right_IFSp	R_IFSp_ROI	frontoparietal	unimodal	association 1
+1082	Right_IFSa	R_IFSa_ROI	frontoparietal	heteromodal	association 1
+1083	Right_p9-46v	R_p9-46v_ROI	frontoparietal	heteromodal	association 2
+1084	Right_46	R_46_ROI	frontoparietal	heteromodal	association 2
+1085	Right_a9-46v	R_a9-46v_ROI	frontoparietal	heteromodal	association 2
+1086	Right_9-46d	R_9-46d_ROI	frontoparietal	heteromodal	association 2
+1087	Right_9a	R_9a_ROI	default mode	heteromodal	association 2
+1088	Right_10v	R_10v_ROI	limbic	heteromodal	sensory 1
+1089	Right_a10p	R_a10p_ROI	default mode	heteromodal	association 2
+1090	Right_10pp	R_10pp_ROI	limbic	heteromodal	association 2
+1091	Right_11l	R_11l_ROI	frontoparietal	heteromodal	sensory 1
+1092	Right_13l	R_13l_ROI	limbic	idiotypic	sensory 1
+1093	Right_OFC	R_OFC_ROI	limbic	idiotypic	sensory 1
+1094	Right_47s	R_47s_ROI	default mode	idiotypic	sensory 1
+1095	Right_LIPd	R_LIPd_ROI	dorsal attention	heteromodal	association 1
+1096	Right_6a	R_6a_ROI	dorsal attention	unimodal	motor
+1097	Right_i6-8	R_i6-8_ROI	frontoparietal	unimodal	association 1
+1098	Right_s6-8	R_s6-8_ROI	default mode	unimodal	association 1
+1099	Right_43	R_43_ROI	ventral attention	unimodal	motor
+1100	Right_OP4	R_OP4_ROI	somatosensory	unimodal	sensory 2
+1101	Right_OP1	R_OP1_ROI	somatosensory	heteromodal	association 2
+1102	Right_OP2-3	R_OP2-3_ROI	somatosensory	heteromodal	insula
+1103	Right_52	R_52_ROI	somatosensory	unimodal	insula
+1104	Right_RI	R_RI_ROI	somatosensory	unimodal	association 2
+1105	Right_PFcm	R_PFcm_ROI	ventral attention	unimodal	association 2
+1106	Right_PoI2	R_PoI2_ROI	ventral attention	idiotypic	insula
+1107	Right_TA2	R_TA2_ROI	somatosensory	unimodal	association 2
+1108	Right_FOP4	R_FOP4_ROI	ventral attention	heteromodal	association 1
+1109	Right_MI	R_MI_ROI	ventral attention	idiotypic	insula
+1110	Right_Pir	R_Pir_ROI	limbic	idiotypic	insula
+1111	Right_AVI	R_AVI_ROI	frontoparietal	idiotypic	sensory 1
+1112	Right_AAIC	R_AAIC_ROI	default mode	idiotypic	insula
+1113	Right_FOP1	R_FOP1_ROI	ventral attention	heteromodal	motor
+1114	Right_FOP3	R_FOP3_ROI	ventral attention	heteromodal	insula
+1115	Right_FOP2	R_FOP2_ROI	somatosensory	unimodal	motor
+1116	Right_PFt	R_PFt_ROI	dorsal attention	unimodal	association 2
+1117	Right_AIP	R_AIP_ROI	dorsal attention	heteromodal	association 1
+1118	Right_EC	R_EC_ROI	limbic	idiotypic	limbic
+1119	Right_PreS	R_PreS_ROI	default mode	idiotypic	limbic
+1120	Right_H	R_H_ROI	limbic	idiotypic	limbic
+1121	Right_ProS	R_ProS_ROI	visual	paralimbic	sensory 1
+1122	Right_PeEc	R_PeEc_ROI	limbic	idiotypic	limbic
+1123	Right_STGa	R_STGa_ROI	default mode	idiotypic	association 2
+1124	Right_PBelt	R_PBelt_ROI	somatosensory	unimodal	association 2
+1125	Right_A5	R_A5_ROI	somatosensory	unimodal	association 2
+1126	Right_PHA1	R_PHA1_ROI	default mode	idiotypic	limbic
+1127	Right_PHA3	R_PHA3_ROI	visual	unimodal	association 1
+1128	Right_STSda	R_STSda_ROI	default mode	unimodal	association 2
+1129	Right_STSdp	R_STSdp_ROI	default mode	unimodal	association 2
+1130	Right_STSvp	R_STSvp_ROI	default mode	unimodal	association 1
+1131	Right_TGd	R_TGd_ROI	limbic	idiotypic	association 1
+1132	Right_TE1a	R_TE1a_ROI	default mode	heteromodal	association 1
+1133	Right_TE1p	R_TE1p_ROI	default mode	heteromodal	association 1
+1134	Right_TE2a	R_TE2a_ROI	limbic	unimodal	association 1
+1135	Right_TF	R_TF_ROI	limbic	unimodal	association 1
+1136	Right_TE2p	R_TE2p_ROI	dorsal attention	unimodal	association 1
+1137	Right_PHT	R_PHT_ROI	dorsal attention	heteromodal	association 1
+1138	Right_PH	R_PH_ROI	dorsal attention	unimodal	association 1
+1139	Right_TPOJ1	R_TPOJ1_ROI	somatosensory	heteromodal	association 2
+1140	Right_TPOJ2	R_TPOJ2_ROI	dorsal attention	heteromodal	association 2
+1141	Right_TPOJ3	R_TPOJ3_ROI	dorsal attention	heteromodal	association 2
+1142	Right_DVT	R_DVT_ROI	visual	unimodal	association 1
+1143	Right_PGp	R_PGp_ROI	dorsal attention	unimodal	association 2
+1144	Right_IP2	R_IP2_ROI	frontoparietal	heteromodal	association 2
+1145	Right_IP1	R_IP1_ROI	frontoparietal	heteromodal	association 2
+1146	Right_IP0	R_IP0_ROI	dorsal attention	unimodal	association 2
+1147	Right_PFop	R_PFop_ROI	ventral attention	heteromodal	association 2
+1148	Right_PF	R_PF_ROI	ventral attention	heteromodal	association 2
+1149	Right_PFm	R_PFm_ROI	default mode	heteromodal	association 2
+1150	Right_PGi	R_PGi_ROI	default mode	heteromodal	association 2
+1151	Right_PGs	R_PGs_ROI	default mode	heteromodal	association 2
+1152	Right_V6A	R_V6A_ROI	visual	unimodal	association 1
+1153	Right_VMV1	R_VMV1_ROI	visual	paralimbic	sensory 1
+1154	Right_VMV3	R_VMV3_ROI	visual	unimodal	association 1
+1155	Right_PHA2	R_PHA2_ROI	default mode	heteromodal	limbic
+1156	Right_V4t	R_V4t_ROI	visual	unimodal	sensory 1
+1157	Right_FST	R_FST_ROI	dorsal attention	unimodal	association 1
+1158	Right_V3CD	R_V3CD_ROI	visual	unimodal	sensory 1
+1159	Right_LO3	R_LO3_ROI	visual	unimodal	sensory 1
+1160	Right_VMV2	R_VMV2_ROI	visual	paralimbic	sensory 1
+1161	Right_31pd	R_31pd_ROI	default mode	heteromodal	association 1
+1162	Right_31a	R_31a_ROI	default mode	heteromodal	association 1
+1163	Right_VVC	R_VVC_ROI	visual	unimodal	association 1
+1164	Right_25	R_25_ROI	limbic	idiotypic	sensory 1
+1165	Right_s32	R_s32_ROI	limbic	idiotypic	sensory 1
+1166	Right_pOFC	R_pOFC_ROI	limbic	idiotypic	sensory 1
+1167	Right_PoI1	R_PoI1_ROI	ventral attention	idiotypic	insula
+1168	Right_Ig	R_Ig_ROI	somatosensory	idiotypic	insula
+1169	Right_FOP5	R_FOP5_ROI	ventral attention	heteromodal	association 1
+1170	Right_p10p	R_p10p_ROI	default mode	heteromodal	association 2
+1171	Right_p47r	R_p47r_ROI	frontoparietal	heteromodal	sensory 1
+1172	Right_TGv	R_TGv_ROI	limbic	idiotypic	association 1
+1173	Right_MBelt	R_MBelt_ROI	somatosensory	unimodal	sensory 2
+1174	Right_LBelt	R_LBelt_ROI	somatosensory	paralimbic	association 2
+1175	Right_A4	R_A4_ROI	somatosensory	unimodal	association 2
+1176	Right_STSva	R_STSva_ROI	default mode	unimodal	association 1
+1177	Right_TE1m	R_TE1m_ROI	default mode	heteromodal	association 1
+1178	Right_PI	R_PI_ROI	ventral attention	unimodal	association 2
+1179	Right_a32pr	R_a32pr_ROI	frontoparietal	heteromodal	association 1
+1180	Right_p24	R_p24_ROI	default mode	idiotypic	limbic

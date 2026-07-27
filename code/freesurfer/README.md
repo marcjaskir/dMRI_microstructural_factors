@@ -2,7 +2,7 @@
 
 ## Purpose
 
-recon-all from QSIPrep T1; HCP YA/Aging ingress; fsaverage helpers.
+Run FreeSurfer recon-all from QSIPrep T1w inputs (Penn / HCP-Aging).
 
 ## Entry points
 

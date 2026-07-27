@@ -16,7 +16,8 @@ Paths in this docs set refer to modules under `code/` unless noted as `data/open
 1. Clone the repository and copy `config.example.yaml` to `config.yaml` at the
    workspace root.
 2. Point `data_controlled_dir` (and related keys) at your imaging workspace, or
-   populate `data/open/` with Tier 1 products.
+   populate `data/open/` with Tier 1 products via
+   `python -u code/lib/export_tier1_open.py`.
 3. Install the conda environment from `environment.yml`.
 4. Set `PYTHONPATH` to include `code/`.
 
@@ -25,5 +26,6 @@ Paths in this docs set refer to modules under `code/` unless noted as `data/open
 | Path | Role |
 |------|------|
 | `code/` | Pipelines, analyses, `lib/paths.py`, docs, tests |
+| `code/lib/export_tier1_open.py` | De-identify and populate `data/open/` |
 | `data/open/` | Tier 1 publishable products |
 | `data/controlled/` | Tier 2 controlled inputs (gitignored) |

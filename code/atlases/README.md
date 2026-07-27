@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Atlas construction, QC, and conversion helpers (Glasser, HCP1065, random atlases).
+Atlas construction and QC helpers (Glasser centroids, HCP1065 tract volumes).
 
 ## Entry points
 

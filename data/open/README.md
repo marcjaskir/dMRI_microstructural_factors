@@ -44,10 +44,17 @@ CSVs — keyed by `anon_id` / `group` only.
 
 ## How to populate
 
-Export from your local controlled workspace (e.g. `structural_tractometry`) by:
+From the repo root (with source derivatives available):
 
-1. Mapping real `sub` → `anon_id` consistently across all tables
-2. Dropping age/sex/scanner/clinical columns from GAM CSVs
-3. Writing products into the paths above
+```bash
+python -u code/lib/export_tier1_open.py
+```
+
+This maps real `sub` → `anon_id`, drops age/sex/scanner/clinical columns from
+GAM CSVs, and writes products into the paths above. The reversible ID map is
+written only to `data/controlled/anon_id_map.csv` (gitignored).
+
+Large trees (`gam/`, `analysis/`) are gitignored; keep them local or deposit on
+Zenodo. Small products (`atlases/`, `metadata/`, `inclusion/`) can be committed.
 
 See root `README.md` and `code/docs/reproducibility.md`.

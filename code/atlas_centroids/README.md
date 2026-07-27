@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Build unified MNI centroid tables (Glasser, 4S156, HCP1065 thirds) for gradient visualizations.
+Build unified MNI centroid tables (Glasser, 4S156, HCP1065 thirds) for gradient visualizations and comparison with neuroanatomical axes.
 
 ## Entry points
 

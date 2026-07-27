@@ -1,28 +1,46 @@
 # Conda environment for dMRI microstructural factor analysis.
 # Create with: conda env create -f environment.yml
+# Activate:    conda activate dmri_microstructural_factors
 #
-# This is a minimal pin; the full lab environment includes FSL, qsiprep,
-# qsirecon, trekker, and R packages for CovBat/GAM. Export your local env with:
-#   conda env export -n structural_tractometry --no-builds > environment.yml
+# Covers Python/R imports used by shipped scripts under code/.
+# Singularity images (QSIPrep, QSIRecon, Trekker) and ANTs/FSL CLIs are
+# site-installed separately and are not listed here.
+#
+# After create, install CovBat R dependency (not on conda-forge):
+#   Rscript -e "remotes::install_github('andy1764/ComBatFamily')"
 
 name: dmri_microstructural_factors
 channels:
   - conda-forge
-  - defaults
 dependencies:
   - python>=3.10
-  - numpy
-  - pandas
-  - scipy
-  - scikit-learn
-  - matplotlib
-  - seaborn
-  - pyyaml
-  - h5py
-  - nibabel
-  - nilearn
-  - pytest
   - pip
+  - numpy>=1.24
+  - pandas>=2.0
+  - scipy>=1.10
+  - scikit-learn>=1.3
+  - statsmodels>=0.14
+  - matplotlib>=3.7
+  - seaborn>=0.13
+  - pyyaml>=6.0
+  - h5py>=3.8
+  - nibabel>=5.0
+  - nilearn>=0.10
+  - dipy>=1.7
+  - tqdm>=4.66
+  - joblib>=1.3
+  - pillow>=10.0
+  - upsetplot>=0.9
+  - pytest>=7.0
+  - coloredlogs>=15.0
+  # R (GAM / CovBat scripts)
+  - r-base>=4.2
+  - r-mgcv>=1.8
+  - r-jsonlite>=1.8
+  - r-remotes
   - pip:
-    - brainspace
-    - neuromaps
+    - brainspace>=0.1.10
+    - neuromaps>=0.0.5
+    # BundleSeg / Trekker conversion helpers
+    - scilpy
+    - trimeshpy

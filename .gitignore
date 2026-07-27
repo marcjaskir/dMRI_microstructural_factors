@@ -52,3 +52,52 @@ tests/golden/output/
 # Binary images
 *.png
 *.mat
+
+# Tier 1 large products (populate locally / Zenodo; do not commit multi-GB trees)
+data/open/gam/**
+data/open/analysis/**
+!data/open/gam/.gitkeep
+!data/open/analysis/.gitkeep
+# anon map is controlled
+data/controlled/anon_id_map.csv
+
+# Local/exploratory atlas helpers (keep out of published repo)
+code/atlases/correct_glasser.sh
+code/atlases/gen_random_atlases.py
+code/atlases/optimize_mni_tissue_prob_mask_thresholding.py
+code/atlases/random_atlas_wm_gm_comparison.py
+code/atlases/visualize_glasser_yeo_networks.ipynb
+code/atlases/visualize_glasser_yeo_networks_ipyniivue.py
+
+# Vendored HCP→BIDS converter (use upstream instead)
+code/bids/HCPLifespan2BIDS/
+
+# CovBat exploratory notebooks
+code/covbat/pyafq/evaluate_covbat_pyafq.ipynb
+
+# Vendored DSI Studio ↔ MRtrix converter
+code/dmri_convert/
+
+# FreeSurfer helpers not shipped
+code/freesurfer/compute_tract_end_averages.py
+code/freesurfer/compute_tract_end_surface_area.py
+code/freesurfer/freesurfer_to_fsaverage.sh
+code/freesurfer/fsnative_measure_to_fsaverage.sh
+code/freesurfer/move_hcpya_freesurfer.sh
+code/freesurfer/organize_hcpaging_freesurfer.sh
+
+# Local HCP-YA ingress helpers (not shipped)
+code/hcpya/
+
+# Controlled metadata generation scripts (not shipped)
+code/metadata/
+
+# Alternate pyAFQ entry (not shipped)
+code/pyafq/dipy_pyafq_hcp1065.py
+
+# QSIPrep QC / reports helpers (not shipped)
+code/qsiprep/qc/
+code/qsiprep/make_reports.sh
+
+# Cohort-specific QSIRecon recon spec (not shipped)
+code/qsirecon/recon_spec_custom_hcpaging_mapmri.yaml

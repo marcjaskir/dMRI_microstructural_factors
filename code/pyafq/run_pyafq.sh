@@ -17,7 +17,7 @@ logs_dir=$CODE_ROOT/pyafq/logs; mkdir -p ${logs_dir}
 n_subs=1
 
 sub_counter=0
-for sub_dir in ${bundleseg_dir}/sub-HCA6742377*; do
+for sub_dir in ${bundleseg_dir}/sub-*; do
 
     sub=$(basename ${sub_dir})
 

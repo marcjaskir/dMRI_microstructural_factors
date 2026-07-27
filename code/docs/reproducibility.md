@@ -21,6 +21,17 @@ Enough to reproduce factor analysis, gradients, and asymmetry reports:
 - Atlas label tables and tract metadata
 - Anonymized inclusion (`laterality`, `lobe`; no age/sex)
 
+Export from a local controlled workspace (e.g. `structural_tractometry`):
+
+```bash
+python -u code/lib/export_tier1_open.py
+```
+
+This writes de-identified products under `data/open/` and the reversible
+`sub`→`anon_id` map under `data/controlled/anon_id_map.csv` (gitignored).
+Small trees (`atlases/`, `metadata/`, `inclusion/`) can be committed; `gam/` and
+`analysis/` stay local / Zenodo (gitignored).
+
 ### Tier 2 (controlled)
 
 Required only to **recompute** CovBat/GAM:
@@ -65,3 +76,18 @@ Baselines are written under `code/tests/golden/baseline/` (gitignored) and use
 
 QSIPrep, QSIRecon, and Trekker `.sif` files are not shipped. Configure local
 image paths in your environment.
+
+## Python / R environment
+
+Create the conda env from the repo root:
+
+```bash
+conda env create -f environment.yml
+conda activate dmri_microstructural_factors
+```
+
+Then install the CovBat R package (not on conda-forge):
+
+```bash
+Rscript -e "remotes::install_github('andy1764/ComBatFamily')"
+```
