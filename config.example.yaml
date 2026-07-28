@@ -7,14 +7,14 @@ code_dir: ${workspace_root}/code
 data_open_dir: ${workspace_root}/data/open
 data_controlled_dir: ${workspace_root}/data/controlled
 
-# Tier 1 product roots (default for manuscript reproduction)
+# Open product roots (default for manuscript reproduction)
 gam_dir: ${data_open_dir}/gam
 analysis_dir: ${data_open_dir}/analysis
 atlas_dir: ${data_open_dir}/atlases
 open_metadata_dir: ${data_open_dir}/metadata
 inclusion_dir: ${data_open_dir}/inclusion
 
-# Tier 2 roots (CovBat/GAM recompute and early imaging pipeline)
+# Controlled roots (CovBat/GAM recompute and early imaging pipeline)
 controlled_derivatives_dir: ${data_controlled_dir}/derivatives
 controlled_metadata_dir: ${data_controlled_dir}/metadata
 controlled_inclusion_dir: ${data_controlled_dir}/inclusion

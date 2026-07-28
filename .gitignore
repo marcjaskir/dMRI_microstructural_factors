@@ -1,12 +1,12 @@
 # Local config with machine-specific paths
 config.yaml
 
-# Tier 2 controlled data (never commit), except the schema README
+# Controlled data (never commit), except the schema README
 data/controlled/**
 !data/controlled/
 !data/controlled/README.md
 
-# Allow Tier 1 open placeholders/docs; still ignore large binaries
+# Allow open placeholders/docs; still ignore large binaries
 data/open/**/*.nii
 data/open/**/*.nii.gz
 data/open/**/*.h5
@@ -53,7 +53,7 @@ tests/golden/output/
 *.png
 *.mat
 
-# Tier 1 large products (populate locally / Zenodo; do not commit multi-GB trees)
+# Large open products (populate locally / Zenodo; do not commit multi-GB trees)
 data/open/gam/**
 data/open/analysis/**
 !data/open/gam/.gitkeep

@@ -1,7 +1,7 @@
 # dMRI Microstructural Factors
 
-Code and data layout accompanying the publication on diffusion MRI microstructural
-factor analysis and temporal lobe epilepsy asymmetry.
+Code and data for reproducing results of Jaskir et. al 2026, Mapping Whole-Brain
+Factors of Microstructural Similarity with Diffusion MRI.
 
 ## Repository layout
 
@@ -9,8 +9,7 @@ factor analysis and temporal lobe epilepsy asymmetry.
 dMRI_microstructural_factors/
   code/                 # All pipelines and analyses
   data/
-    open/               # Tier 1 — publishable post-GAM products (no age/sex/IDs)
-    controlled/         # Tier 2 — pre-CovBat inputs (gitignored; DUA only)
+    open/               # Publishable post-GAM products (no age/sex/IDs)
   config.example.yaml
   README.md
 ```
@@ -39,39 +38,28 @@ All filesystem roots are defined in [`config.yaml`](config.yaml) (see
 |-----|---------|
 | `workspace_root` | This repository root |
 | `code_dir` | `code/` (scripts) |
-| `data_open_dir` | Tier 1 open products |
-| `data_controlled_dir` | Tier 2 controlled inputs |
+| `data_open_dir` | Open analysis products under `data/open/` |
+| `data_controlled_dir` | Local controlled inputs (gitignored) |
 | `gam_dir` | Post-GAM residual z-scores |
 | `analysis_dir` | Factor / asymmetry / gradient outputs |
 | `atlas_dir` | Atlas metadata (labels, tract tables) |
 | `inclusion_dir` | Cohort inclusion tables |
 | `controlled_derivatives_dir` | Early pipeline + pre-GAM derivatives |
-| `controlled_metadata_dir` | Age/sex/scanner/clinical (controlled) |
+| `controlled_metadata_dir` | Age/sex/scanner/clinical (local only) |
 
 Python scripts import [`code/lib/paths.py`](code/lib/paths.py). Shell scripts
 resolve `$CODE_ROOT` / `$BASE` from the same config.
 
-## Data tiers (Nature Neuroscience)
+## Data availability and privacy
 
-**Tier 1 (`data/open/`)** — minimum open dataset to reproduce manuscript figures
-from GAM z-scores onward: anonymized GAM CSVs, factor/asymmetry products, atlas
-metadata, inclusion with `laterality`/`lobe` only. No age, sex, or real IDs.
-
-Populate from a local controlled workspace with:
-
-```bash
-python -u code/lib/export_tier1_open.py
-```
-
-Small products (`atlases/`, `metadata/`, `inclusion/`) ship in-repo. Large trees
-(`gam/`, `analysis/`) are gitignored — keep them local or deposit on Zenodo.
-
-**Tier 2 (`data/controlled/`)** — pre-CovBat/GAM features and covariates (age,
-sex, scanner). Gitignored; share under controlled access / DUA if recomputing
-harmonization from scratch.
-
-See [`data/open/README.md`](data/open/README.md) and
-[`data/controlled/README.md`](data/controlled/README.md).
+Data is provided to reproduce manuscript figures from GAM z-scores onward:
+anonymized GAM CSVs, factor/asymmetry products, atlas metadata, inclusion with
+laterality/lobe only. These data do not include participant age, sex, or IDs.
+Populate from a local controlled workspace with
+`python -u code/lib/export_tier1_open.py`. See
+[`data/open/README.md`](data/open/README.md) for more information.
+Pre-CovBat/GAM features and covariates (age, sex, scanner) are omitted for
+protection of patient privacy.
 
 ## Pipeline overview
 
@@ -99,12 +87,6 @@ HCP Young Adult / Aging BIDS conversion uses
 Docs: [`code/docs/pipeline.md`](code/docs/pipeline.md),
 [`code/docs/analysis.md`](code/docs/analysis.md),
 [`code/docs/reproducibility.md`](code/docs/reproducibility.md).
-
-## Privacy
-
-No subject identifiers, demographics, or clinical outcomes are stored in open
-source or `data/open/`. Controlled metadata stay in `data/controlled/` (local /
-DUA only).
 
 ## Citation
 

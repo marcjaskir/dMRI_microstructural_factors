@@ -1,7 +1,7 @@
 """Central path resolution for dMRI_microstructural_factors.
 
 Scripts import from this module instead of hardcoding filesystem roots.
-Tier 1 (open) and Tier 2 (controlled) roots are configured in config.yaml.
+Open (`data/open/`) and controlled roots are configured in config.yaml.
 """
 from __future__ import annotations
 
@@ -167,7 +167,7 @@ def data_dir() -> Path:
 
 
 def derivatives_dir() -> Path:
-    """Early-pipeline / Tier 2 derivatives root."""
+    """Early-pipeline / controlled derivatives root."""
     return get_path("derivatives_dir")
 
 
@@ -176,7 +176,7 @@ def results_dir() -> Path:
 
 
 def analysis_derivatives(*parts: str) -> Path:
-    """Build path under Tier 1 analysis products."""
+    """Build path under open analysis products."""
     return analysis_dir().joinpath(*parts)
 
 
@@ -211,7 +211,7 @@ def subject_outcome_csv() -> Path:
 
 
 def inclusion_dir() -> Path:
-    """Tier 1 (open) inclusion directory by default."""
+    """Open inclusion directory by default."""
     return get_path("inclusion_dir")
 
 
@@ -225,7 +225,7 @@ def inclusion_csv(name: str) -> Path:
 
 
 def analysis_output_dir(name: str) -> Path:
-    """Path under Tier 1 analysis/<name>."""
+    """Path under analysis/<name>."""
     return analysis_dir() / name
 
 

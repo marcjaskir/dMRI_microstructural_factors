@@ -1,4 +1,4 @@
-# Tier 2 — controlled-access inputs
+# Controlled-access inputs
 
 This directory holds **pre-GAM / pre-CovBat** inputs that require age, sex,
 scanner, and/or identifiable subject keys. Contents are **gitignored** and
@@ -35,4 +35,5 @@ Point `data_controlled_dir` in `config.yaml` at an existing workspace (e.g.
 ## Sharing
 
 Release under a data-use agreement / controlled-access repository (e.g. dbGaP,
-institutional DUA). Do not place Tier 2 files under `data/open/`.
+institutional DUA). Do not place identifiable or covariate files under
+`data/open/`.

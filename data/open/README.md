@@ -1,4 +1,4 @@
-# Tier 1 — open / publishable analysis products
+# Open analysis products
 
 This directory holds the **minimum open dataset** for reproducing manuscript
 figures from post-GAM residual z-scores onward. No subject IDs, age, or sex.
@@ -16,7 +16,7 @@ data/open/
 
 ## Column schemas
 
-### `gam/**/*.csv` (Tier 1)
+### `gam/**/*.csv`
 
 | Column | Required | Notes |
 |--------|----------|-------|

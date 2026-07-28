@@ -1,18 +1,18 @@
 # Reproducibility
 
-## Two-tier data layout
+## Data layout
 
 ```
 workspace_root/
   code/                  # This repository's scripts
   data/
-    open/                # Tier 1 — publishable
+    open/                # Publishable products
       gam/ analysis/ atlases/ metadata/ inclusion/
-    controlled/          # Tier 2 — gitignored / DUA
+    controlled/          # Local / DUA only (gitignored)
       metadata/ derivatives/ inclusion/
 ```
 
-### Tier 1 (open)
+### Open products (`data/open/`)
 
 Enough to reproduce factor analysis, gradients, and asymmetry reports:
 
@@ -32,7 +32,7 @@ This writes de-identified products under `data/open/` and the reversible
 Small trees (`atlases/`, `metadata/`, `inclusion/`) can be committed; `gam/` and
 `analysis/` stay local / Zenodo (gitignored).
 
-### Tier 2 (controlled)
+### Controlled inputs (`data/controlled/`)
 
 Required only to **recompute** CovBat/GAM:
 
@@ -59,7 +59,7 @@ Environment overrides:
 
 - `DMRI_MICRO_CONFIG` — path to config file
 - `DMRI_MICRO_ROOT` — override `workspace_root`
-- `DMRI_MICRO_OPEN` / `DMRI_MICRO_CONTROLLED` — override tier roots
+- `DMRI_MICRO_OPEN` / `DMRI_MICRO_CONTROLLED` — override open / controlled roots
 
 ## Golden-output tests
 

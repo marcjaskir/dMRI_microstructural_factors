@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export de-identified Tier 1 products into data/open/.
+"""Export de-identified open products into data/open/.
 
 Reads from structural_tractometry (or config-controlled roots) and writes:
   data/open/{atlases,metadata,gam,analysis,inclusion}
