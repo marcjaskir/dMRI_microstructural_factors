@@ -15,12 +15,9 @@ HCP-YA:                                     →  qsirecon
                               ↓
               trekker  →  bundleseg  →  pyafq / mni_micro
                               ↓
-                    [Tier 2] covbat  →  gam
+                      covbat  →  gam
                               ↓
-                         [Tier 1 open products]
               factor_analysis  →  factor_z-scores  →  gradients
-                              ↓
-         tract/region asymmetry  →  microstructural asymmetry reports
 ```
 
 HCP Young Adult / Aging BIDS conversion uses
