@@ -101,3 +101,6 @@ code/qsiprep/make_reports.sh
 
 # Cohort-specific QSIRecon recon spec (not shipped)
 code/qsirecon/recon_spec_custom_hcpaging_mapmri.yaml
+
+# Local GitHub bootstrap helper (not shipped)
+create_github_repo.sh
