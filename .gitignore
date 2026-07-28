@@ -1,10 +1,8 @@
 # Local config with machine-specific paths
 config.yaml
 
-# Controlled data (never commit), except the schema README
-data/controlled/**
-!data/controlled/
-!data/controlled/README.md
+# Controlled data (never commit — entire tree is local-only)
+data/controlled/
 
 # Allow open placeholders/docs; still ignore large binaries
 data/open/**/*.nii
@@ -104,3 +102,7 @@ code/qsirecon/recon_spec_custom_hcpaging_mapmri.yaml
 
 # Local GitHub bootstrap helper (not shipped)
 create_github_repo.sh
+
+# Open atlas extras (not shipped)
+data/open/atlases/thalamus/
+data/open/atlases/S-A_ArchetypalAxis/

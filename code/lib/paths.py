@@ -118,7 +118,13 @@ def get_path(key: str) -> Path:
     cfg = load_config()
     if key not in cfg:
         raise KeyError(f"Config key not found: {key}")
-    return Path(str(cfg[key])).expanduser().resolve()
+    val = cfg[key]
+    if val is None or val == "":
+        raise KeyError(
+            f"Config key {key!r} is unset (null). Required for this script, "
+            "or set it in config.yaml if you have local controlled inputs."
+        )
+    return Path(str(val)).expanduser().resolve()
 
 
 def workspace_root() -> Path:

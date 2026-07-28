@@ -8,8 +8,6 @@ workspace_root/
   data/
     open/                # Publishable products
       gam/ analysis/ atlases/ metadata/ inclusion/
-    controlled/          # Local / DUA only (gitignored)
-      metadata/ derivatives/ inclusion/
 ```
 
 ### Open products (`data/open/`)
@@ -27,39 +25,22 @@ Export from a local controlled workspace (e.g. `structural_tractometry`):
 python -u code/lib/export_tier1_open.py
 ```
 
-This writes de-identified products under `data/open/` and the reversible
-`sub`→`anon_id` map under `data/controlled/anon_id_map.csv` (gitignored).
-Small trees (`atlases/`, `metadata/`, `inclusion/`) can be committed; `gam/` and
+This writes de-identified products under `data/open/`. Small trees
+(`atlases/`, `metadata/`, `inclusion/`) can be committed; `gam/` and
 `analysis/` stay local / Zenodo (gitignored).
-
-### Controlled inputs (`data/controlled/`)
-
-Required only to **recompute** CovBat/GAM:
-
-- Subject-level pyAFQ profiles / mni_micro HDF5
-- `age`, `sex`, scanner batch IDs
-- Identifiable inclusion / clinical tables
 
 ## Configuration
 
-Copy `config.example.yaml` → `config.yaml` at the workspace root.
-
-For local development without copying terabytes of data, point controlled roots
-at an existing workspace:
-
-```yaml
-data_controlled_dir: /path/to/structural_tractometry
-gam_dir: ${data_controlled_dir}/derivatives/gam
-analysis_dir: ${data_controlled_dir}/derivatives/analysis
-atlas_dir: ${data_controlled_dir}/data/atlases
-inclusion_dir: ${data_controlled_dir}/results/1_inclusion
-```
+Copy `config.example.yaml` → `config.yaml` at the workspace root and set
+`workspace_root`. Defaults point all manuscript-reproduction roots at
+`data/open/`. Optional controlled_* keys are unused for open figure
+replication.
 
 Environment overrides:
 
 - `DMRI_MICRO_CONFIG` — path to config file
 - `DMRI_MICRO_ROOT` — override `workspace_root`
-- `DMRI_MICRO_OPEN` / `DMRI_MICRO_CONTROLLED` — override open / controlled roots
+- `DMRI_MICRO_OPEN` — override `data_open_dir`
 
 ## Golden-output tests
 

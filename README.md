@@ -20,7 +20,7 @@ dMRI_microstructural_factors/
 git clone git@github.com:marcjaskir/dMRI_microstructural_factors.git
 cd dMRI_microstructural_factors
 cp config.example.yaml config.yaml
-# Edit config.yaml: set workspace_root; point controlled roots at local data
+# Edit config.yaml: set workspace_root
 
 conda env create -f environment.yml
 conda activate dmri_microstructural_factors
@@ -29,26 +29,8 @@ export PYTHONPATH="$PWD/code:$PYTHONPATH"
 python code/tests/golden/run_golden_tests.py
 ```
 
-## Configuration
-
-All filesystem roots are defined in [`config.yaml`](config.yaml) (see
-[`config.example.yaml`](config.example.yaml)):
-
-| Key | Purpose |
-|-----|---------|
-| `workspace_root` | This repository root |
-| `code_dir` | `code/` (scripts) |
-| `data_open_dir` | Open analysis products under `data/open/` |
-| `data_controlled_dir` | Local controlled inputs (gitignored) |
-| `gam_dir` | Post-GAM residual z-scores |
-| `analysis_dir` | Factor / asymmetry / gradient outputs |
-| `atlas_dir` | Atlas metadata (labels, tract tables) |
-| `inclusion_dir` | Cohort inclusion tables |
-| `controlled_derivatives_dir` | Early pipeline + pre-GAM derivatives |
-| `controlled_metadata_dir` | Age/sex/scanner/clinical (local only) |
-
-Python scripts import [`code/lib/paths.py`](code/lib/paths.py). Shell scripts
-resolve `$CODE_ROOT` / `$BASE` from the same config.
+All filesystem roots are defined in `config.yaml` (see
+[`config.example.yaml`](config.example.yaml)).
 
 ## Data availability and privacy
 

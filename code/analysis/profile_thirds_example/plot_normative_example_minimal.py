@@ -94,8 +94,8 @@ GROUP_COLORS = {
     "hcpaging": "#DE8F05",
 }
 
-SCALAR_COLORS_JSON = ospj(PROJECT_ROOT, "data/metadata/scalar_labels_to_colors.json")
-SCALAR_HUMAN_JSON = ospj(PROJECT_ROOT, "data/metadata/scalar_labels_to_human.json")
+SCALAR_COLORS_JSON = ospj(str(open_metadata_dir()), "scalar_labels_to_colors.json")
+SCALAR_HUMAN_JSON = ospj(str(open_metadata_dir()), "scalar_labels_to_human.json")
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -233,13 +233,18 @@ def plot_ilf_mean_profile_with_node_segments(
     Node thirds match ``factor_analysis.py`` / ``factor_z-scores.py`` (100 nodes per tract).
     """
     df = load_ilf_gam_mean(scalar)
+    node_cols_z = [f"node{i}_z" for i in range(1, N_NODES_PROFILE + 1)]
     node_cols = [f"node{i}" for i in range(1, N_NODES_PROFILE + 1)]
-    missing = [c for c in node_cols if c not in df.columns]
-    if missing:
-        raise KeyError(f"Missing node columns in GAM table (first few): {missing[:5]!r}")
+    if all(c in df.columns for c in node_cols_z):
+        cols = node_cols_z
+    elif all(c in df.columns for c in node_cols):
+        cols = node_cols
+    else:
+        missing = [c for c in node_cols if c not in df.columns][:5]
+        raise KeyError(f"Missing node columns in GAM table (first few): {missing!r}")
 
     # Grand mean across all rows (all cohorts / groups in the harmonized table)
-    profile = df[node_cols].astype(float).mean(axis=0).to_numpy()
+    profile = df[cols].astype(float).mean(axis=0).to_numpy()
     x = np.arange(1, N_NODES_PROFILE + 1, dtype=float)
 
     y_label, y_color = _scalar_human_and_color(scalar)

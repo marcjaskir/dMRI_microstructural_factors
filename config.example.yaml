@@ -1,30 +1,35 @@
-# Copy to config.yaml and set workspace_root / controlled roots for your machine.
+# Copy to config.yaml and set workspace_root for your machine.
 # All pipeline and analysis scripts resolve paths through this file.
+#
+# Default layout supports post-GAM manuscript reproduction from data/open/ only.
+# Optional controlled_* keys remain for early-pipeline / CovBat recompute scripts
+# and are unused for open figure replication.
 
 # Workspace = this git repository root
 workspace_root: /path/to/dMRI_microstructural_factors
 code_dir: ${workspace_root}/code
 data_open_dir: ${workspace_root}/data/open
-data_controlled_dir: ${workspace_root}/data/controlled
 
-# Open product roots (default for manuscript reproduction)
+# Open product roots (manuscript reproduction)
 gam_dir: ${data_open_dir}/gam
 analysis_dir: ${data_open_dir}/analysis
 atlas_dir: ${data_open_dir}/atlases
 open_metadata_dir: ${data_open_dir}/metadata
 inclusion_dir: ${data_open_dir}/inclusion
 
-# Controlled roots (CovBat/GAM recompute and early imaging pipeline)
-controlled_derivatives_dir: ${data_controlled_dir}/derivatives
-controlled_metadata_dir: ${data_controlled_dir}/metadata
-controlled_inclusion_dir: ${data_controlled_dir}/inclusion
-subject_outcome_csv: ${data_controlled_dir}/subject_outcomes.csv
-
-# Compatibility aliases (early pipeline still uses these names)
+# Compatibility aliases used by some scripts (point at open products)
 project_root: ${workspace_root}
-data_dir: ${data_controlled_dir}
-derivatives_dir: ${controlled_derivatives_dir}
+data_dir: ${data_open_dir}
+derivatives_dir: ${data_open_dir}
 results_dir: ${data_open_dir}
+
+# Optional: local controlled workspace for CovBat/GAM recompute or early pipeline.
+# Leave null for open-only reproduction; set only if you have those inputs locally.
+data_controlled_dir: null
+controlled_derivatives_dir: null
+controlled_metadata_dir: null
+controlled_inclusion_dir: null
+subject_outcome_csv: null
 
 cohorts:
   - penn_epilepsy

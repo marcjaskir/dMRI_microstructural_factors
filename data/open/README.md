@@ -52,7 +52,7 @@ python -u code/lib/export_tier1_open.py
 
 This maps real `sub` → `anon_id`, drops age/sex/scanner/clinical columns from
 GAM CSVs, and writes products into the paths above. The reversible ID map is
-written only to `data/controlled/anon_id_map.csv` (gitignored).
+kept only in a local controlled workspace (not shipped).
 
 Large trees (`gam/`, `analysis/`) are gitignored; keep them local or deposit on
 Zenodo. Small products (`atlases/`, `metadata/`, `inclusion/`) can be committed.

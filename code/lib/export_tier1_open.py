@@ -198,6 +198,16 @@ def export_tabular(src: Path, dst: Path, mapping: dict[str, str]) -> None:
         shutil.copy2(src, dst)
 
 
+def anonymize_path_part(part: str, mapping: dict[str, str]) -> str:
+    """Anonymize BIDS ``sub-*`` directory names and ``sub-*_...`` filenames."""
+    if re.fullmatch(r"sub-[A-Za-z0-9]+", part):
+        return anon_id(part, mapping)
+    m = re.match(r"^(sub-[A-Za-z0-9]+)(_.+)$", part)
+    if m:
+        return anon_id(m.group(1), mapping) + m.group(2)
+    return part
+
+
 def export_analysis_dir(name: str, mapping: dict[str, str]) -> None:
     src = SRC / "derivatives" / "analysis" / name
     if not src.exists():
@@ -208,13 +218,7 @@ def export_analysis_dir(name: str, mapping: dict[str, str]) -> None:
     files = [p for p in src.rglob("*") if p.is_file() and not is_skipped_file(p)]
     for src_f in tqdm(files, desc=f"analysis/{name}"):
         rel = src_f.relative_to(src)
-        # anonymize subject directory names
-        parts = []
-        for part in rel.parts:
-            if part.startswith("sub-"):
-                parts.append(anon_id(part, mapping))
-            else:
-                parts.append(part)
+        parts = [anonymize_path_part(part, mapping) for part in rel.parts]
         dst = dst_root.joinpath(*parts)
         if src_f.suffix.lower() in {".csv", ".tsv"}:
             try:
