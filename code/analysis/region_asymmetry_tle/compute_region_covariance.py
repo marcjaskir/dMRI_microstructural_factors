@@ -1,20 +1,8 @@
 #!/usr/bin/env python3
-import sys
-from pathlib import Path
-_p = Path(__file__).resolve()
-while _p != _p.parent and not (_p / "lib" / "paths.py").exists():
-    _p = _p.parent
-if str(_p) not in sys.path:
-    sys.path.insert(0, str(_p))
-from lib.paths import project_root, data_dir, derivatives_dir, results_dir, gam_dir, analysis_dir, atlas_dir, inclusion_dir, open_metadata_dir, controlled_metadata_dir, controlled_derivatives_dir
-PROJECT_ROOT = project_root()
-"""
-Compute and save region-wise (scalar x scalar) covariance matrices from healthy control subjects.
-Uses same GAM mni_micro paths and config as region_asymmetry_tle; controls = group != "penn_epilepsy".
-Outputs under derivatives/analysis/region_asymmetry_tle_normative/{atlas}/{region}/:
-  - cov.csv, invcov.csv (sample covariance and inverse)
-  - cov_mincovdet.csv, invcov_mincovdet.csv (MinCovDet robust covariance and inverse)
-for downstream Mahalanobis distance in patients.
+"""Compute region-wise (scalar × scalar) control covariance for Mahalanobis asymmetry.
+
+Uses the same mni_micro paths/config as region asymmetry; controls = group != penn_epilepsy.
+Writes under region_asymmetry_tle_normative/{atlas}/{region}/ cov and invcov CSVs.
 """
 from __future__ import annotations
 
@@ -23,11 +11,20 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+_p = Path(__file__).resolve()
+while _p != _p.parent and not (_p / "lib" / "paths.py").exists():
+    _p = _p.parent
+if str(_p) not in sys.path:
+    sys.path.insert(0, str(_p))
+from lib.paths import project_root  # noqa: E402
+
+PROJECT_ROOT = project_root()
+
 import numpy as np
 import pandas as pd
 from sklearn.covariance import MinCovDet
 
-# Reuse config and helpers from region_asymmetry_tle
+# Package root is code/analysis (sibling of this package dir)
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from region_asymmetry_tle import config as cfg
 from region_asymmetry_tle.core import get_scalars_for_atlas

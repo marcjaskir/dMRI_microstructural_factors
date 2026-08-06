@@ -2,19 +2,26 @@
 
 ## Purpose
 
-WM tract scalar asymmetry (Cohen's d) from GAM pyAFQ z-scores.
+WM tract scalar asymmetry (Cohen's d) from GAM pyAFQ z-scores, plus normative
+covariance for Mahalanobis asymmetry.
 
 ## Entry points
 
-cli.py
+| Script | Role |
+|--------|------|
+| `cli.py` / `python -m tract_asymmetry` | Per-subject asymmetry CSVs |
+| `compute_tract_covariance.py` | Control normative cov / invcov |
 
 ## Inputs
 
-gam
+`gam` (pyAFQ)
 
 ## Outputs
 
-derivatives/analysis/tract_asymmetry
+| Path | Contents |
+|------|----------|
+| `derivatives/analysis/tract_asymmetry` | Subject asymmetry CSVs |
+| `derivatives/analysis/tract_asymmetry_normative` | Segment/node cov matrices |
 
 ## Configuration
 

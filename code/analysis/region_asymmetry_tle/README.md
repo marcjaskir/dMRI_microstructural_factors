@@ -2,19 +2,26 @@
 
 ## Purpose
 
-GM region asymmetry from GAM mni_micro z-scores.
+GM region asymmetry from GAM mni_micro z-scores, plus normative covariance for
+Mahalanobis asymmetry.
 
 ## Entry points
 
-cli.py
+| Script | Role |
+|--------|------|
+| `cli.py` / `python -m region_asymmetry_tle` | Per-subject asymmetry CSVs |
+| `compute_region_covariance.py` | Control normative cov / invcov |
 
 ## Inputs
 
-gam
+`gam` (mni_micro)
 
 ## Outputs
 
-derivatives/analysis/region_asymmetry_tle
+| Path | Contents |
+|------|----------|
+| `derivatives/analysis/region_asymmetry_tle` | Subject asymmetry CSVs |
+| `derivatives/analysis/region_asymmetry_tle_normative` | Per-region cov matrices |
 
 ## Configuration
 

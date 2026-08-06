@@ -1,21 +1,8 @@
 #!/usr/bin/env python3
-import sys
-from pathlib import Path
-_p = Path(__file__).resolve()
-while _p != _p.parent and not (_p / "lib" / "paths.py").exists():
-    _p = _p.parent
-if str(_p) not in sys.path:
-    sys.path.insert(0, str(_p))
-from lib.paths import project_root, data_dir, derivatives_dir, results_dir, gam_dir, analysis_dir, atlas_dir, inclusion_dir, open_metadata_dir, controlled_metadata_dir, controlled_derivatives_dir
-PROJECT_ROOT = project_root()
-"""
-Compute and save normative (scalar x scalar) covariance matrices at two levels from control subjects.
-Uses same GAM pyafq paths/config as tract_asymmetry; controls = group != "penn_epilepsy".
-Levels:
-  - segment_level: 3 along-tract segments (end1, core, end2) -> mean z over segment nodes.
-  - node_level: 100 nodes -> node_k_z per node.
-Outputs: cov.csv, invcov.csv, cov_mincovdet.csv, invcov_mincovdet.csv per unit.
-MinCovDet is optional (script runs without scikit-learn).
+"""Compute normative (scalar × scalar) covariance from control tract GAM z-scores.
+
+Uses the same pyAFQ paths/config as tract asymmetry; controls = group != penn_epilepsy.
+Levels: segment (end1/core/end2) and node (100 nodes). Writes cov/invcov (+ optional MinCovDet).
 """
 from __future__ import annotations
 
@@ -23,6 +10,15 @@ import argparse
 import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+
+_p = Path(__file__).resolve()
+while _p != _p.parent and not (_p / "lib" / "paths.py").exists():
+    _p = _p.parent
+if str(_p) not in sys.path:
+    sys.path.insert(0, str(_p))
+from lib.paths import project_root  # noqa: E402
+
+PROJECT_ROOT = project_root()
 
 import numpy as np
 import pandas as pd
@@ -32,7 +28,7 @@ try:
 except ImportError:
     MinCovDet = None  # type: ignore
 
-# Reuse tract_asymmetry config and core
+# Package root is code/analysis (sibling of this package dir)
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tract_asymmetry import config as cfg
 from tract_asymmetry.core import TractAsymmetry, _parse_segment

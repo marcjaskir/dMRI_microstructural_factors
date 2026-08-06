@@ -1,18 +1,18 @@
-import sys
-from pathlib import Path
-_p = Path(__file__).resolve()
-while _p != _p.parent and not (_p / "lib" / "paths.py").exists():
-    _p = _p.parent
-if str(_p) not in sys.path:
-    sys.path.insert(0, str(_p))
-from lib.paths import project_root, data_dir, derivatives_dir, results_dir, gam_dir, analysis_dir, atlas_dir, inclusion_dir, open_metadata_dir, controlled_metadata_dir, controlled_derivatives_dir
-PROJECT_ROOT = project_root()
-"""CLI: compute region asymmetry from GAM mni_micro (Glasser, 4S156 cortex+subcortex, HCP1065), write per-subject CSV."""
+"""CLI: compute region asymmetry from GAM mni_micro; write per-subject CSV."""
 from __future__ import annotations
 
 import argparse
 import sys
 from pathlib import Path
+
+_p = Path(__file__).resolve()
+while _p != _p.parent and not (_p / "lib" / "paths.py").exists():
+    _p = _p.parent
+if str(_p) not in sys.path:
+    sys.path.insert(0, str(_p))
+from lib.paths import project_root  # noqa: E402
+
+PROJECT_ROOT = project_root()
 
 from tqdm import tqdm
 

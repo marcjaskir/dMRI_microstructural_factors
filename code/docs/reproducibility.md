@@ -75,8 +75,8 @@ Environment overrides:
 factor_analysis → factor_z-scores → gradients_group-controls (LE)
                                            ↘ gradients_tle_z
 factor_analysis → factor_representation / factor_analysis_voxelwise (supp)
-tract_asymmetry (+ normative) ┐
-region_asymmetry_tle (+ normative) ├→ microstructural_asymmetries
+tract_asymmetry ┐
+region_asymmetry_tle ├→ microstructural_asymmetries
 ```
 
 Factor labels (F1 overall, F2 non-Gaussian, F3 anisotropic) are centralized in

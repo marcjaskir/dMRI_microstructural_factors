@@ -28,10 +28,8 @@ GAM normative z-scores; **Laplacian eigenmaps** (G1/G2); Cohen’s d and
 
 | Module | Purpose | Entry points |
 |--------|---------|--------------|
-| [tract_asymmetry](../analysis/tract_asymmetry/) | WM tract scalar asymmetry (Cohen's d) | `cli.py` |
-| [tract_asymmetry_normative](../analysis/tract_asymmetry_normative/) | Normative WM covariance for Mahalanobis | `compute_tract_covariance.py` |
-| [region_asymmetry_tle](../analysis/region_asymmetry_tle/) | GM region asymmetry (TLE) | `cli.py` |
-| [region_asymmetry_tle_normative](../analysis/region_asymmetry_tle_normative/) | Normative GM covariance | `compute_region_covariance.py` |
+| [tract_asymmetry](../analysis/tract_asymmetry/) | WM tract scalar asymmetry + normative cov | `cli.py`, `compute_tract_covariance.py` |
+| [region_asymmetry_tle](../analysis/region_asymmetry_tle/) | GM region asymmetry + normative cov | `cli.py`, `compute_region_covariance.py` |
 | [microstructural_asymmetries](../analysis/microstructural_asymmetries/) | Group Cohen's d / Mahalanobis reports & LaTeX | `microstructural_asymmetry_report_*.py` |
 
 ## Examples and visualization
@@ -44,7 +42,7 @@ GAM normative z-scores; **Laplacian eigenmaps** (G1/G2); Cohen’s d and
 ## Typical analysis order
 
 1. `factor_analysis` → `factor_z-scores` → `gradients_group-controls` (LE) / `gradients_tle_z`
-2. `tract_asymmetry` + `region_asymmetry_tle` (+ normative covariance modules)
+2. `tract_asymmetry` + `region_asymmetry_tle` (asymmetry CSVs + normative covariance)
 3. `microstructural_asymmetries` group reports
 
 ## Outputs
