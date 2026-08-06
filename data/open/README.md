@@ -42,10 +42,13 @@ data/open/
 
 ### From OSF (typically)
 
-- `analysis/` — factor loadings/scores/z, LE gradient CSVs, asymmetry digests
-- `gam/` — at least the minimal core sample
-  (`gam/pyafq/HCP1065/ILF_L/ILF_L_dti_md_stat-mean_gam.csv`), or a fuller GAM
-  dump if you export with `export_tier1_open.py` without `--core`
+- `analysis/` — factor loadings/z, flattened LE gradient CSVs,
+  `factor_representation/factor_matched_subject_similarity.csv`, tract subject
+  asymmetry (`tract_asymmetry`), and the three golden group digests under
+  `microstructural_asymmetries/` (not the full subject `region_asymmetry_tle`
+  tree; regenerate GM reports from controlled data if needed)
+- `gam/` — manuscript-allowlisted residual-z GAM tables under `pyafq/` and
+  `mni_micro/` (`anon_id` + `*_z` only; no age/sex/scanner/batch)
 
 You may upload only `analysis/` + `gam/` (users keep git’s `atlases/` /
 `metadata/` / `inclusion/`), or the whole `data/open/` tree for a one-stop
@@ -54,14 +57,14 @@ download.
 ## Core manuscript share
 
 Default lab export for OSF is the **core** product set (golden tests + published
-digests), not a full multi‑GB GAM re-export:
+digests) plus full manuscript-allowlisted GAM residual-z tables:
 
 ```bash
 # Lab only — from controlled structural_tractometry source
 python -u code/lib/export_tier1_open.py --core
+# Or refresh GAM only:
+python -u code/lib/export_tier1_open.py --gam-only --force-gam
 ```
-
-Omit `--core` for a fuller CSV tree (all manuscript-allowlisted GAM tables).
 
 **Intentionally omitted from open products:** raw dMRI, CovBat covariates
 (age/sex/scanner), reversible ID maps, NIfTI volumes, HTML dumps, and

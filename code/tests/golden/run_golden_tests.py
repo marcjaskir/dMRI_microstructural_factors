@@ -152,6 +152,9 @@ def export_manuscript_digests(out_json: Path) -> dict:
     from lib.paths import analysis_dir
 
     root = analysis_dir()
+    from lib.paths import controls_le_csv_dir
+
+    le_csv = controls_le_csv_dir()
     targets = [
         ("factor_loadings", root / "factor_analysis/controls_All4_Combined_scalar_factor_loadings.csv"),
         (
@@ -163,17 +166,18 @@ def export_manuscript_digests(out_json: Path) -> dict:
         ("controls_F3_z", root / "factor_z-scores/factor_z_scores/controls_F3_z_scores.csv"),
         (
             "le_neuroaxis",
-            root / "gradients_group-controls/laplacian_eigenmodes/csv/neuroaxis_correlations_cohort-controls.csv",
+            root / "gradients_group-controls/neuroaxis_correlations_cohort-controls.csv"
+            if (root / "gradients_group-controls/neuroaxis_correlations_cohort-controls.csv").exists()
+            else root
+            / "gradients_group-controls/laplacian_eigenmodes/csv/neuroaxis_correlations_cohort-controls.csv",
         ),
         (
             "le_F1_G1",
-            root
-            / "gradients_group-controls/laplacian_eigenmodes/csv/gradients-2/F1_principal_gradient1_scores_cohort-controls.csv",
+            le_csv / "F1_principal_gradient1_scores_cohort-controls.csv",
         ),
         (
             "le_F1_G2",
-            root
-            / "gradients_group-controls/laplacian_eigenmodes/csv/gradients-2/F1_principal_gradient2_scores_cohort-controls.csv",
+            le_csv / "F1_principal_gradient2_scores_cohort-controls.csv",
         ),
         (
             "asym_thirds_mahalanobis",

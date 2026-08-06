@@ -141,7 +141,10 @@ FACTOR_BAR_YLABELS: Dict[str, str] = {
 EXCLUSIVE_STAT_PAIRS: List[frozenset] = [frozenset({"pa", "path"})]
 
 # Non-ROI columns present in every CSV.
-META_COLS = ["subject", "group"]
+META_COLS = ["subject", "group", "anon_id"]
+
+# Open / manuscript subject-level export (all models, factor-matched |loading| > 0.5).
+FACTOR_MATCHED_SUBJECT_CSV = "factor_matched_subject_similarity.csv"
 
 # ============================================================================
 # DATA LOADING
@@ -240,6 +243,122 @@ def candidate_sets(
                 best_col = abs_load.loc[factor].idxmax()
                 candidates[factor] = [next(s for s in stats if col_for[s] == best_col)]
     return candidates
+
+
+def factor_matched_stats(
+    loadings: pd.DataFrame,
+    *,
+    min_abs_loading: float = FALLBACK_LOADING_THRESHOLD,
+) -> List[dict]:
+    """Return manuscript figure stats: factor-matched with |loading| > threshold.
+
+    Each entry has keys ``model``, ``statistic``, ``matched_factor``,
+    ``abs_loading``, ``loading_col``.
+    """
+    rows: List[dict] = []
+    for model in MODEL_PLOT_ORDER:
+        prefix = MODEL_FILE_PREFIX[model]
+        stats = ordered_model_stats(model, loadings)
+        for stat in stats:
+            col = f"{prefix}_{stat}"
+            if col not in loadings.columns:
+                continue
+            abs_series = loadings[col].abs()
+            matched = str(abs_series.idxmax())
+            abs_loading = float(abs_series.loc[matched])
+            if abs_loading <= min_abs_loading:
+                continue
+            rows.append(
+                {
+                    "model": model,
+                    "statistic": stat,
+                    "matched_factor": matched,
+                    "abs_loading": abs_loading,
+                    "loading_col": col,
+                }
+            )
+    return rows
+
+
+def _subject_id_series(df: pd.DataFrame) -> pd.Series:
+    for col in ("anon_id", "subject", "sub"):
+        if col in df.columns:
+            return df[col].astype(str)
+    raise KeyError("Expected anon_id/subject/sub column in factor-score CSV")
+
+
+def build_factor_matched_subject_similarity(
+    *,
+    loadings: pd.DataFrame | None = None,
+    factors: Dict[str, np.ndarray] | None = None,
+    subject_ids: List[str] | None = None,
+    ref_cols: List[str] | None = None,
+) -> pd.DataFrame:
+    """Per-subject factor-matched |cosine| / |Pearson r| for all manuscript models.
+
+    Long-form table with one row per (subject, model, statistic).
+    """
+    if loadings is None:
+        loadings = load_loadings()
+    if factors is None or ref_cols is None or subject_ids is None:
+        factors_loaded, ref_cols_loaded = load_factor_gradients()
+        factors = factors if factors is not None else factors_loaded
+        ref_cols = ref_cols if ref_cols is not None else ref_cols_loaded
+        if subject_ids is None:
+            sample = pd.read_csv(ospj(FACTOR_DIR, f"{GROUP}_{FACTORS[0]}_scores.csv"))
+            subject_ids = _subject_id_series(sample).tolist()
+
+    assert factors is not None and ref_cols is not None and subject_ids is not None
+    matched = factor_matched_stats(loadings)
+    rows: List[dict] = []
+    # Cache scalar matrices per model to avoid reloading.
+    scalars_by_model: Dict[str, Dict[str, np.ndarray]] = {}
+    id_key = (
+        "anon_id"
+        if any(str(s).startswith("anon_") for s in subject_ids)
+        else "subject"
+    )
+    for entry in matched:
+        model = entry["model"]
+        if model not in scalars_by_model:
+            stats = ordered_model_stats(model, loadings)
+            scalars_by_model[model] = load_scalar_gradients(model, stats, ref_cols)
+        stat = entry["statistic"]
+        factor = entry["matched_factor"]
+        cos = per_subject_abs_cosine(
+            scalars_by_model[model][stat], factors[factor]
+        )
+        pear = per_subject_abs_pearson(
+            scalars_by_model[model][stat], factors[factor]
+        )
+        for i, sid in enumerate(subject_ids):
+            rows.append(
+                {
+                    id_key: sid,
+                    "model": model,
+                    "statistic": stat,
+                    "matched_factor": factor,
+                    "abs_loading": entry["abs_loading"],
+                    "abs_cosine": float(cos[i]) if np.isfinite(cos[i]) else np.nan,
+                    "abs_pearson": float(pear[i]) if np.isfinite(pear[i]) else np.nan,
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def save_factor_matched_subject_similarity(
+    df: pd.DataFrame | None = None,
+    *,
+    out_path: str | None = None,
+) -> str:
+    """Write the consolidated subject-level factor-representation CSV."""
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    if df is None:
+        df = build_factor_matched_subject_similarity()
+    path = out_path or ospj(OUTPUT_DIR, FACTOR_MATCHED_SUBJECT_CSV)
+    df.to_csv(path, index=False)
+    print(f"saved {path} ({len(df)} rows)")
+    return path
 
 # ============================================================================
 # CORE COMPUTATION
@@ -706,13 +825,13 @@ def main() -> None:
                     f"{similarity_file_label(similarity)}.csv"
                 ),
             )
-            sim.to_csv(sim_path)
+            sim.to_csv(sim_path, index_label="statistic")
             print(f"  saved {sim_path}")
             if similarity == "cosine":
                 legacy_sim_path = ospj(
                     OUTPUT_DIR, f"similarity_matrix_{MODEL_FILE_PREFIX[model]}.csv"
                 )
-                sim.to_csv(legacy_sim_path)
+                sim.to_csv(legacy_sim_path, index_label="statistic")
 
             triplet_df = score_triplets(per_subject, candidates, stats, similarity)
             print(f"  {len(triplet_df)} valid triplets")
@@ -750,6 +869,19 @@ def main() -> None:
             stripplot=True,
             per_subject_panels=factor_bar_per_subject[similarity],
         )
+
+    # Consolidated subject-level table for open / manuscript products.
+    sample = pd.read_csv(ospj(FACTOR_DIR, f"{GROUP}_{FACTORS[0]}_scores.csv"))
+    subject_ids = _subject_id_series(sample).tolist()
+    save_factor_matched_subject_similarity(
+        build_factor_matched_subject_similarity(
+            loadings=loadings,
+            factors=factors,
+            subject_ids=subject_ids,
+            ref_cols=ref_cols,
+        )
+    )
+
 
 if __name__ == "__main__":
     main()

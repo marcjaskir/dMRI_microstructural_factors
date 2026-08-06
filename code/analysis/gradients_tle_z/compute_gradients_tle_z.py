@@ -81,12 +81,19 @@ from gradient_lib.roi_markers import DEFAULT_ROI_MARKERS  # noqa: E402
 
 
 def _default_gradients_csv_dir(gradients_controls_dir: Path) -> Path:
-    return (
+    nested = (
         gradients_controls_dir
         / METHOD_TAG
         / "csv"
         / f"gradients-{GRADIENTS_K}"
     )
+    probe = "F1_principal_gradient1_scores_cohort-controls.csv"
+    if (nested / probe).is_file():
+        return nested
+    # Flattened open layout: CSVs live directly under gradients_group-controls/
+    if (gradients_controls_dir / probe).is_file():
+        return gradients_controls_dir
+    return nested
 
 
 def _default_figures_dir(output_dir: Path) -> Path:

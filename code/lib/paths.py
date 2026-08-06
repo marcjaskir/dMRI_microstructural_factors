@@ -161,6 +161,21 @@ def analysis_dir() -> Path:
     return get_path("analysis_dir")
 
 
+def controls_le_csv_dir() -> Path:
+    """Directory with controls Laplacian G1/G2 score CSVs.
+
+    Prefers the lab nested layout
+    ``gradients_group-controls/laplacian_eigenmodes/csv/gradients-2/``,
+    otherwise the flattened open layout ``gradients_group-controls/``.
+    """
+    root = analysis_dir() / "gradients_group-controls"
+    nested = root / "laplacian_eigenmodes" / "csv" / "gradients-2"
+    probe = "F1_principal_gradient1_scores_cohort-controls.csv"
+    if (nested / probe).is_file():
+        return nested
+    return root
+
+
 def atlas_dir() -> Path:
     return get_path("atlas_dir")
 

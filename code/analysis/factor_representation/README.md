@@ -15,8 +15,11 @@ factor-score gradients (overall / non-Gaussian / anisotropic diffusivity).
 
 ## Outputs
 
-`derivatives/analysis/factor_representation` — similarity / triplet CSVs and
-factor-bar figures
+`derivatives/analysis/factor_representation` — per-model similarity / triplet CSVs,
+factor-bar figures, and a consolidated subject-level table
+`factor_matched_subject_similarity.csv` (all NODDI/MAP-MRI/DKI statistics with
+factor-matched |loading| > 0.5; columns include per-subject |cosine| and
+|Pearson r|). The open OSF share ships only that consolidated CSV.
 
 ## Configuration
 

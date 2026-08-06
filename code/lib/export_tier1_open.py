@@ -30,7 +30,16 @@ OPEN = WORKSPACE / "data" / "open"
 MAP_PATH = WORKSPACE / "data" / "controlled" / "anon_id_map.csv"  # local only / gitignored
 
 DROP_COLS = {
-    "age", "sex", "bat", "split",
+    "age",
+    "sex",
+    "gender",
+    "bat",
+    "batch",
+    "scanner",
+    "scanner_id",
+    "site",
+    "site_id",
+    "split",
 }
 DROP_SUFFIXES = ("_pred", "_centile", "_unharm", "_unharm_pred")
 DROP_EXACT_IF_NOT_Z = re.compile(r"^(?!.*_z$).+")  # unused; we keep explicitly
@@ -49,7 +58,6 @@ ANALYSIS_DIRS = [
     "region_asymmetry_tle_normative",
     "2_microstructural_asymmetries",
     "microstructural_asymmetries",
-    "profile_thirds_example",
     "qc",
     "covbat_example",
 ]
@@ -62,11 +70,8 @@ CORE_ANALYSIS_DIRS = [
     "gradients_group-controls",
     "gradients_tle_z",
     "tract_asymmetry",
-    "region_asymmetry_tle",
     "2_microstructural_asymmetries",
     "microstructural_asymmetries",
-    "profile_thirds_example",
-    "qc",
 ]
 
 CORE_OPEN_GLOBS: tuple[str, ...] = (
@@ -77,18 +82,43 @@ CORE_OPEN_GLOBS: tuple[str, ...] = (
     "atlases/**/*.json",
     "atlases/**/*.txt",
     "atlases/**/*.md",
-    "analysis/factor_analysis/**/*.csv",
-    "analysis/factor_z-scores/factor_scores/*.csv",
-    "analysis/factor_z-scores/factor_z_scores/*.csv",
-    "analysis/factor_representation/**/*.csv",
-    "analysis/gradients_group-controls/laplacian_eigenmodes/csv/**/*.csv",
-    "analysis/gradients_tle_z/**/*.csv",
-    "analysis/microstructural_asymmetries/*.csv",
-    "analysis/qc/**/*.csv",
+    # factor_analysis: exclude brainmaps glasser correlation tables
+    "analysis/factor_analysis/controls_All4_Combined_scalar_*.csv",
+    "analysis/factor_analysis/controls_All4_Combined_pca_*.csv",
+    "analysis/factor_analysis/subjects_included.csv",
+    # factor z: controls + epilepsy cohort digests only
+    "analysis/factor_z-scores/factor_z_scores/controls_F*_z_scores.csv",
+    "analysis/factor_z-scores/factor_z_scores/epilepsy_F*_z_scores.csv",
+    "analysis/factor_z-scores/factor_z_scores/epilepsy_mahalanobis.csv",
+    # factor representation: one subject-level table
+    "analysis/factor_representation/factor_matched_subject_similarity.csv",
+    # LE gradients flattened under module root (2D only)
+    "analysis/gradients_group-controls/*.csv",
+    "analysis/gradients_tle_z/*.csv",
+    # group asymmetry digests used by golden tests (not full subject trees)
+    "analysis/microstructural_asymmetries/summary_hcp1065_thirds_mahalanobis.csv",
+    "analysis/microstructural_asymmetries/summary_hcp1065_whole_scalars.csv",
+    "analysis/microstructural_asymmetries/factor_score_z_ipsi_contra_cohens_d_summary.csv",
     "analysis/tract_asymmetry/**/*_asym_scalars.csv",
-    "analysis/region_asymmetry_tle/**/*.csv",
-    "analysis/profile_thirds_example/**/*.csv",
-    "gam/pyafq/HCP1065/ILF_L/ILF_L_dti_md_stat-mean_gam.csv",
+    # Full manuscript-allowlisted GAM residual-z trees
+    "gam/pyafq/**/*_gam.csv",
+    "gam/mni_micro/**/*_gam.csv",
+)
+
+# Gradient CSVs kept after flattening (2D subspace; drop lambdas / sorted / 3D).
+GRADIENT_FLAT_KEEP_SUFFIXES: tuple[str, ...] = (
+    "_principal_gradient1_scores_cohort-controls.csv",
+    "_principal_gradient2_scores_cohort-controls.csv",
+    "_factor_score_means_cohort-controls.csv",
+)
+GRADIENT_FLAT_KEEP_NAMES: frozenset[str] = frozenset(
+    {
+        "neuroaxis_correlations_cohort-controls.csv",
+        "factor_z_correlations_cohort-epilepsy.csv",
+        "epilepsy_F1_mean_z_scores.csv",
+        "epilepsy_F2_mean_z_scores.csv",
+        "epilepsy_F3_mean_z_scores.csv",
+    }
 )
 
 CORE_GAM_FILES: tuple[tuple[str, str], ...] = (
@@ -152,18 +182,18 @@ def is_skipped_file(path: Path) -> bool:
 def gam_keep_columns(columns: list[str]) -> list[str]:
     keep = []
     for c in columns:
+        cl = c.lower()
         if c in ("sub", "group", "anon_id"):
             keep.append(c)
             continue
-        if c in DROP_COLS:
+        if c in DROP_COLS or cl in DROP_COLS:
             continue
         if any(c.endswith(suf) for suf in DROP_SUFFIXES):
             continue
-        # keep residual z and raw feature only if *_z
+        # keep residual z only
         if c.endswith("_z") or re.fullmatch(r"node\d+_z", c):
             keep.append(c)
             continue
-        # mni_micro sometimes has bare scalar name as observed — drop non-z
     return keep
 
 
@@ -172,7 +202,9 @@ def export_gam_csv(src: Path, dst: Path, mapping: dict[str, str]) -> None:
     cols = gam_keep_columns(list(df.columns))
     if "sub" not in df.columns:
         # copy as-is without PHI-looking cols
-        df = df[[c for c in df.columns if c not in DROP_COLS and not any(c.endswith(s) for s in DROP_SUFFIXES)]]
+        drop = {c for c in df.columns if c in DROP_COLS or c.lower() in DROP_COLS}
+        drop |= {c for c in df.columns if any(c.endswith(s) for s in DROP_SUFFIXES)}
+        df = df[[c for c in df.columns if c not in drop]]
     else:
         df = df[cols].copy()
         df["anon_id"] = df["sub"].map(lambda s: anon_id(str(s), mapping))
@@ -184,7 +216,14 @@ def export_gam_csv(src: Path, dst: Path, mapping: dict[str, str]) -> None:
     df.to_csv(dst, index=False)
 
 
-def export_gam_tree(src_root: Path, dst_root: Path, mapping: dict[str, str], workers: int = 16) -> int:
+def export_gam_tree(
+    src_root: Path,
+    dst_root: Path,
+    mapping: dict[str, str],
+    workers: int = 16,
+    *,
+    force: bool = False,
+) -> int:
     from lib.manuscript_features import gam_relpath_is_manuscript
 
     files = [
@@ -196,7 +235,7 @@ def export_gam_tree(src_root: Path, dst_root: Path, mapping: dict[str, str], wor
     for src in files:
         rel = src.relative_to(src_root)
         dst = dst_root / rel
-        if dst.exists() and dst.stat().st_size > 0:
+        if not force and dst.exists() and dst.stat().st_size > 0:
             continue
         pending.append((src, dst))
 
@@ -311,6 +350,176 @@ def flatten_factor_analysis_all4() -> None:
     print("flattened factor_analysis/All4_Combined/ -> factor_analysis/")
 
 
+def _should_keep_flat_gradient(name: str) -> bool:
+    if name in GRADIENT_FLAT_KEEP_NAMES:
+        return True
+    if "sorted" in name or "embedding_lambdas" in name:
+        return False
+    return any(name.endswith(suf) for suf in GRADIENT_FLAT_KEEP_SUFFIXES)
+
+
+def flatten_open_gradient_csvs(module: str, *, prefer_subdir: str = "gradients-2") -> None:
+    """Lift 2D LE CSVs to ``analysis/<module>/`` and drop nested trees."""
+    root = OPEN / "analysis" / module
+    if not root.exists():
+        return
+    nested_csv = root / "laplacian_eigenmodes" / "csv"
+    sources: list[Path] = []
+    prefer = nested_csv / prefer_subdir
+    if prefer.is_dir():
+        sources.extend(p for p in prefer.glob("*.csv") if p.is_file())
+    if nested_csv.is_dir():
+        sources.extend(p for p in nested_csv.glob("*.csv") if p.is_file())
+    # Also gather epilepsy mean z etc. already under nested trees
+    for path in root.rglob("*.csv"):
+        if path.is_file() and path not in sources:
+            sources.append(path)
+
+    kept = 0
+    for src in sources:
+        if not _should_keep_flat_gradient(src.name):
+            continue
+        dst = root / src.name
+        if src.resolve() == dst.resolve():
+            kept += 1
+            continue
+        if dst.exists():
+            dst.unlink()
+        shutil.copy2(src, dst)
+        kept += 1
+
+    # Remove nested method trees
+    for child in list(root.iterdir()):
+        if child.is_dir():
+            shutil.rmtree(child, ignore_errors=True)
+    print(f"flattened {module}/ LE CSVs -> analysis/{module}/ ({kept} files)")
+
+
+def fix_unnamed_index_columns() -> int:
+    """Rename pandas ``Unnamed: 0`` index columns to meaningful labels."""
+    label_by_name = {
+        "controls_All4_Combined_scalar_correlations.csv": "scalar",
+        "controls_All4_Combined_scalar_means.csv": "scalar",
+        "controls_All4_Combined_scalar_uniquenesses.csv": "scalar",
+        "controls_All4_Combined_pca_component_loadings.csv": "component",
+    }
+    fixed = 0
+    for path in OPEN.rglob("*.csv"):
+        if not path.is_file():
+            continue
+        try:
+            df = pd.read_csv(path)
+        except Exception:
+            continue
+        if "Unnamed: 0" not in df.columns:
+            continue
+        label = label_by_name.get(path.name)
+        if label is None:
+            # Heuristic for similarity matrices / generic index dumps
+            if path.name.startswith("similarity_matrix_"):
+                label = "statistic"
+            elif df.columns[0] == "Unnamed: 0":
+                label = "index"
+            else:
+                continue
+        df = df.rename(columns={"Unnamed: 0": label})
+        df.to_csv(path, index=False)
+        fixed += 1
+    print(f"renamed Unnamed: 0 columns in {fixed} open CSVs")
+    return fixed
+
+
+def export_factor_matched_subject_similarity(mapping: dict[str, str]) -> None:
+    """Build consolidated factor-representation subject table into data/open/."""
+    # Point factor_representation path helpers at controlled derivatives for inputs,
+    # then write anonymized open product.
+    from analysis.factor_representation import factor_representation as fr
+
+    # Temporarily override dirs used by the representation module.
+    controlled_fz = SRC / "derivatives" / "analysis" / "factor_z-scores"
+    controlled_fa = SRC / "derivatives" / "analysis" / "factor_analysis"
+    fr.FACTOR_DIR = str(controlled_fz / "factor_scores")
+    fr.SCALAR_DIR = str(controlled_fz / "scalar_z-scores")
+    # Prefer flattened All4 loadings if present in open (already anonymized-free).
+    open_loadings = (
+        OPEN
+        / "analysis"
+        / "factor_analysis"
+        / "controls_All4_Combined_scalar_factor_loadings_ordered.csv"
+    )
+    src_loadings = (
+        controlled_fa
+        / "All4_Combined"
+        / "controls_All4_Combined_scalar_factor_loadings_ordered.csv"
+    )
+    if not src_loadings.exists():
+        src_loadings = (
+            controlled_fa / "controls_All4_Combined_scalar_factor_loadings_ordered.csv"
+        )
+    loadings_path = open_loadings if open_loadings.exists() else src_loadings
+    fr.LOADINGS_PATH = str(loadings_path)
+
+    sample = pd.read_csv(Path(fr.FACTOR_DIR) / f"{fr.GROUP}_{fr.FACTORS[0]}_scores.csv")
+    real_ids = fr._subject_id_series(sample).tolist()
+    anon_ids = [anon_id(str(s), mapping) for s in real_ids]
+    loadings = pd.read_csv(loadings_path).set_index("factor").loc[fr.FACTORS]
+    factors, ref_cols = fr.load_factor_gradients()
+    df = fr.build_factor_matched_subject_similarity(
+        loadings=loadings,
+        factors=factors,
+        subject_ids=anon_ids,
+        ref_cols=ref_cols,
+    )
+    if "subject" in df.columns and "anon_id" not in df.columns:
+        df = df.rename(columns={"subject": "anon_id"})
+    out_dir = OPEN / "analysis" / "factor_representation"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    # Drop per-model intermediates from open share
+    for path in list(out_dir.glob("*.csv")):
+        path.unlink()
+    out = out_dir / fr.FACTOR_MATCHED_SUBJECT_CSV
+    df.to_csv(out, index=False)
+    print(f"wrote {out.relative_to(OPEN)} ({len(df)} rows)")
+
+
+def finalize_core_open_layout(mapping: dict[str, str]) -> None:
+    """Apply open-share layout rules after tabular export."""
+    # Drop excluded brainmaps / non-kept trees early
+    fa = OPEN / "analysis" / "factor_analysis"
+    if fa.exists():
+        for path in fa.glob("*brainmaps_glasser_correlations*.csv"):
+            path.unlink(missing_ok=True)
+    for drop in ("profile_thirds_example", "qc"):
+        p = OPEN / "analysis" / drop
+        if p.exists():
+            shutil.rmtree(p, ignore_errors=True)
+
+    # Keep only selected factor_z files
+    fz = OPEN / "analysis" / "factor_z-scores"
+    keep_fz = {
+        "controls_F1_z_scores.csv",
+        "controls_F2_z_scores.csv",
+        "controls_F3_z_scores.csv",
+        "epilepsy_F1_z_scores.csv",
+        "epilepsy_F2_z_scores.csv",
+        "epilepsy_F3_z_scores.csv",
+        "epilepsy_mahalanobis.csv",
+    }
+    if fz.exists():
+        for path in fz.rglob("*.csv"):
+            if path.name not in keep_fz:
+                path.unlink(missing_ok=True)
+        # Remove emptied factor_scores dir etc.
+        for path in sorted(fz.rglob("*"), key=lambda p: len(p.parts), reverse=True):
+            if path.is_dir() and not any(path.iterdir()):
+                path.rmdir()
+
+    flatten_open_gradient_csvs("gradients_group-controls")
+    flatten_open_gradient_csvs("gradients_tle_z")
+    export_factor_matched_subject_similarity(mapping)
+    fix_unnamed_index_columns()
+
+
 def prune_open_to_core_globs() -> int:
     """Keep only paths matching manuscript core globs under data/open/."""
     import fnmatch
@@ -336,7 +545,6 @@ def prune_open_to_core_globs() -> int:
             continue
         if path.resolve() in kept:
             continue
-        # Do not delete committed-ish small trees wholesale if matched somehow
         rel = path.relative_to(OPEN).as_posix()
         if any(fnmatch.fnmatch(rel, pat) for pat in CORE_OPEN_GLOBS):
             continue
@@ -356,6 +564,9 @@ def prune_open_to_core_globs() -> int:
 def export_atlases() -> None:
     from lib.manuscript_features import MANUSCRIPT_WM_TRACT_SET
 
+    # Not needed for open manuscript reproduction / goldens.
+    skip_top_level = {"S-A_ArchetypalAxis", "thalamus"}
+
     src = SRC / "data" / "atlases"
     dst = OPEN / "atlases"
     for path in src.rglob("*"):
@@ -366,6 +577,8 @@ def export_atlases() -> None:
         if path.suffix.lower() not in {".tsv", ".csv", ".json", ".txt", ".md"}:
             continue
         rel = path.relative_to(src)
+        if rel.parts and rel.parts[0] in skip_top_level:
+            continue
         out = dst / rel
         out.parent.mkdir(parents=True, exist_ok=True)
         if path.name == "HCP1065_tract_metadata.csv":
@@ -382,6 +595,8 @@ def export_atlases() -> None:
         for path in cent.rglob("*"):
             if path.is_file() and path.suffix.lower() in {".csv", ".tsv", ".json"}:
                 rel = path.relative_to(cent)
+                if rel.parts and rel.parts[0] in skip_top_level:
+                    continue
                 out = OPEN / "atlases" / "centroids" / rel
                 out.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(path, out)
@@ -468,7 +683,20 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument(
         "--core",
         action="store_true",
-        help="Manuscript core OSF share only (CSV/JSON digests + minimal GAM; no full GAM dump).",
+        help=(
+            "Manuscript core OSF share: trimmed analysis digests + full "
+            "manuscript-allowlisted GAM residual-z trees (pyafq + mni_micro)."
+        ),
+    )
+    p.add_argument(
+        "--gam-only",
+        action="store_true",
+        help="Only export/update GAM trees under data/open/gam/ (skip atlases/analysis).",
+    )
+    p.add_argument(
+        "--force-gam",
+        action="store_true",
+        help="Overwrite existing open GAM CSVs instead of skipping them.",
     )
     args = p.parse_args(argv)
 
@@ -477,36 +705,57 @@ def main(argv: list[str] | None = None) -> int:
     for sub in ["atlases", "metadata", "gam", "analysis", "inclusion"]:
         (OPEN / sub).mkdir(parents=True, exist_ok=True)
 
-    print("=== atlases ===")
-    export_atlases()
-    print("=== metadata ===")
-    export_metadata()
-    print("=== inclusion ===")
-    export_inclusion(mapping)
-    save_map(mapping)
-
-    if args.core:
-        print("=== GAM (core sample only) ===")
-        export_core_gam(mapping)
+    def _export_full_gam() -> None:
+        print("=== GAM pyafq (manuscript residual-z) ===")
+        export_gam_tree(
+            SRC / "derivatives" / "gam" / "pyafq",
+            OPEN / "gam" / "pyafq",
+            mapping,
+            force=args.force_gam,
+        )
         save_map(mapping)
+        print("=== GAM mni_micro (manuscript residual-z) ===")
+        export_gam_tree(
+            SRC / "derivatives" / "gam" / "mni_micro",
+            OPEN / "gam" / "mni_micro",
+            mapping,
+            force=args.force_gam,
+        )
+        save_map(mapping)
+
+    if args.gam_only:
+        _export_full_gam()
+    elif args.core:
+        print("=== atlases ===")
+        export_atlases()
+        print("=== metadata ===")
+        export_metadata()
+        print("=== inclusion ===")
+        export_inclusion(mapping)
+        save_map(mapping)
+        _export_full_gam()
         print("=== analysis (core, tabular only) ===")
         for name in CORE_ANALYSIS_DIRS:
             export_analysis_dir(name, mapping, tabular_only=True)
             save_map(mapping)
         flatten_factor_analysis_all4()
+        finalize_core_open_layout(mapping)
         prune_open_to_core_globs()
     else:
-        print("=== GAM pyafq ===")
-        export_gam_tree(SRC / "derivatives" / "gam" / "pyafq", OPEN / "gam" / "pyafq", mapping)
+        print("=== atlases ===")
+        export_atlases()
+        print("=== metadata ===")
+        export_metadata()
+        print("=== inclusion ===")
+        export_inclusion(mapping)
         save_map(mapping)
-        print("=== GAM mni_micro ===")
-        export_gam_tree(SRC / "derivatives" / "gam" / "mni_micro", OPEN / "gam" / "mni_micro", mapping)
-        save_map(mapping)
+        _export_full_gam()
         print("=== analysis ===")
         for name in ANALYSIS_DIRS:
             export_analysis_dir(name, mapping)
             save_map(mapping)
         flatten_factor_analysis_all4()
+        fix_unnamed_index_columns()
 
     save_map(mapping)
     print("=== done ===")

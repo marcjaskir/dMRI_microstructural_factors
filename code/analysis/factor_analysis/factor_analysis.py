@@ -3224,7 +3224,7 @@ def main() -> None:
         print("\nComputing correlation matrix between scalars...")
         corr_df, _, _ = compute_correlation_matrix_scalars(feature_matrix)
         corr_matrix_path = ospj(run_output_dir, f"{file_prefix}_scalar_correlations.csv")
-        corr_df.to_csv(corr_matrix_path)
+        corr_df.to_csv(corr_matrix_path, index_label="scalar")
         print(f"Saved correlation matrix to: {corr_matrix_path}")
         corr_matrix_minimal_path = ospj(run_output_dir, f"{file_prefix}_corr_matrix_minimal.png")
         plot_corr_matrix_minimal(corr_df, corr_matrix_minimal_path)
@@ -3306,13 +3306,13 @@ def main() -> None:
         uniquenesses = factor_analyzer.get_uniquenesses()  # 1D, length n_scalars (same order as loadings rows = scalar_order)
         uniquenesses_df = pd.DataFrame({"uniqueness": uniquenesses}, index=scalar_order)
         uniquenesses_csv_path = ospj(run_output_dir, f"{file_prefix}_scalar_uniquenesses.csv")
-        uniquenesses_df.to_csv(uniquenesses_csv_path)
+        uniquenesses_df.to_csv(uniquenesses_csv_path, index_label="scalar")
         print(f"Saved scalar uniquenesses to: {uniquenesses_csv_path}")
 
         scalar_means = np.nanmean(X_imputed, axis=0)  # column means, same order as scalar_order
         scalar_means_df = pd.DataFrame({"mean": scalar_means}, index=scalar_order)
         scalar_means_csv_path = ospj(run_output_dir, f"{file_prefix}_scalar_means.csv")
-        scalar_means_df.to_csv(scalar_means_csv_path)
+        scalar_means_df.to_csv(scalar_means_csv_path, index_label="scalar")
         print(f"Saved scalar means to: {scalar_means_csv_path}")
 
         variance_plot_path = ospj(run_output_dir, f"{file_prefix}_scalar_factor_eigenvalues_scree.png")
@@ -3394,7 +3394,9 @@ def main() -> None:
                 pca_component_loadings_csv_path = ospj(
                     run_output_dir, f"{file_prefix}_pca_component_loadings.csv"
                 )
-                pca_loadings_full_df.to_csv(pca_component_loadings_csv_path)
+                pca_loadings_full_df.to_csv(
+                    pca_component_loadings_csv_path, index_label="component"
+                )
 
                 # Per-component explained variance (for tissue PC1 subtitles in GM/WM combined plots).
                 ev_ratio = np.asarray(pca_full.explained_variance_ratio_, dtype=float)

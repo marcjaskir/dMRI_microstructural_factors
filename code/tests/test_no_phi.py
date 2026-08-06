@@ -12,7 +12,7 @@ CODE = REPO / "code"
 
 SUB_RE = re.compile(r"\bsub-\d+\b", re.IGNORECASE)
 RID_RE = re.compile(r"\bRID\d{3,}\b")
-FORBIDDEN_COLS = {"age", "sex", "bat", "anon_id_map"}
+FORBIDDEN_COLS = {"age", "sex", "gender", "bat", "batch", "scanner", "scanner_id", "site", "anon_id_map"}
 TEXT_SUFFIXES = {".py", ".md", ".yml", ".yaml", ".txt", ".csv", ".tsv", ".json", ".ipynb", ".sh"}
 
 
