@@ -6,15 +6,23 @@
 workspace_root/
   code/                  # This repository's scripts
   data/
-    open/                # Publishable products (small trees + unpacked OSF HDF5)
-      atlases/ metadata/ inclusion/ gam/ analysis/
-      dmri_microstructural_factors_open_v1.h5   # gitignored cache
+    open/                # Publishable products
+      atlases/ metadata/ inclusion/   # small; committed
+      dmri_microstructural_factors_open_v1.h5   # ← download / pack here (gitignored)
+      gam/ analysis/     # created by unpack; gitignored; not separate downloads
 ```
 
 ### Open products (`data/open/`)
 
 Enough to reproduce factor analysis digests, **Laplacian eigenmaps** gradients,
-and asymmetry reports:
+and asymmetry reports. Prefer the **OSF HDF5** as the single large artifact:
+
+1. Place `dmri_microstructural_factors_open_v1.h5` under `data/open/` (default),
+   or set `open_h5_path` / pass `--h5` to `fetch_open_data.py`.
+2. Unpack (`fetch_open_data.py` or `pack_open_h5.py unpack`) so `gam/` and
+   `analysis/` CSVs exist for `lib/paths.py` (`gam_dir`, `analysis_dir`).
+
+Contents after unpack:
 
 - Post-GAM residual z-scores (`anon_id`, `group`, `*_z`) for kept analyses
   (manuscript scalars/tracts only; see `lib/manuscript_features.py`)
@@ -27,11 +35,18 @@ and asymmetry reports:
 reversible ID maps, NIfTI volumes, HTML dumps, diffusion-map gradient trees,
 and microstructural scalars / WM tracts outside the manuscript analysis set.
 
+You may delete local `data/open/gam/` and `data/open/analysis/` to save disk;
+recreate them with `python -u code/lib/fetch_open_data.py --unpack-only`.
+
 ### OSF HDF5 (preferred distribution)
 
 ```bash
 # Set open_h5_osf_url in config.yaml or DMRI_MICRO_OSF_URL
+# Downloads to: data/open/dmri_microstructural_factors_open_v1.h5
 python -u code/lib/fetch_open_data.py
+
+# File already at that path:
+python -u code/lib/fetch_open_data.py --unpack-only
 ```
 
 Pack / unpack / PHI schema check (lab):

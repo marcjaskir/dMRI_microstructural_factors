@@ -17,8 +17,12 @@ atlas_dir: ${data_open_dir}/atlases
 open_metadata_dir: ${data_open_dir}/metadata
 inclusion_dir: ${data_open_dir}/inclusion
 
-# Single OSF-hosted reproduction archive (download via code/lib/fetch_open_data.py)
+# Single OSF-hosted reproduction archive.
+# Default path: ${data_open_dir}/dmri_microstructural_factors_open_v1.h5
+# Download/unpack: python -u code/lib/fetch_open_data.py
+# (gam/ and analysis/ under data/open/ are created by unpack; not separate downloads)
 open_h5_filename: dmri_microstructural_factors_open_v1.h5
+# open_h5_path: null  # optional absolute override; default = data_open_dir / open_h5_filename
 open_h5_osf_url: OSF_URL=https://osf.io/XXXXX/  # replace after creating the OSF project
 
 # Compatibility aliases used by some scripts (point at open products)

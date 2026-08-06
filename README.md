@@ -9,10 +9,21 @@ Factors of Microstructural Similarity with Diffusion MRI.
 dMRI_microstructural_factors/
   code/                 # All pipelines and analyses
   data/
-    open/               # Small committed atlases/metadata/inclusion + OSF HDF5 cache
+    open/               # Small committed trees + OSF HDF5 (see below)
   config.example.yaml
   README.md
 ```
+
+**HDF5 location (required for manuscript reproduction):**
+
+```
+data/open/dmri_microstructural_factors_open_v1.h5
+```
+
+Download from OSF into that path (or run `fetch_open_data.py`, which does it).
+`data/open/gam/` and `data/open/analysis/` are **not** shipped in git — unpack
+the HDF5 to create them. You may delete those trees anytime and re-run
+`python -u code/lib/fetch_open_data.py --unpack-only`.
 
 ## Quick start
 
@@ -28,7 +39,7 @@ conda activate dmri_microstructural_factors
 
 export PYTHONPATH="$PWD/code:$PYTHONPATH"
 
-# Download manuscript-reproduction HDF5 from OSF and unpack into data/open/
+# Downloads → data/open/dmri_microstructural_factors_open_v1.h5, then unpacks gam/ + analysis/
 python -u code/lib/fetch_open_data.py
 
 python code/tests/golden/run_golden_tests.py
@@ -36,10 +47,18 @@ python code/tests/test_factor_labels.py
 python code/tests/test_no_phi.py
 ```
 
+If you already have the HDF5 file, copy it to
+`data/open/dmri_microstructural_factors_open_v1.h5` and run:
+
+```bash
+python -u code/lib/fetch_open_data.py --unpack-only
+```
+
 If the OSF project is not public yet, pack locally from an existing open tree:
 
 ```bash
 python -u code/lib/pack_open_h5.py pack --profile core
+# writes data/open/dmri_microstructural_factors_open_v1.h5
 python -u code/lib/pack_open_h5.py unpack
 ```
 

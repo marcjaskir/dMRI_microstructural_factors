@@ -15,8 +15,9 @@ Paths in this docs set refer to modules under `code/` unless noted as `data/open
 
 1. Clone the repository and copy `config.example.yaml` to `config.yaml` at the
    workspace root; set `workspace_root`.
-2. Download/unpack the OSF HDF5: `python -u code/lib/fetch_open_data.py`
-   (or pack locally with `python -u code/lib/pack_open_h5.py pack`).
+2. Place the OSF HDF5 at `data/open/dmri_microstructural_factors_open_v1.h5`
+   and unpack: `python -u code/lib/fetch_open_data.py` (or `--unpack-only`).
+   That creates `data/open/gam/` and `data/open/analysis/` (not in git).
 3. Install the conda environment from `environment.yml`.
 4. Set `PYTHONPATH` to include `code/` and run golden tests under `code/tests/golden/`.
 
@@ -26,7 +27,7 @@ Paths in this docs set refer to modules under `code/` unless noted as `data/open
 |------|------|
 | `code/` | Pipelines, analyses, `lib/paths.py`, docs, tests |
 | `code/lib/pack_open_h5.py` | Pack/unpack manuscript-reproduction HDF5 |
-| `code/lib/fetch_open_data.py` | Download OSF HDF5 into `data/open/` |
+| `code/lib/fetch_open_data.py` | Download OSF HDF5 → `data/open/*.h5`, unpack `gam/`/`analysis/` |
 | `code/lib/export_tier1_open.py` | Lab-only de-identify export into `data/open/` |
 | `code/lib/factor_labels.py` | Canonical F1/F2/F3 paper labels |
-| `data/open/` | Publishable products (small committed trees + OSF unpack) |
+| `data/open/` | Small committed trees + HDF5; `gam/`/`analysis/` from unpack only |

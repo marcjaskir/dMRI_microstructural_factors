@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """Download the OSF-hosted manuscript-reproduction HDF5 and unpack into data/open/.
 
+Default HDF5 location (put the downloaded file here if fetching manually)::
+
+  <data_open_dir>/dmri_microstructural_factors_open_v1.h5
+  # usually:  <repo>/data/open/dmri_microstructural_factors_open_v1.h5
+
+Unpack expands ``gam/`` and ``analysis/`` CSVs beside that file (gitignored).
+Those trees are not separate downloads and are not committed to git.
+
 Set the download URL via (first match wins):
   1. CLI ``--url``
   2. env ``DMRI_MICRO_OSF_URL``
@@ -30,10 +38,9 @@ from lib.pack_open_h5 import (  # noqa: E402
     DEFAULT_H5_NAME,
     OSF_URL_PLACEHOLDER,
     check_open_h5,
-    default_h5_path,
     unpack_open_h5,
 )
-from lib.paths import load_config, open_dir  # noqa: E402
+from lib.paths import open_dir, open_h5_path  # noqa: E402
 
 
 def resolve_osf_url(cli_url: str | None) -> str:
@@ -42,6 +49,8 @@ def resolve_osf_url(cli_url: str | None) -> str:
     env = os.environ.get("DMRI_MICRO_OSF_URL", "").strip()
     if env:
         return env
+    from lib.paths import load_config
+
     cfg = load_config()
     cfg_url = str(cfg.get("open_h5_osf_url") or "").strip()
     if cfg_url and "XXXXX" not in cfg_url:
@@ -62,11 +71,13 @@ def download(url: str, dest: Path) -> Path:
         raise SystemExit(
             "OSF URL not configured. Set open_h5_osf_url in config.yaml, "
             "export DMRI_MICRO_OSF_URL, or pass --url after uploading the HDF5.\n"
+            f"Expected file location: {dest}\n"
             f"Expected file name: {DEFAULT_H5_NAME}\n"
             f"Placeholder: {OSF_URL_PLACEHOLDER}"
         )
     dest.parent.mkdir(parents=True, exist_ok=True)
-    print(f"Downloading {url} -> {dest}")
+    print(f"Downloading {url}")
+    print(f"  → {dest}")
     urllib.request.urlretrieve(url, dest)
     digest = _sha256_file(dest)
     print(f"Downloaded {dest.stat().st_size / 1e6:.1f} MB  SHA256={digest}")
@@ -80,26 +91,48 @@ def download(url: str, dest: Path) -> Path:
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(description=__doc__)
+    p = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     p.add_argument("--url", default=None, help="Direct OSF download URL")
-    p.add_argument("--h5", type=Path, default=None, help="Local HDF5 path")
+    p.add_argument(
+        "--h5",
+        type=Path,
+        default=None,
+        help=f"Local HDF5 path (default: {DEFAULT_H5_NAME} under data/open/)",
+    )
     p.add_argument("--dest", type=Path, default=None, help="Unpack root (default data/open)")
     p.add_argument("--unpack-only", action="store_true", help="Skip download; unpack existing HDF5")
     p.add_argument("--download-only", action="store_true", help="Download without unpacking")
     args = p.parse_args(argv)
 
-    h5_path = args.h5 or default_h5_path()
-    dest = args.dest or open_dir()
+    h5_path = (args.h5 or open_h5_path()).resolve()
+    dest = (args.dest or open_dir()).resolve()
+
+    print(f"HDF5 path: {h5_path}")
+    print(f"Unpack root: {dest}  (creates gam/ and analysis/ here)")
 
     if not args.unpack_only:
         url = resolve_osf_url(args.url)
         download(url, h5_path)
+    elif not h5_path.is_file():
+        raise SystemExit(
+            f"HDF5 not found at {h5_path}.\n"
+            f"Download from OSF into that path, or pass --h5 / set open_h5_path.\n"
+            f"Expected file name: {DEFAULT_H5_NAME}"
+        )
 
     if args.download_only:
+        print(
+            "Download-only done. Unpack later with: "
+            "python -u code/lib/fetch_open_data.py --unpack-only"
+        )
         return 0
 
     check_open_h5(h5_path)
     unpack_open_h5(h5_path=h5_path, dest_root=dest)
+    print(f"Unpacked into {dest}")
     return 0
 
 
