@@ -2,7 +2,7 @@
 
 Analysis code should not filter with exclusion lists; it consumes whatever
 scalars and tracts are present. These allowlists are used only when building
-``data/open/`` and the OSF HDF5 so shipped products contain the analyzed set.
+``data/open/`` (OSF directory share) so shipped products contain the analyzed set.
 """
 from __future__ import annotations
 
@@ -131,7 +131,7 @@ def _scalar_from_gam_stem(stem: str, region: str) -> str | None:
 
 
 def gam_relpath_is_manuscript(relpath: str) -> bool:
-    """Return True if a path under ``gam/`` belongs in the open/HDF5 bundle."""
+    """Return True if a path under ``gam/`` belongs in the open OSF share."""
     parts = Path(relpath).parts
     name = parts[-1] if parts else ""
     stem = name[: -len(".csv")] if name.endswith(".csv") else name

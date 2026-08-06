@@ -140,14 +140,13 @@ def open_dir() -> Path:
     return get_path("data_open_dir")
 
 
-def open_h5_path() -> Path:
-    """Path to the manuscript-reproduction HDF5 under data/open/."""
+def open_osf_url() -> str:
+    """OSF project/storage URL for the open ``data/open/`` directory share."""
     cfg = load_config()
-    name = cfg.get("open_h5_filename") or "dmri_microstructural_factors_open_v1.h5"
-    custom = cfg.get("open_h5_path")
-    if custom:
-        return Path(str(custom)).expanduser().resolve()
-    return open_dir() / str(name)
+    env = __import__("os").environ.get("DMRI_MICRO_OSF_URL", "").strip()
+    if env:
+        return env
+    return str(cfg.get("open_osf_url") or "").strip()
 
 
 def controlled_dir() -> Path:

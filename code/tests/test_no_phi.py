@@ -5,7 +5,6 @@ from __future__ import annotations
 import csv
 import re
 import subprocess
-import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
@@ -97,26 +96,31 @@ def test_open_csvs_lack_demographics() -> None:
     assert not bad, "Demographic columns in open CSVs:\n  " + "\n  ".join(bad)
 
 
-def test_packed_h5_lacks_demographics() -> None:
-    """If the manuscript HDF5 is present, run the packager schema/PHI check."""
-    candidates = [
-        REPO / "data" / "open" / "dmri_microstructural_factors_open_v1.h5",
-        REPO / "data" / "open" / "dmri_microstructural_factors_open.h5",
-    ]
-    h5_path = next((p for p in candidates if p.exists()), None)
-    if h5_path is None:
-        print("SKIP packed HDF5 PHI check (archive not present)")
+def test_open_csvs_lack_real_subject_ids() -> None:
+    """Scan open CSVs for BIDS-like ``sub-*`` / RID tokens in cell values."""
+    open_dir = REPO / "data" / "open"
+    if not open_dir.exists():
         return
-    if str(CODE) not in sys.path:
-        sys.path.insert(0, str(CODE))
-    from lib.pack_open_h5 import check_open_h5
-
-    check_open_h5(h5_path)
+    bad: list[str] = []
+    for path in open_dir.rglob("*.csv"):
+        try:
+            rel = path.relative_to(REPO).as_posix()
+        except ValueError:
+            continue
+        try:
+            text = path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        for m in SUB_RE.finditer(text):
+            bad.append(f"{rel}: {m.group(0)}")
+        for m in RID_RE.finditer(text):
+            bad.append(f"{rel}: {m.group(0)}")
+    assert not bad, "Possible real IDs in open CSVs:\n  " + "\n  ".join(bad[:50])
 
 
 if __name__ == "__main__":
     test_no_anon_id_map_tracked()
     test_no_sub_or_rid_in_tracked_text()
     test_open_csvs_lack_demographics()
-    test_packed_h5_lacks_demographics()
+    test_open_csvs_lack_real_subject_ids()
     print("PASS PHI guard")

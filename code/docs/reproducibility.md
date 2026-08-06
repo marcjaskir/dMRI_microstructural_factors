@@ -8,21 +8,19 @@ workspace_root/
   data/
     open/                # Publishable products
       atlases/ metadata/ inclusion/   # small; committed
-      dmri_microstructural_factors_open_v1.h5   # ← download / pack here (gitignored)
-      gam/ analysis/     # created by unpack; gitignored; not separate downloads
+      analysis/ gam/                  # from OSF storage; gitignored
 ```
 
 ### Open products (`data/open/`)
 
 Enough to reproduce factor analysis digests, **Laplacian eigenmaps** gradients,
-and asymmetry reports. Prefer the **OSF HDF5** as the single large artifact:
+and asymmetry reports. Prefer the **OSF directory share** of `data/open/`:
 
-1. Place `dmri_microstructural_factors_open_v1.h5` under `data/open/` (default),
-   or set `open_h5_path` / pass `--h5` to `fetch_open_data.py`.
-2. Unpack (`fetch_open_data.py` or `pack_open_h5.py unpack`) so `gam/` and
-   `analysis/` CSVs exist for `lib/paths.py` (`gam_dir`, `analysis_dir`).
+1. Clone the repo (committed stubs under `atlases/`, `metadata/`, `inclusion/`).
+2. Sync OSF storage into `data/open/` so `gam/` and `analysis/` CSVs exist for
+   `lib/paths.py` (`gam_dir`, `analysis_dir`).
 
-Contents after unpack:
+Typical contents after sync:
 
 - Post-GAM residual z-scores (`anon_id`, `group`, `*_z`) for kept analyses
   (manuscript scalars/tracts only; see `lib/manuscript_features.py`)
@@ -36,41 +34,24 @@ reversible ID maps, NIfTI volumes, HTML dumps, diffusion-map gradient trees,
 and microstructural scalars / WM tracts outside the manuscript analysis set.
 
 You may delete local `data/open/gam/` and `data/open/analysis/` to save disk;
-recreate them with `python -u code/lib/fetch_open_data.py --unpack-only`.
+re-download those folders from OSF into `data/open/`.
 
-### OSF HDF5 (preferred distribution)
-
-```bash
-# Set open_h5_osf_url in config.yaml or DMRI_MICRO_OSF_URL
-# Downloads to: data/open/dmri_microstructural_factors_open_v1.h5
-python -u code/lib/fetch_open_data.py
-
-# File already at that path:
-python -u code/lib/fetch_open_data.py --unpack-only
-```
-
-Pack / unpack / PHI schema check (lab):
+### OSF directory (preferred distribution)
 
 ```bash
-python -u code/lib/pack_open_h5.py pack --profile core
-python -u code/lib/pack_open_h5.py check
-python -u code/lib/pack_open_h5.py unpack
+# Set open_osf_url in config.yaml (project or storage link)
+# Download/sync OSF files into data/open/ so analysis/ and gam/ exist
 ```
 
-Placeholder until the OSF project exists: `OSF_URL=https://osf.io/XXXXX/`.
-
-Inspect a packed archive (schema v2 path-mirrored groups under `/open/`):
-
-```bash
-python -u code/lib/pack_open_h5.py ls --tree
-```
+Placeholder until the OSF project exists: `https://osf.io/XXXXX/`.
 
 ### Controlled export (lab only)
 
 From a local controlled workspace (e.g. `structural_tractometry`):
 
 ```bash
-python -u code/lib/export_tier1_open.py
+python -u code/lib/export_tier1_open.py --core   # manuscript core OSF share
+# or without --core for fuller manuscript-allowlisted GAM CSVs
 ```
 
 Maps real `sub` → `anon_id`, drops demographics, writes under `data/open/`. The
@@ -88,7 +69,7 @@ Environment overrides:
 - `DMRI_MICRO_CONFIG` — path to config file
 - `DMRI_MICRO_ROOT` — override `workspace_root`
 - `DMRI_MICRO_OPEN` — override `data_open_dir`
-- `DMRI_MICRO_OSF_URL` — OSF download URL for the open HDF5
+- `DMRI_MICRO_OSF_URL` — OSF project/storage URL for the open directory
 
 ## Manuscript analysis DAG
 

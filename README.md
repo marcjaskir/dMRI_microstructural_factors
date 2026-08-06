@@ -9,21 +9,14 @@ Factors of Microstructural Similarity with Diffusion MRI.
 dMRI_microstructural_factors/
   code/                 # All pipelines and analyses
   data/
-    open/               # Small committed trees + OSF HDF5 (see below)
+    open/               # Small committed trees + OSF-synced analysis/gam
   config.example.yaml
   README.md
 ```
 
-**HDF5 location (required for manuscript reproduction):**
-
-```
-data/open/dmri_microstructural_factors_open_v1.h5
-```
-
-Download from OSF into that path (or run `fetch_open_data.py`, which does it).
-`data/open/gam/` and `data/open/analysis/` are **not** shipped in git — unpack
-the HDF5 to create them. You may delete those trees anytime and re-run
-`python -u code/lib/fetch_open_data.py --unpack-only`.
+**Open data for manuscript reproduction:** sync the OSF **storage** tree into
+`data/open/` so `analysis/` and `gam/` exist beside the committed
+`atlases/` / `metadata/` / `inclusion/` stubs. No unpack step.
 
 ## Quick start
 
@@ -32,34 +25,17 @@ git clone git@github.com:marcjaskir/dMRI_microstructural_factors.git
 cd dMRI_microstructural_factors
 cp config.example.yaml config.yaml
 # Edit config.yaml: set workspace_root
-# After OSF upload: set open_h5_osf_url (or export DMRI_MICRO_OSF_URL)
+# After OSF upload: set open_osf_url (project/storage link)
 
 conda env create -f environment.yml
 conda activate dmri_microstructural_factors
 
 export PYTHONPATH="$PWD/code:$PYTHONPATH"
 
-# Downloads → data/open/dmri_microstructural_factors_open_v1.h5, then unpacks gam/ + analysis/
-python -u code/lib/fetch_open_data.py
-
+# Download OSF files into data/open/ (merge with committed stubs), then:
 python code/tests/golden/run_golden_tests.py
 python code/tests/test_factor_labels.py
 python code/tests/test_no_phi.py
-```
-
-If you already have the HDF5 file, copy it to
-`data/open/dmri_microstructural_factors_open_v1.h5` and run:
-
-```bash
-python -u code/lib/fetch_open_data.py --unpack-only
-```
-
-If the OSF project is not public yet, pack locally from an existing open tree:
-
-```bash
-python -u code/lib/pack_open_h5.py pack --profile core
-# writes data/open/dmri_microstructural_factors_open_v1.h5
-python -u code/lib/pack_open_h5.py unpack
 ```
 
 All filesystem roots are defined in `config.yaml` (see
@@ -67,16 +43,17 @@ All filesystem roots are defined in `config.yaml` (see
 
 ## Data availability and privacy
 
-Manuscript reproduction uses **one OSF-hosted HDF5**
-(`dmri_microstructural_factors_open_v1.h5`) containing anonymized tabular
-products: inclusion (`anon_id`, laterality/lobe), GAM residual z tables needed
-for kept analyses, factor loadings/scores/z, Laplacian-eigenmap gradient CSVs,
-and asymmetry digests. No participant age, sex, scanner covariates, or real IDs.
+Manuscript reproduction uses an **OSF-hosted `data/open/` directory** of
+anonymized tabular products: inclusion (`anon_id`, laterality/lobe), a minimal
+GAM residual-z sample (or fuller export), factor loadings/scores/z,
+Laplacian-eigenmap gradient CSVs, and asymmetry digests. No participant age,
+sex, scanner covariates, or real IDs.
 
-See [`data/open/README.md`](data/open/README.md) for the HDF5 schema and
-[`code/docs/reproducibility.md`](code/docs/reproducibility.md) for what is
-intentionally omitted (raw dMRI, CovBat covariates). Controlled export (lab
-only): `python -u code/lib/export_tier1_open.py` from `structural_tractometry`.
+See [`data/open/README.md`](data/open/README.md) and
+[`code/docs/reproducibility.md`](code/docs/reproducibility.md) for layout and
+what is intentionally omitted (raw dMRI, CovBat covariates). Controlled export
+(lab only): `python -u code/lib/export_tier1_open.py --core` from
+`structural_tractometry`.
 
 ## Pipeline overview
 

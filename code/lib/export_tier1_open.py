@@ -54,6 +54,50 @@ ANALYSIS_DIRS = [
     "covbat_example",
 ]
 
+# Core OSF share: enough for golden tests + manuscript digests (no full GAM dump).
+CORE_ANALYSIS_DIRS = [
+    "factor_analysis",
+    "factor_z-scores",
+    "factor_representation",
+    "gradients_group-controls",
+    "gradients_tle_z",
+    "tract_asymmetry",
+    "region_asymmetry_tle",
+    "2_microstructural_asymmetries",
+    "microstructural_asymmetries",
+    "profile_thirds_example",
+    "qc",
+]
+
+CORE_OPEN_GLOBS: tuple[str, ...] = (
+    "inclusion/*.csv",
+    "metadata/*.json",
+    "atlases/**/*.csv",
+    "atlases/**/*.tsv",
+    "atlases/**/*.json",
+    "atlases/**/*.txt",
+    "atlases/**/*.md",
+    "analysis/factor_analysis/**/*.csv",
+    "analysis/factor_z-scores/factor_scores/*.csv",
+    "analysis/factor_z-scores/factor_z_scores/*.csv",
+    "analysis/factor_representation/**/*.csv",
+    "analysis/gradients_group-controls/laplacian_eigenmodes/csv/**/*.csv",
+    "analysis/gradients_tle_z/**/*.csv",
+    "analysis/microstructural_asymmetries/*.csv",
+    "analysis/qc/**/*.csv",
+    "analysis/tract_asymmetry/**/*_asym_scalars.csv",
+    "analysis/region_asymmetry_tle/**/*.csv",
+    "analysis/profile_thirds_example/**/*.csv",
+    "gam/pyafq/HCP1065/ILF_L/ILF_L_dti_md_stat-mean_gam.csv",
+)
+
+CORE_GAM_FILES: tuple[tuple[str, str], ...] = (
+    (
+        "derivatives/gam/pyafq/HCP1065/ILF_L/ILF_L_dti_md_stat-mean_gam.csv",
+        "gam/pyafq/HCP1065/ILF_L/ILF_L_dti_md_stat-mean_gam.csv",
+    ),
+)
+
 # Rename on copy into open analysis/
 ANALYSIS_RENAME = {
     "2_microstructural_asymmetries": "microstructural_asymmetries",
@@ -91,6 +135,8 @@ def save_map(mapping: dict[str, str]) -> None:
 
 def is_skipped_file(path: Path) -> bool:
     name = path.name
+    if name.startswith("._"):
+        return True
     if any(part in path.parts for part in SKIP_NAME_PARTS):
         return True
     lower = name.lower()
@@ -210,7 +256,12 @@ def anonymize_path_part(part: str, mapping: dict[str, str]) -> str:
     return part
 
 
-def export_analysis_dir(name: str, mapping: dict[str, str]) -> None:
+def export_analysis_dir(
+    name: str,
+    mapping: dict[str, str],
+    *,
+    tabular_only: bool = False,
+) -> None:
     src = SRC / "derivatives" / "analysis" / name
     if not src.exists():
         print(f"skip missing {name}")
@@ -222,25 +273,84 @@ def export_analysis_dir(name: str, mapping: dict[str, str]) -> None:
         rel = src_f.relative_to(src)
         parts = [anonymize_path_part(part, mapping) for part in rel.parts]
         dst = dst_root.joinpath(*parts)
-        if src_f.suffix.lower() in {".csv", ".tsv"}:
+        suf = src_f.suffix.lower()
+        if suf in {".csv", ".tsv"}:
             try:
                 export_tabular(src_f, dst, mapping)
             except Exception as e:
                 print(f"warn: {src_f}: {e}")
-        elif src_f.suffix.lower() in {".json"}:
+        elif suf in {".json"}:
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src_f, dst)
-        elif src_f.stat().st_size > 25_000_000:
-            # skip huge html/png
+        elif tabular_only:
             continue
-        elif src_f.suffix.lower() in {".png", ".html", ".pdf", ".svg"}:
+        elif src_f.stat().st_size > 25_000_000:
+            continue
+        elif suf in {".png", ".html", ".pdf", ".svg"}:
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src_f, dst)
         else:
-            # other small text-like
             if src_f.stat().st_size < 5_000_000:
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(src_f, dst)
+
+
+def flatten_factor_analysis_all4() -> None:
+    """Move ``factor_analysis/All4_Combined/*`` up to ``factor_analysis/``."""
+    nested = OPEN / "analysis" / "factor_analysis" / "All4_Combined"
+    dest = OPEN / "analysis" / "factor_analysis"
+    if not nested.is_dir():
+        return
+    for path in nested.iterdir():
+        if path.is_file():
+            target = dest / path.name
+            if target.exists():
+                target.unlink()
+            shutil.move(str(path), str(target))
+    shutil.rmtree(nested, ignore_errors=True)
+    print("flattened factor_analysis/All4_Combined/ -> factor_analysis/")
+
+
+def prune_open_to_core_globs() -> int:
+    """Keep only paths matching manuscript core globs under data/open/."""
+    import fnmatch
+
+    kept: set[Path] = set()
+    for pattern in CORE_OPEN_GLOBS:
+        for path in OPEN.glob(pattern):
+            if path.is_file():
+                kept.add(path.resolve())
+    # Always keep README and .gitkeep placeholders
+    for path in OPEN.rglob("*"):
+        if path.is_file() and (
+            path.name == "README.md"
+            or path.name == ".gitkeep"
+            or path.suffix.lower() in {".md"}
+            and "atlases" in path.parts
+        ):
+            kept.add(path.resolve())
+
+    removed = 0
+    for path in list(OPEN.rglob("*")):
+        if not path.is_file():
+            continue
+        if path.resolve() in kept:
+            continue
+        # Do not delete committed-ish small trees wholesale if matched somehow
+        rel = path.relative_to(OPEN).as_posix()
+        if any(fnmatch.fnmatch(rel, pat) for pat in CORE_OPEN_GLOBS):
+            continue
+        path.unlink()
+        removed += 1
+    # Remove empty dirs (bottom-up), keep top-level placeholders
+    for path in sorted(OPEN.rglob("*"), key=lambda p: len(p.parts), reverse=True):
+        if path.is_dir() and not any(path.iterdir()):
+            if path.name in {"atlases", "metadata", "gam", "analysis", "inclusion"}:
+                continue
+            path.rmdir()
+    print(f"pruned {removed} non-core files under data/open/")
+    return removed
+
 
 
 def export_atlases() -> None:
@@ -340,7 +450,28 @@ def export_inclusion(mapping: dict[str, str]) -> None:
         df.to_csv(dst / "penn_epilepsy_included_basic_metadata.csv", index=False)
 
 
-def main() -> int:
+def export_core_gam(mapping: dict[str, str]) -> None:
+    for src_rel, dst_rel in CORE_GAM_FILES:
+        src = SRC / src_rel
+        dst = OPEN / dst_rel
+        if not src.exists():
+            print(f"warn: missing core GAM {src}")
+            continue
+        export_gam_csv(src, dst, mapping)
+        print(f"  wrote {dst_rel}")
+
+
+def main(argv: list[str] | None = None) -> int:
+    import argparse
+
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument(
+        "--core",
+        action="store_true",
+        help="Manuscript core OSF share only (CSV/JSON digests + minimal GAM; no full GAM dump).",
+    )
+    args = p.parse_args(argv)
+
     mapping = load_or_init_map()
     OPEN.mkdir(parents=True, exist_ok=True)
     for sub in ["atlases", "metadata", "gam", "analysis", "inclusion"]:
@@ -354,26 +485,36 @@ def main() -> int:
     export_inclusion(mapping)
     save_map(mapping)
 
-    print("=== GAM pyafq ===")
-    export_gam_tree(SRC / "derivatives" / "gam" / "pyafq", OPEN / "gam" / "pyafq", mapping)
-    save_map(mapping)
-    print("=== GAM mni_micro ===")
-    export_gam_tree(SRC / "derivatives" / "gam" / "mni_micro", OPEN / "gam" / "mni_micro", mapping)
-    save_map(mapping)
-
-    print("=== analysis ===")
-    for name in ANALYSIS_DIRS:
-        export_analysis_dir(name, mapping)
+    if args.core:
+        print("=== GAM (core sample only) ===")
+        export_core_gam(mapping)
         save_map(mapping)
+        print("=== analysis (core, tabular only) ===")
+        for name in CORE_ANALYSIS_DIRS:
+            export_analysis_dir(name, mapping, tabular_only=True)
+            save_map(mapping)
+        flatten_factor_analysis_all4()
+        prune_open_to_core_globs()
+    else:
+        print("=== GAM pyafq ===")
+        export_gam_tree(SRC / "derivatives" / "gam" / "pyafq", OPEN / "gam" / "pyafq", mapping)
+        save_map(mapping)
+        print("=== GAM mni_micro ===")
+        export_gam_tree(SRC / "derivatives" / "gam" / "mni_micro", OPEN / "gam" / "mni_micro", mapping)
+        save_map(mapping)
+        print("=== analysis ===")
+        for name in ANALYSIS_DIRS:
+            export_analysis_dir(name, mapping)
+            save_map(mapping)
+        flatten_factor_analysis_all4()
 
     save_map(mapping)
-    # summarize
     print("=== done ===")
     print(f"anon map: {MAP_PATH} ({len(mapping)} subjects)")
     for sub in ["atlases", "metadata", "gam", "analysis", "inclusion"]:
-        p = OPEN / sub
-        size = sum(f.stat().st_size for f in p.rglob("*") if f.is_file())
-        print(f"  {sub}: {size/1e9:.2f} GB")
+        pth = OPEN / sub
+        size = sum(f.stat().st_size for f in pth.rglob("*") if f.is_file())
+        print(f"  {sub}: {size/1e6:.1f} MB")
     return 0
 
 

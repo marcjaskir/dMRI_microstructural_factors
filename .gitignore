@@ -51,12 +51,12 @@ tests/golden/output/
 *.png
 *.mat
 
-# Large open products (populate via OSF HDF5 unpack; do not commit multi-GB trees)
+# Large open products (populate via OSF directory sync; do not commit multi-GB trees)
 data/open/gam/**
 data/open/analysis/**
 !data/open/gam/.gitkeep
 !data/open/analysis/.gitkeep
-# Manuscript HDF5 + checksum sidecar (download from OSF; do not commit)
+# Legacy HDF5 artifacts if present locally (not part of the published workflow)
 data/open/*.h5
 data/open/*.h5.sha256
 data/open/dmri_microstructural_factors_open*.h5*

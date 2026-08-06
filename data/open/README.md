@@ -1,158 +1,78 @@
-# Open analysis products
+# Open data (`data/open/`)
 
-Publishable products for reproducing manuscript figures/tables from post-GAM
-residual **z-scores** onward. No subject IDs, age, or sex.
+De-identified products for manuscript reproduction. Analysis code reads
+`gam_dir` / `analysis_dir` (and related roots) under this tree via `config.yaml`.
 
-Distribution model: **one OSF-hosted HDF5**. The large `gam/` and `analysis/`
-trees are **not** in git and are **not** separate downloads — they appear only
-after you unpack that file.
+**Distribution model:** OSF hosts the **`data/open/` directory tree** (CSV/JSON/TSV).
+There is no HDF5 unpack step.
 
-## Where the HDF5 goes
+## After clone
 
-After downloading from OSF (or copying a lab-built pack), place the file here:
-
-```
-<data_open_dir>/dmri_microstructural_factors_open_v1.h5
-```
-
-With the default config (`data_open_dir: ${workspace_root}/data/open`), that is:
-
-```
-dMRI_microstructural_factors/data/open/dmri_microstructural_factors_open_v1.h5
-```
-
-Optional overrides:
-
-| Mechanism | Effect |
-|-----------|--------|
-| `open_h5_filename` in `config.yaml` | Change the file name under `data/open/` |
-| `open_h5_path` in `config.yaml` | Absolute path to the HDF5 (anywhere on disk) |
-| `python …/fetch_open_data.py --h5 PATH` | Use a one-off path for this run |
-
-## Preferred workflow
+1. Clone this repository (ships small committed trees: `atlases/`, `metadata/`,
+   `inclusion/`, and placeholders).
+2. Download the OSF **storage** files into `data/open/` so `analysis/` and `gam/`
+   sit beside those committed stubs (merge/overwrite as needed).
+3. Run golden tests (see repo root `README.md`).
 
 ```bash
-# 1. config.yaml: set workspace_root and open_h5_osf_url (or DMRI_MICRO_OSF_URL)
-# 2. Download into data/open/ and unpack gam/ + analysis/ CSVs
-python -u code/lib/fetch_open_data.py
-
-# Already have the file at the path above?
-python -u code/lib/fetch_open_data.py --unpack-only
+# 1. config.yaml: set workspace_root and open_osf_url (project/storage link)
+# 2. Sync OSF files into data/open/ (browser, osfclient, or manual zip extract)
+# 3. Confirm analysis/ and gam/ exist, then:
+export PYTHONPATH="$PWD/code:$PYTHONPATH"
+python code/tests/golden/run_golden_tests.py
 ```
 
-`fetch_open_data.py` writes the HDF5 to the path above (gitignored), then expands
-tabular products into `data/open/`. You can delete local `gam/` and `analysis/`
-at any time and recreate them with `--unpack-only`.
-
-**OSF placeholder (replace after upload):**
-
-```
-OSF_URL=https://osf.io/XXXXX/
-```
-
-Upload checklist: file name `dmri_microstructural_factors_open_v1.h5`, root attr
-`schema_version=2`, publish SHA256 in this README once available.
-
-Local core pack checksum (regenerate after re-pack):
-
-```
-4fbbd397ce23d8ad90eec30c48011dd72b7451f7cb14e203125feab8b806787a  dmri_microstructural_factors_open_v1.h5
-```
+Placeholder until the OSF project exists: set `open_osf_url` in `config.yaml` to
+`https://osf.io/XXXXX/` (or your storage/files URL).
 
 ## Layout
-
-### Committed in git (small)
 
 ```
 data/open/
   README.md
-  atlases/       # Label TSVs, tract metadata, centroids
-  metadata/      # Scalar label/color JSON (manuscript n=26)
-  inclusion/     # Anonymized cohort tables
-  gam/.gitkeep
-  analysis/.gitkeep
+  atlases/ metadata/ inclusion/   # small; committed in git
+  analysis/                       # from OSF (gitignored)
+  gam/                            # from OSF (gitignored; core sample or fuller export)
 ```
 
-### Local only (from HDF5 unpack; gitignored)
+### Committed (git)
 
-```
-data/open/
-  dmri_microstructural_factors_open_v1.h5   # ← put the download here
-  gam/           # Selected post-GAM residual z tables
-  analysis/      # Factor loadings/scores, LE gradients, asymmetry digests
-```
+- Atlas label tables / metadata JSON filtered to manuscript scalars & tracts
+- Anonymized inclusion lists (`anon_id`, laterality/lobe; no age/sex)
 
-Open products contain only the **manuscript feature set**: 26 microstructural
-scalars and 48 HCP1065 WM tracts (24 L/R pairs). Packaging/export uses
-allowlists in `code/lib/manuscript_features.py`; analysis code reads whatever
-is present and does not apply exclusion lists.
+### From OSF (typically)
 
-## HDF5 schema (version 2)
+- `analysis/` — factor loadings/scores/z, LE gradient CSVs, asymmetry digests
+- `gam/` — at least the minimal core sample
+  (`gam/pyafq/HCP1065/ILF_L/ILF_L_dti_md_stat-mean_gam.csv`), or a fuller GAM
+  dump if you export with `export_tier1_open.py` without `--core`
 
-Root attributes:
+You may upload only `analysis/` + `gam/` (users keep git’s `atlases/` /
+`metadata/` / `inclusion/`), or the whole `data/open/` tree for a one-stop
+download.
 
-| Attr | Meaning |
-|------|---------|
-| `schema_version` | `2` |
-| `paper_citation` | Manuscript citation stub |
-| `created_utc` | Pack timestamp |
-| `profile` | `core` or `full_csv` |
-| `osf_url` | Download URL / placeholder |
-| `n_files` | Number of packed payloads |
-| `sha256` | Archive checksum |
+## Core manuscript share
 
-Layout (path-mirrored under `/open/…`, same as unpack tree):
-
-```
-/
-├── catalog          # inventory: relpath, h5_path, nbytes, sha256, content_type
-└── open/
-    ├── inclusion/
-    ├── metadata/
-    ├── atlases/
-    ├── gam/
-    └── analysis/
-        ├── factor_analysis/          # combined FA products (no All4_Combined/ subdir)
-        ├── factor_z-scores/
-        ├── gradients_group-controls/
-        └── …
-```
-
-Leaf datasets are gzip-compressed file bytes with attrs `relpath`, `content_type`,
-`sha256`, `nbytes`. Browse with:
+Default lab export for OSF is the **core** product set (golden tests + published
+digests), not a full multi‑GB GAM re-export:
 
 ```bash
-python -u code/lib/pack_open_h5.py ls --tree
-# or: h5ls -r data/open/dmri_microstructural_factors_open_v1.h5
+# Lab only — from controlled structural_tractometry source
+python -u code/lib/export_tier1_open.py --core
 ```
 
-Schema v1 archives (`/files/<uuid>`) still unpack for compatibility; new packs are v2 only.
+Omit `--core` for a fuller CSV tree (all manuscript-allowlisted GAM tables).
 
-### Column rules
+**Intentionally omitted from open products:** raw dMRI, CovBat covariates
+(age/sex/scanner), reversible ID maps, NIfTI volumes, HTML dumps, and
+scalars / WM tracts outside the manuscript analysis set
+(`lib/manuscript_features.py`).
 
-| Product | Keep | Never include |
-|---------|------|----------------|
-| GAM / factor z | `anon_id`, `group`, `*_z` / `node*_z` | age, sex, scanner/`bat`, real BIDS IDs |
-| Inclusion | `anon_id`, `group`, `laterality`, `lobe` | age, sex, RID, outcomes |
-| Gradients / asymmetry | ROI labels, G1/G2, Cohen’s d, Mahalanobis digests | demographics, `anon_id_map` |
+## Privacy
 
-### Excluded from the archive
-
-NIfTI / voxelwise volumes, HTML reports, exploratory PNGs, diffusion-map
-(`diffusion_embedding`) trees, reversible `anon_id_map`, age/sex/scanner columns.
-
-## Lab-only: build the pack
-
-From a populated open tree (e.g. after `export_tier1_open.py`):
+Open CSVs use `anon_id` only. The reversible map stays in
+`data/controlled/anon_id_map.csv` (gitignored). Run:
 
 ```bash
-python -u code/lib/pack_open_h5.py pack --profile core
-python -u code/lib/pack_open_h5.py check
-python -u code/lib/pack_open_h5.py ls --tree
-python -u code/lib/pack_open_h5.py unpack   # round-trip into data/open/
+python code/tests/test_no_phi.py
 ```
-
-`core` covers golden tests + manuscript digests. `full_csv` adds broader GAM /
-normative covariance CSVs (much larger).
-
-See root `README.md` and `code/docs/reproducibility.md`.
