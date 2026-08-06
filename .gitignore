@@ -66,6 +66,9 @@ data/controlled/anon_id_map.csv
 # Cohort inclusion scripts (controlled-source only; open ships data/open/inclusion CSVs)
 code/analysis/inclusion/
 
+# Along-tract Mahalanobis profile HTML report (not shipped)
+code/analysis/microstructural_asymmetries/microstructural_asymmetry_report_mahalanobis_profiles.py
+
 # Local/exploratory atlas helpers (keep out of published repo)
 code/atlases/correct_glasser.sh
 code/atlases/gen_random_atlases.py
