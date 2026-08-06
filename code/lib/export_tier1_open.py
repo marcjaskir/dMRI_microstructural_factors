@@ -262,6 +262,25 @@ def export_atlases() -> None:
                 shutil.copy2(path, out)
 
 
+# Scalars omitted from the manuscript All4_Combined factor analysis (n=26 retained).
+MANUSCRIPT_EXCLUDED_SCALARS = frozenset(
+    {
+        "map_li",
+        "map_am",
+        "dti_txx",
+        "dti_txy",
+        "dti_txz",
+        "dti_tyy",
+        "dti_tyz",
+        "dti_tzz",
+        "dti_ha",
+        "rdi_rd1",
+        "rdi_rd2",
+        "gqi_iso",
+    }
+)
+
+
 def export_metadata() -> None:
     src = SRC / "data" / "metadata"
     dst = OPEN / "metadata"
@@ -272,8 +291,15 @@ def export_metadata() -> None:
         "scalar_labels_to_directories.json",
     ]:
         p = src / name
-        if p.exists():
-            shutil.copy2(p, dst / name)
+        if not p.exists():
+            continue
+        with p.open(encoding="utf-8") as fh:
+            data = json.load(fh)
+        filtered = {k: v for k, v in data.items() if k not in MANUSCRIPT_EXCLUDED_SCALARS}
+        dst.mkdir(parents=True, exist_ok=True)
+        with (dst / name).open("w", encoding="utf-8") as fh:
+            json.dump(filtered, fh, indent=2)
+            fh.write("\n")
 
 
 def export_inclusion(mapping: dict[str, str]) -> None:

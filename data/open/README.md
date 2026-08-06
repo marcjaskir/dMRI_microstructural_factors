@@ -36,7 +36,7 @@ Local core pack checksum (regenerate after re-pack):
 data/open/
   dmri_microstructural_factors_open_v1.h5   # cache (gitignored)
   atlases/       # Label TSVs, tract metadata, centroids (also small files may be committed)
-  metadata/      # Scalar label/color JSON only (no demographics)
+  metadata/      # Scalar label/color JSON for the manuscript n=26 scalars only
   inclusion/     # Anonymized cohort tables
   gam/           # Selected post-GAM residual z tables
   analysis/      # Factor loadings/scores, LE gradients, asymmetry digests
