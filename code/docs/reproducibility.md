@@ -87,19 +87,6 @@ region_asymmetry_tle ├→ microstructural_asymmetries
 Factor labels (F1 overall, F2 non-Gaussian, F3 anisotropic) are centralized in
 `code/lib/factor_labels.py`.
 
-## Golden-output tests
-
-```bash
-export PYTHONPATH="$PWD/code:$PYTHONPATH"
-python code/tests/golden/run_golden_tests.py capture  # first run / justified refresh
-python code/tests/golden/run_golden_tests.py
-python code/tests/test_factor_labels.py
-python code/tests/test_no_phi.py
-```
-
-Baselines under `code/tests/golden/baseline/` (gitignored) cover profile means,
-tract asymmetry summaries, and manuscript table digests (`rtol≈1e-6`).
-
 ## Singularity images
 
 QSIPrep, QSIRecon, and Trekker `.sif` files are not shipped. Configure local

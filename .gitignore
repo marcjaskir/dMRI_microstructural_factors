@@ -27,10 +27,8 @@ results/
 *.sif
 
 # Golden test local checkpoints (may contain identifiable keys)
-code/tests/golden/baseline/
-code/tests/golden/output/
-tests/golden/baseline/
-tests/golden/output/
+code/tests/
+tests/
 
 # OS / editor
 .DS_Store
