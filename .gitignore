@@ -69,6 +69,9 @@ code/analysis/inclusion/
 # Along-tract Mahalanobis profile HTML report (not shipped)
 code/analysis/microstructural_asymmetries/microstructural_asymmetry_report_mahalanobis_profiles.py
 
+# QC correlation script (not shipped; BundleSeg QC remains)
+code/analysis/qc/qc.py
+
 # Local/exploratory atlas helpers (keep out of published repo)
 code/atlases/correct_glasser.sh
 code/atlases/gen_random_atlases.py

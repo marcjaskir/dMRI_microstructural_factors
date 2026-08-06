@@ -2,15 +2,15 @@
 
 ## Purpose
 
-QC vs factor z correlations; BundleSeg QC.
+BundleSeg QC.
 
 ## Entry points
 
-qc.py, bundleseg_qc.py
+`bundleseg_qc.py`
 
 ## Inputs
 
-factor_z-scores, bundleseg
+bundleseg
 
 ## Outputs
 

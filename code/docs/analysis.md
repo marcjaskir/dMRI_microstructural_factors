@@ -11,7 +11,7 @@ GAM normative z-scores; **Laplacian eigenmaps** (G1/G2); Cohen’s d and
 
 | Module | Purpose | Entry points |
 |--------|---------|--------------|
-| [qc](../analysis/qc/) | QC correlations; BundleSeg QC | `qc.py`, `bundleseg_qc.py` |
+| [qc](../analysis/qc/) | BundleSeg QC | `bundleseg_qc.py` |
 
 ## Factor analysis and gradients
 
