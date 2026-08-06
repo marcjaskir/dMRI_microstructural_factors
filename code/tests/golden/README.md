@@ -11,7 +11,8 @@ cp config.example.yaml config.yaml   # set workspace_root
 export PYTHONPATH="$PWD/code:$PYTHONPATH"
 ```
 
-Open products must be present under `data/open/` (see root README / OSF directory sync).
+Open products must be present under `data/open/` (download from
+[https://osf.io/xsr7y](https://osf.io/xsr7y); see root README).
 
 ## Capture baseline (first run / after justified refresh)
 

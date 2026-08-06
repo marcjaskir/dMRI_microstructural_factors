@@ -14,19 +14,25 @@ workspace_root/
 ### Open products (`data/open/`)
 
 Enough to reproduce factor analysis digests, **Laplacian eigenmaps** gradients,
-and asymmetry reports. Prefer the **OSF directory share** of `data/open/`:
+and asymmetry reports. Prefer the OSF project
+[https://osf.io/xsr7y](https://osf.io/xsr7y):
 
 1. Clone the repo (committed stubs under `atlases/`, `metadata/`, `inclusion/`).
-2. Sync OSF storage into `data/open/` so `gam/` and `analysis/` CSVs exist for
-   `lib/paths.py` (`gam_dir`, `analysis_dir`).
+2. Download the OSF zip (or sync storage) into `data/open/` so `gam/` and
+   `analysis/` CSVs exist for `lib/paths.py` (`gam_dir`, `analysis_dir`).
+
+```bash
+mkdir -p data/open
+unzip /path/to/dmri_microstructural_factors_open_v1.zip -d data/open
+```
 
 Typical contents after sync:
 
 - Post-GAM residual z-scores (`anon_id`, `group`, `*_z`) for kept analyses
   (manuscript scalars/tracts only; see `lib/manuscript_features.py`)
-- Factor loadings / scores / factor z
+- Factor loadings / factor z
 - Control LE gradient products (G1/G2, neuroaxis correlations)
-- Tract/region asymmetry summaries and group Cohen’s d / Mahalanobis digests
+- Tract asymmetry subject tables and group Cohen’s d / Mahalanobis digests
 - Atlas label tables and anonymized inclusion (`laterality`, `lobe`; no age/sex)
 
 **Intentionally omitted:** raw dMRI, CovBat covariates (age/sex/scanner),
@@ -34,24 +40,21 @@ reversible ID maps, NIfTI volumes, HTML dumps, diffusion-map gradient trees,
 and microstructural scalars / WM tracts outside the manuscript analysis set.
 
 You may delete local `data/open/gam/` and `data/open/analysis/` to save disk;
-re-download those folders from OSF into `data/open/`.
+re-download from [https://osf.io/xsr7y](https://osf.io/xsr7y).
 
-### OSF directory (preferred distribution)
+### OSF (preferred distribution)
 
-```bash
-# Set open_osf_url in config.yaml (project or storage link)
-# Download/sync OSF files into data/open/ so analysis/ and gam/ exist
-```
-
-Placeholder until the OSF project exists: `https://osf.io/XXXXX/`.
+Project: [https://osf.io/xsr7y](https://osf.io/xsr7y)  
+Config key: `open_osf_url` (or env `DMRI_MICRO_OSF_URL`).
 
 ### Controlled export (lab only)
 
 From a local controlled workspace (e.g. `structural_tractometry`):
 
 ```bash
-python -u code/lib/export_tier1_open.py --core   # manuscript core OSF share
-# or without --core for fuller manuscript-allowlisted GAM CSVs
+python -u code/lib/export_tier1_open.py --core   # manuscript core + full manuscript GAM
+# Or refresh GAM only:
+python -u code/lib/export_tier1_open.py --gam-only --force-gam
 ```
 
 Maps real `sub` → `anon_id`, drops demographics, writes under `data/open/`. The

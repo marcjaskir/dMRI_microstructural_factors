@@ -3,27 +3,28 @@
 De-identified products for manuscript reproduction. Analysis code reads
 `gam_dir` / `analysis_dir` (and related roots) under this tree via `config.yaml`.
 
-**Distribution model:** OSF hosts the **`data/open/` directory tree** (CSV/JSON/TSV).
+**Distribution:** OSF project **[https://osf.io/xsr7y](https://osf.io/xsr7y)** hosts
+the `data/open/` tree (typically as `dmri_microstructural_factors_open_v1.zip`).
 There is no HDF5 unpack step.
 
 ## After clone
 
 1. Clone this repository (ships small committed trees: `atlases/`, `metadata/`,
    `inclusion/`, and placeholders).
-2. Download the OSF **storage** files into `data/open/` so `analysis/` and `gam/`
-   sit beside those committed stubs (merge/overwrite as needed).
+2. Download open data from [https://osf.io/xsr7y](https://osf.io/xsr7y) into
+   `data/open/` so `analysis/` and `gam/` sit beside those committed stubs.
 3. Run golden tests (see repo root `README.md`).
 
 ```bash
-# 1. config.yaml: set workspace_root and open_osf_url (project/storage link)
-# 2. Sync OSF files into data/open/ (browser, osfclient, or manual zip extract)
-# 3. Confirm analysis/ and gam/ exist, then:
+# config.yaml: set workspace_root; open_osf_url is https://osf.io/xsr7y
+mkdir -p data/open
+# Prefer the OSF zip (contents are rooted at data/open/):
+unzip /path/to/dmri_microstructural_factors_open_v1.zip -d data/open
+# Or sync individual OSF storage files into data/open/
+
 export PYTHONPATH="$PWD/code:$PYTHONPATH"
 python code/tests/golden/run_golden_tests.py
 ```
-
-Placeholder until the OSF project exists: set `open_osf_url` in `config.yaml` to
-`https://osf.io/XXXXX/` (or your storage/files URL).
 
 ## Layout
 
@@ -32,7 +33,7 @@ data/open/
   README.md
   atlases/ metadata/ inclusion/   # small; committed in git
   analysis/                       # from OSF (gitignored)
-  gam/                            # from OSF (gitignored; core sample or fuller export)
+  gam/                            # from OSF (gitignored)
 ```
 
 ### Committed (git)
@@ -51,19 +52,18 @@ data/open/
   `mni_micro/` (`anon_id` + `*_z` only; no age/sex/scanner/batch)
 
 You may upload only `analysis/` + `gam/` (users keep git’s `atlases/` /
-`metadata/` / `inclusion/`), or the whole `data/open/` tree for a one-stop
-download.
+`metadata/` / `inclusion/`), or the whole `data/open/` tree / zip for a
+one-stop download.
 
-## Core manuscript share
-
-Default lab export for OSF is the **core** product set (golden tests + published
-digests) plus full manuscript-allowlisted GAM residual-z tables:
+## Lab export (maintainers)
 
 ```bash
-# Lab only — from controlled structural_tractometry source
+# From controlled structural_tractometry source
 python -u code/lib/export_tier1_open.py --core
 # Or refresh GAM only:
 python -u code/lib/export_tier1_open.py --gam-only --force-gam
+# Optional: rebuild zip for OSF upload
+# (from repo)  cd data/open && zip -r ../dmri_microstructural_factors_open_v1.zip .
 ```
 
 **Intentionally omitted from open products:** raw dMRI, CovBat covariates

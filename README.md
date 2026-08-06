@@ -14,9 +14,10 @@ dMRI_microstructural_factors/
   README.md
 ```
 
-**Open data for manuscript reproduction:** sync the OSF **storage** tree into
-`data/open/` so `analysis/` and `gam/` exist beside the committed
-`atlases/` / `metadata/` / `inclusion/` stubs. No unpack step.
+**Open data for manuscript reproduction:** download from OSF
+([https://osf.io/xsr7y](https://osf.io/xsr7y)) and place under `data/open/` so
+`analysis/` and `gam/` exist beside the committed `atlases/` / `metadata/` /
+`inclusion/` stubs.
 
 ## Quick start
 
@@ -24,15 +25,18 @@ dMRI_microstructural_factors/
 git clone git@github.com:marcjaskir/dMRI_microstructural_factors.git
 cd dMRI_microstructural_factors
 cp config.example.yaml config.yaml
-# Edit config.yaml: set workspace_root
-# After OSF upload: set open_osf_url (project/storage link)
+# Edit config.yaml: set workspace_root (open_osf_url defaults to https://osf.io/xsr7y)
 
 conda env create -f environment.yml
 conda activate dmri_microstructural_factors
 
 export PYTHONPATH="$PWD/code:$PYTHONPATH"
 
-# Download OSF files into data/open/ (merge with committed stubs), then:
+# Download open data from OSF (https://osf.io/xsr7y), e.g. the open zip, then:
+mkdir -p data/open
+unzip /path/to/dmri_microstructural_factors_open_v1.zip -d data/open
+# Or sync OSF storage files into data/open/ so analysis/ and gam/ are present
+
 python code/tests/golden/run_golden_tests.py
 python code/tests/test_factor_labels.py
 python code/tests/test_no_phi.py
@@ -43,11 +47,12 @@ All filesystem roots are defined in `config.yaml` (see
 
 ## Data availability and privacy
 
-Manuscript reproduction uses an **OSF-hosted `data/open/` directory** of
-anonymized tabular products: inclusion (`anon_id`, laterality/lobe), a minimal
-GAM residual-z sample (or fuller export), factor loadings/scores/z,
-Laplacian-eigenmap gradient CSVs, and asymmetry digests. No participant age,
-sex, scanner covariates, or real IDs.
+Manuscript reproduction uses an **OSF-hosted `data/open/` archive**
+([https://osf.io/xsr7y](https://osf.io/xsr7y)) of anonymized tabular products:
+inclusion (`anon_id`, laterality/lobe), manuscript-allowlisted GAM residual-z
+tables (`pyafq/` + `mni_micro/`), factor loadings/z, Laplacian-eigenmap gradient
+CSVs, and asymmetry digests. No participant age, sex, scanner covariates, or
+real IDs.
 
 See [`data/open/README.md`](data/open/README.md) and
 [`code/docs/reproducibility.md`](code/docs/reproducibility.md) for layout and

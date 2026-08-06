@@ -60,6 +60,9 @@ data/open/analysis/**
 data/open/*.h5
 data/open/*.h5.sha256
 data/open/dmri_microstructural_factors_open*.h5*
+# Local OSF upload zip (do not commit)
+data/dmri_microstructural_factors_open*.zip
+data/*.zip
 # anon map is controlled
 data/controlled/anon_id_map.csv
 

@@ -15,10 +15,9 @@ Paths in this docs set refer to modules under `code/` unless noted as `data/open
 
 1. Clone the repository and copy `config.example.yaml` to `config.yaml` at the
    workspace root; set `workspace_root`.
-2. Sync OSF storage into `data/open/` so `analysis/` and `gam/` exist beside the
-   committed `atlases/` / `metadata/` / `inclusion/` stubs (see
-   `data/open/README.md`). Set `open_osf_url` in `config.yaml` to the project
-   or storage link.
+2. Download open data from [https://osf.io/xsr7y](https://osf.io/xsr7y) into
+   `data/open/` (zip extract or storage sync) so `analysis/` and `gam/` exist
+   beside the committed stubs (see `data/open/README.md`).
 3. Install the conda environment from `environment.yml`.
 4. Set `PYTHONPATH` to include `code/` and run golden tests under `code/tests/golden/`.
 

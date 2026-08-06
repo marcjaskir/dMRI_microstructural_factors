@@ -17,10 +17,9 @@ atlas_dir: ${data_open_dir}/atlases
 open_metadata_dir: ${data_open_dir}/metadata
 inclusion_dir: ${data_open_dir}/inclusion
 
-# OSF project/storage link for the open data/open/ directory share.
-# After clone, sync OSF files into data/open/ so analysis/ and gam/ exist.
-# (atlases/, metadata/, inclusion/ are small and committed in git.)
-open_osf_url: https://osf.io/XXXXX/  # replace after creating the OSF project
+# OSF open-data project (download zip / storage into data/open/).
+# https://osf.io/xsr7y
+open_osf_url: https://osf.io/xsr7y
 
 # Compatibility aliases used by some scripts (point at open products)
 project_root: ${workspace_root}
