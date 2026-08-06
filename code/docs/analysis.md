@@ -7,11 +7,10 @@ Terminology: **overall / non-Gaussian / anisotropic diffusivity** (F1/F2/F3);
 GAM normative z-scores; **Laplacian eigenmaps** (G1/G2); Cohen’s d and
 **Mahalanobis** asymmetry. Datasets: Penn, HCP-YA, HCP-Aging, TLE.
 
-## Cohort and QC
+## QC
 
 | Module | Purpose | Entry points |
 |--------|---------|--------------|
-| [inclusion](../analysis/inclusion/) | Penn epilepsy / control inclusion criteria | `penn_epilepsy_inclusion.py`, `controls_inclusion.py` |
 | [qc](../analysis/qc/) | QC correlations; BundleSeg QC | `qc.py`, `bundleseg_qc.py` |
 
 ## Factor analysis and gradients
@@ -44,10 +43,9 @@ GAM normative z-scores; **Laplacian eigenmaps** (G1/G2); Cohen’s d and
 
 ## Typical analysis order
 
-1. `inclusion` → anonymized subject lists
-2. `factor_analysis` → `factor_z-scores` → `gradients_group-controls` (LE) / `gradients_tle_z`
-3. `tract_asymmetry` + `region_asymmetry_tle` (+ normative covariance modules)
-4. `microstructural_asymmetries` group reports
+1. `factor_analysis` → `factor_z-scores` → `gradients_group-controls` (LE) / `gradients_tle_z`
+2. `tract_asymmetry` + `region_asymmetry_tle` (+ normative covariance modules)
+3. `microstructural_asymmetries` group reports
 
 ## Outputs
 

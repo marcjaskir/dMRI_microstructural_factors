@@ -63,6 +63,9 @@ data/open/dmri_microstructural_factors_open*.h5*
 # anon map is controlled
 data/controlled/anon_id_map.csv
 
+# Cohort inclusion scripts (controlled-source only; open ships data/open/inclusion CSVs)
+code/analysis/inclusion/
+
 # Local/exploratory atlas helpers (keep out of published repo)
 code/atlases/correct_glasser.sh
 code/atlases/gen_random_atlases.py

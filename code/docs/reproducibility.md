@@ -72,7 +72,7 @@ Environment overrides:
 ## Manuscript analysis DAG
 
 ```
-inclusion → factor_analysis → factor_z-scores → gradients_group-controls (LE)
+factor_analysis → factor_z-scores → gradients_group-controls (LE)
                                            ↘ gradients_tle_z
 factor_analysis → factor_representation / factor_analysis_voxelwise (supp)
 tract_asymmetry (+ normative) ┐
