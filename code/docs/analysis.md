@@ -19,7 +19,7 @@ GAM normative z-scores; **Laplacian eigenmaps** (G1/G2); Cohen’s d and
 | Module | Purpose | Entry points |
 |--------|---------|--------------|
 | [factor_analysis](../analysis/factor_analysis/) | Control FA/PCA on GAM z (GM + WM) | `factor_analysis.py` |
-| [factor_z-scores](../analysis/factor_z-scores/) | Apply loadings; patient/control factor z | `factor_z-scores.py` |
+| [factor_z-scores](../analysis/factor_z-scores/) | Apply loadings → wide factor scores / normative z / scalar z (CSV only) | `factor_z-scores.py` / `python -m factor_z_scores` |
 | [factor_representation](../analysis/factor_representation/) | Statistic vs factor-score representation | `factor_representation.py` |
 | [factor_analysis_voxelwise](../analysis/factor_analysis_voxelwise/) | Voxelwise FA (supplement) | `factor_analysis_voxelwise.py` |
 | [gradients_group-controls](../analysis/gradients_group-controls/) | Control **Laplacian eigenmaps** (BrainSpace) | `compute_gradients.py` |

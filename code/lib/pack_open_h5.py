@@ -54,10 +54,8 @@ CORE_GLOBS: tuple[str, ...] = (
     "atlases/**/*.md",
     # Factor analysis / z / representation
     "analysis/factor_analysis/**/*.csv",
+    "analysis/factor_z-scores/factor_scores/*.csv",
     "analysis/factor_z-scores/factor_z_scores/*.csv",
-    "analysis/factor_z-scores/roi_factor_scores/*.csv",
-    "analysis/factor_z-scores/roi_means_rescaled/*.csv",
-    "analysis/factor_z-scores/plots/*statistics*.csv",
     "analysis/factor_representation/**/*.csv",
     # LE gradients only (not diffusion_embedding)
     "analysis/gradients_group-controls/laplacian_eigenmodes/csv/**/*.csv",
