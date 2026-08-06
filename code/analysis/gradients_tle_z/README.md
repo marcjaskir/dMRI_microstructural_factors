@@ -2,19 +2,19 @@
 
 ## Purpose
 
-TLE z-aligned gradients reusing control gradient positions.
+Project TLE factor z onto control **Laplacian eigenmaps** (G1/G2) axes.
 
 ## Entry points
 
-compute_gradients_tle_z.py
+`compute_gradients_tle_z.py`
 
 ## Inputs
 
-gradients_group-controls, factor_z-scores
+`gradients_group-controls` (LE), `factor_z-scores`
 
 ## Outputs
 
-derivatives/analysis/gradients_tle_z
+`derivatives/analysis/gradients_tle_z`
 
 ## Configuration
 

@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Golden-output regression tests for cleaned dMRI_microstructural_factors code."""
+"""Golden-output regression tests for cleaned dMRI_microstructural_factors code.
+
+Freeze digests for manuscript DAG products (loadings, factor z, LE neuroaxis,
+group asymmetry summaries) plus the original profile / tract-asymmetry checks.
+"""
 from __future__ import annotations
 
 import hashlib
@@ -33,11 +37,19 @@ def md5_file(path: Path) -> str:
     return h.hexdigest()
 
 
+def sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def compare_csv(a: Path, b: Path, label: str) -> None:
     df_a = pd.read_csv(a)
     df_b = pd.read_csv(b)
     if list(df_a.columns) != list(df_b.columns):
-        raise AssertionError(f"{label}: column mismatch\n{a.columns}\n{b.columns}")
+        raise AssertionError(f"{label}: column mismatch\n{df_a.columns}\n{df_b.columns}")
     if len(df_a) != len(df_b):
         raise AssertionError(f"{label}: row count {len(df_a)} vs {len(df_b)}")
     for col in df_a.columns:
@@ -65,7 +77,6 @@ def export_profile_means(out_csv: Path) -> None:
     )
 
     df = load_ilf_gam_mean(SCALAR)
-    # Prefer residual z columns (open products); fall back to raw node columns.
     node_cols_z = [f"node{i}_z" for i in range(1, N_NODES_PROFILE + 1)]
     node_cols = [f"node{i}" for i in range(1, N_NODES_PROFILE + 1)]
     if all(c in df.columns for c in node_cols_z):
@@ -86,7 +97,6 @@ def export_asymmetry_summary(out_csv: Path) -> None:
 
     tract_dir = analysis_dir() / "tract_asymmetry"
     rows = []
-    # Open exports use anon_* subject dirs; legacy trees use sub-*.
     subject_dirs = sorted(tract_dir.glob("anon_*")) or sorted(tract_dir.glob("sub-*"))
     for i, sub_dir in enumerate(subject_dirs, start=1):
         candidates = list(sub_dir.glob("*_asym_scalars.csv"))
@@ -109,27 +119,138 @@ def export_asymmetry_summary(out_csv: Path) -> None:
     pd.DataFrame(rows).to_csv(out_csv, index=False)
 
 
+def _digest_frame(df: pd.DataFrame, source: str) -> dict:
+    """Stable numeric digest for a table (order-sensitive)."""
+    numeric = df.select_dtypes(include=[np.number])
+    payload = {
+        "source": source,
+        "n_rows": int(len(df)),
+        "n_cols": int(df.shape[1]),
+        "columns": list(df.columns.astype(str)),
+    }
+    if numeric.shape[1]:
+        vals = numeric.to_numpy(dtype=float).ravel()
+        vals = vals[np.isfinite(vals)]
+        payload.update(
+            {
+                "n_finite": int(vals.size),
+                "sum": float(vals.sum()) if vals.size else 0.0,
+                "mean": float(vals.mean()) if vals.size else 0.0,
+                "std": float(vals.std(ddof=0)) if vals.size else 0.0,
+                "abs_sum": float(np.abs(vals).sum()) if vals.size else 0.0,
+            }
+        )
+    # Content hash of CSV text for exact freeze
+    text = df.to_csv(index=False).encode("utf-8")
+    payload["sha256"] = hashlib.sha256(text).hexdigest()
+    return payload
+
+
+def export_manuscript_digests(out_json: Path) -> dict:
+    """Freeze key manuscript DAG table digests under analysis_dir()."""
+    _ensure_paths()
+    from lib.paths import analysis_dir
+
+    root = analysis_dir()
+    targets = [
+        ("factor_loadings", root / "factor_analysis/All4_Combined/controls_All4_Combined_scalar_factor_loadings.csv"),
+        (
+            "factor_loadings_ordered",
+            root / "factor_analysis/All4_Combined/controls_All4_Combined_scalar_factor_loadings_ordered.csv",
+        ),
+        ("controls_F1_z", root / "factor_z-scores/factor_z_scores/controls_F1_z_scores.csv"),
+        ("controls_F2_z", root / "factor_z-scores/factor_z_scores/controls_F2_z_scores.csv"),
+        ("controls_F3_z", root / "factor_z-scores/factor_z_scores/controls_F3_z_scores.csv"),
+        (
+            "le_neuroaxis",
+            root / "gradients_group-controls/laplacian_eigenmodes/csv/neuroaxis_correlations_cohort-controls.csv",
+        ),
+        (
+            "le_F1_G1",
+            root
+            / "gradients_group-controls/laplacian_eigenmodes/csv/gradients-2/F1_principal_gradient1_scores_cohort-controls.csv",
+        ),
+        (
+            "le_F1_G2",
+            root
+            / "gradients_group-controls/laplacian_eigenmodes/csv/gradients-2/F1_principal_gradient2_scores_cohort-controls.csv",
+        ),
+        (
+            "asym_thirds_mahalanobis",
+            root / "microstructural_asymmetries/summary_hcp1065_thirds_mahalanobis.csv",
+        ),
+        (
+            "asym_factor_z_summary",
+            root / "microstructural_asymmetries/factor_score_z_ipsi_contra_cohens_d_summary.csv",
+        ),
+        (
+            "asym_whole_scalars",
+            root / "microstructural_asymmetries/summary_hcp1065_whole_scalars.csv",
+        ),
+    ]
+    digests: dict[str, dict] = {}
+    missing: list[str] = []
+    for key, path in targets:
+        if not path.exists():
+            missing.append(f"{key}: {path}")
+            continue
+        digests[key] = _digest_frame(pd.read_csv(path), source=str(path.relative_to(root)))
+    if missing:
+        raise FileNotFoundError(
+            "Missing manuscript digest sources:\n  " + "\n  ".join(missing)
+        )
+    out_json.parent.mkdir(parents=True, exist_ok=True)
+    out_json.write_text(json.dumps(digests, indent=2, sort_keys=True) + "\n")
+    return digests
+
+
+def compare_digests(a: Path, b: Path, label: str) -> None:
+    da = json.loads(a.read_text())
+    db = json.loads(b.read_text())
+    if set(da) != set(db):
+        raise AssertionError(f"{label}: key mismatch {sorted(da)} vs {sorted(db)}")
+    for key in sorted(da):
+        if da[key].get("sha256") != db[key].get("sha256"):
+            # Fall back to numeric rtol on sum/mean if schema drifted
+            for metric in ("sum", "mean", "std", "abs_sum"):
+                if metric in da[key] and metric in db[key]:
+                    np.testing.assert_allclose(
+                        da[key][metric],
+                        db[key][metric],
+                        rtol=RTOL,
+                        atol=ATOL,
+                        err_msg=f"{label}/{key}: {metric}",
+                    )
+            raise AssertionError(
+                f"{label}/{key}: sha256 mismatch "
+                f"{da[key].get('sha256')} vs {db[key].get('sha256')}"
+            )
+        for field in ("n_rows", "n_cols", "n_finite"):
+            if field in da[key]:
+                assert da[key][field] == db[key][field], f"{label}/{key}: {field}"
+    print(f"PASS {label} ({len(da)} tables)")
+
+
 def run_profile_thirds_script() -> Path:
     script = REPO / "analysis/profile_thirds_example/plot_normative_example_minimal.py"
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     subprocess.run([sys.executable, str(script)], check=True, cwd=str(REPO))
-    png = REPO / "derivatives/analysis/profile_thirds_example/ILF_L_dti_md_mean_profile_nodes_harmonized_pyafq_gam.png"
-    # script writes under project_root derivatives
     from lib.paths import analysis_dir
 
-    png = analysis_dir() / "profile_thirds_example/ILF_L_dti_md_mean_profile_nodes_harmonized_pyafq_gam.png"
-    return png
+    return analysis_dir() / "profile_thirds_example/ILF_L_dti_md_mean_profile_nodes_harmonized_pyafq_gam.png"
 
 
 def capture_baseline() -> None:
     BASELINE_DIR.mkdir(parents=True, exist_ok=True)
     export_profile_means(BASELINE_DIR / "profile_means.csv")
     export_asymmetry_summary(BASELINE_DIR / "asymmetry_tract_summary.csv")
+    digests = export_manuscript_digests(BASELINE_DIR / "manuscript_digests.json")
     meta = {
         "profile_means_rows": int(pd.read_csv(BASELINE_DIR / "profile_means.csv").shape[0]),
         "asymmetry_subjects": int(pd.read_csv(BASELINE_DIR / "asymmetry_tract_summary.csv").shape[0]),
+        "manuscript_digest_keys": sorted(digests.keys()),
     }
-    (BASELINE_DIR / "meta.json").write_text(json.dumps(meta, indent=2))
+    (BASELINE_DIR / "meta.json").write_text(json.dumps(meta, indent=2) + "\n")
     print("Baseline captured:", meta)
 
 
@@ -141,6 +262,7 @@ def run_tests() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     export_profile_means(OUTPUT_DIR / "profile_means.csv")
     export_asymmetry_summary(OUTPUT_DIR / "asymmetry_tract_summary.csv")
+    export_manuscript_digests(OUTPUT_DIR / "manuscript_digests.json")
 
     compare_csv(BASELINE_DIR / "profile_means.csv", OUTPUT_DIR / "profile_means.csv", "profile_means")
     compare_csv(
@@ -148,9 +270,15 @@ def run_tests() -> None:
         OUTPUT_DIR / "asymmetry_tract_summary.csv",
         "asymmetry_tract_summary",
     )
+    if (BASELINE_DIR / "manuscript_digests.json").exists():
+        compare_digests(
+            BASELINE_DIR / "manuscript_digests.json",
+            OUTPUT_DIR / "manuscript_digests.json",
+            "manuscript_digests",
+        )
+    else:
+        print("SKIP manuscript_digests (no baseline yet; run capture)")
 
-    # Optional PNG check: only when residual/raw node profiles can be regenerated
-    # without age/sex (open products lack demographics needed for the age scatter).
     from lib.paths import analysis_dir, gam_dir
 
     gam_csv = gam_dir() / "pyafq/HCP1065/ILF_L/ILF_L_dti_md_stat-mean_gam.csv"

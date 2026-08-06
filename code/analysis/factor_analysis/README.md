@@ -2,19 +2,21 @@
 
 ## Purpose
 
-Control FA/PCA on GAM z-scores (GM parcels + WM thirds).
+Control factor analysis / PCA on GAM residual **z-scores** (GM parcels + WM
+thirds). Factors interpret as overall, non-Gaussian, and anisotropic diffusivity
+(F1/F2/F3; see `lib/factor_labels.py`).
 
 ## Entry points
 
-factor_analysis.py
+`factor_analysis.py`
 
 ## Inputs
 
-gam
+`gam`
 
 ## Outputs
 
-derivatives/analysis/factor_analysis
+`derivatives/analysis/factor_analysis`
 
 ## Configuration
 

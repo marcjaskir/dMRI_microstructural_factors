@@ -1,30 +1,43 @@
 # Golden-output regression tests
 
-These tests verify that cleaned code produces the same numeric results as before reorganization.
+These tests verify that cleaned code and open products produce the same numeric
+results across refactors (`rtol≈1e-6`).
 
 ## Setup
 
-1. Copy `config.example.yaml` to `config.yaml` and set `project_root` to your data workspace.
-2. For legacy `structural_tractometry` layouts, set `inclusion_subdir: 1_inclusion`.
-
-## Capture baseline (first run)
-
 ```bash
 cd /path/to/dMRI_microstructural_factors
-python tests/golden/run_golden_tests.py capture
+cp config.example.yaml config.yaml   # set workspace_root
+export PYTHONPATH="$PWD/code:$PYTHONPATH"
 ```
 
-This writes CSV summaries to `tests/golden/baseline/` (gitignored).
+Open products must be present under `data/open/` (see root README / OSF unpack).
+
+## Capture baseline (first run / after justified refresh)
+
+```bash
+python code/tests/golden/run_golden_tests.py capture
+```
+
+Writes under `code/tests/golden/baseline/` (gitignored):
+
+- `profile_means.csv` — ILF mean along-tract residual-z profile
+- `asymmetry_tract_summary.csv` — per-subject tract Cohen’s d aggregates
+- `manuscript_digests.json` — SHA256 + numeric digests for loadings, factor z,
+  LE G1/G2 / neuroaxis correlations, and group asymmetry summaries
 
 ## Run tests
 
 ```bash
-python tests/golden/run_golden_tests.py
+python code/tests/golden/run_golden_tests.py
 ```
 
-Tests compare:
-- ILF mean along-tract profile (100 nodes) from `profile_thirds_example`
-- Per-subject tract asymmetry summary statistics aggregated from existing derivatives
-- Optional PNG checksum for `profile_thirds_example` output
+Also run contract / privacy guards:
 
-Tolerances: `rtol=1e-6`, `atol=1e-8` for floating-point columns.
+```bash
+python code/tests/test_factor_labels.py
+python code/tests/test_no_phi.py
+```
+
+Tolerances: `rtol=1e-6`, `atol=1e-8` for floating-point columns. Refresh baselines
+only with explicit justification (method change), not during pure reorg.

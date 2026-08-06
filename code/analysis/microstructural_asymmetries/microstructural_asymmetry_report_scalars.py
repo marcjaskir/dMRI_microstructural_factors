@@ -48,10 +48,10 @@ FACTOR_Z_SCORES_DIR = analysis_dir() / "factor_z-scores" / "factor_z_scores"
 FACTOR_SCORES_DIR = analysis_dir() / "factor_z-scores" / "factor_scores"
 
 # Factor score asymmetry (F1–F3); F4 deprecated (isotropic).
+from lib.factor_labels import FACTOR_SHORT_LABELS as _FACTOR_SHORT_LABELS  # noqa: E402
+
 FACTOR_DISPLAY_LABELS: Dict[int, str] = {
-    1: "Overall",
-    2: "Non-Gaussian",
-    3: "Anisotropic",
+    int(fid[1:]): label for fid, label in _FACTOR_SHORT_LABELS.items()
 }
 DEPRECATED_FACTOR_INDICES = frozenset({4})
 DEFAULT_FACTOR_INDICES: List[int] = [1, 2, 3]
@@ -63,7 +63,9 @@ FACTOR_COHENS_D_COLS: Dict[int, str] = {
     3: "factor_cohens_d_3",
 }
 COHEND_D_TEX_COL_KEYS: List[str] = ["mahal_cohens_d"] + [FACTOR_COHENS_D_COLS[k] for k in (1, 2, 3)]
-COHEND_D_TEX_SUBHEADERS: List[str] = ["Mahalanobis", "Overall", "Non-Gaussian", "Anisotropic"]
+COHEND_D_TEX_SUBHEADERS: List[str] = ["Mahalanobis"] + [
+    FACTOR_DISPLAY_LABELS[k] for k in (1, 2, 3)
+]
 
 # Fixed longtable widths (identical across all summary_*_cohend_top{N}.tex fragments).
 # COHEND_TEX_TABLE_WIDTH_FRAC: overall table width as a fraction of \\textwidth (e.g. 0.90 = 10% narrower).
@@ -3021,7 +3023,7 @@ def plot3_2x2_brain_maps(
     """
     try:
         sys.path.insert(0, str(PROJECT_ROOT / "code" / "analysis"))
-        from asymmetry_tle import brain_maps as bm
+        from microstructural_asymmetries import brain_maps as bm
     except Exception as e:
         import traceback
         print("Brain maps skipped (install nilearn for glass brain figures):", e, file=sys.stderr)
@@ -3281,7 +3283,7 @@ def create_report_html(
 
   <h2>Figure 3: Brain maps (2×2: Cortex GM | Association WM; Subcortex GM | Projection WM)</h2>
   """ + (
-    (f'<div class="figure-brain"><img src="{fig_prefix + p3}" alt="2x2 brain maps"></div><p class="caption">One medial view per tissue category (nilearn glass brain; left-hemisphere data only; mean |Cohen\'s d| per region/tract).</p>' if p3 else '<p>No brain maps: ensure <code>nilearn</code> and <code>asymmetry_tle</code> brain_maps are available, and atlas/endpoint paths exist.</p>')
+    (f'<div class="figure-brain"><img src="{fig_prefix + p3}" alt="2x2 brain maps"></div><p class="caption">One medial view per tissue category (nilearn glass brain; left-hemisphere data only; mean |Cohen\'s d| per region/tract).</p>' if p3 else '<p>No brain maps: ensure <code>nilearn</code> and atlas/endpoint paths exist.</p>')
   ) + """
 
   <h2>Figure 4: Epilepsy mean factor z-scores by tissue class</h2>

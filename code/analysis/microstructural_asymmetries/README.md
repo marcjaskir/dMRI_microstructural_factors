@@ -2,19 +2,21 @@
 
 ## Purpose
 
-Group Cohen's d and Mahalanobis HTML reports across GM/WM atlases.
+Group ipsilateral–contralateral **asymmetry** reports: Cohen’s d and
+**Mahalanobis** digests across GM/WM atlases (LaTeX/HTML for manuscript tables).
 
 ## Entry points
 
-microstructural_asymmetry_report_*.py
+`microstructural_asymmetry_report_*.py`, `mahalanobis_group_bars.py`,
+`region_score_summary_tables.py`
 
 ## Inputs
 
-tract_asymmetry, region_asymmetry_tle, factor_z-scores
+`tract_asymmetry`, `region_asymmetry_tle`, `factor_z-scores`
 
 ## Outputs
 
-derivatives/analysis/microstructural_asymmetries
+`derivatives/analysis/microstructural_asymmetries`
 
 ## Configuration
 

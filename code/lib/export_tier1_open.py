@@ -35,22 +35,20 @@ DROP_COLS = {
 DROP_SUFFIXES = ("_pred", "_centile", "_unharm", "_unharm_pred")
 DROP_EXACT_IF_NOT_Z = re.compile(r"^(?!.*_z$).+")  # unused; we keep explicitly
 
+# Manuscript-facing analysis products only (see code/docs/analysis.md).
 ANALYSIS_DIRS = [
     "factor_analysis",
     "factor_z-scores",
     "factor_representation",
+    "factor_analysis_voxelwise",
     "gradients_group-controls",
     "gradients_tle_z",
     "tract_asymmetry",
     "tract_asymmetry_normative",
     "region_asymmetry_tle",
     "region_asymmetry_tle_normative",
-    "asymmetry_tle",
-    "asymmetry_tle_covbat_pyafq",
-    "asymmetry_tle_region",
     "2_microstructural_asymmetries",
-    "3_asymmetry_correlations",
-    "5_within_patient_scalar_asymmetries",
+    "microstructural_asymmetries",
     "profile_thirds_example",
     "qc",
     "covbat_example",
@@ -59,8 +57,6 @@ ANALYSIS_DIRS = [
 # Rename on copy into open analysis/
 ANALYSIS_RENAME = {
     "2_microstructural_asymmetries": "microstructural_asymmetries",
-    "3_asymmetry_correlations": "asymmetry_correlations",
-    "5_within_patient_scalar_asymmetries": "within_patient_scalar_asymmetries",
 }
 
 SKIP_SUFFIXES = {".nii", ".nii.gz", ".gii", ".mgz", ".trk", ".tck", ".h5", ".sif", ".mat", ".mif", ".fib"}

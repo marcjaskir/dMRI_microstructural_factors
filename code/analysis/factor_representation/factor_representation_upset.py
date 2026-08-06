@@ -240,11 +240,7 @@ LOADINGS_PATH = (
 
 GROUP = "controls"
 FACTORS: List[str] = ["F1", "F2", "F3"]
-FACTOR_DISPLAY_LABELS: Dict[str, str] = {
-    "F1": "Overall",
-    "F2": "Non-Gaussian",
-    "F3": "Anisotropic",
-}
+from lib.factor_labels import FACTOR_SHORT_LABELS as FACTOR_DISPLAY_LABELS  # noqa: E402
 MULTIBAR_FACTOR_ALPHAS = [0.45, 0.7, 1.0]
 
 # Single multi-shell models and their statistics (mirrors scalar_z-scores files).

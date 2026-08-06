@@ -22,7 +22,7 @@ from .config import (
     parse_neuromaps_spaces,
 )
 
-# Reuse annotation pools, transforms, and comparison helpers from gradients_voxelwise.
+# Reuse annotation pools, transforms, and comparison helpers from vendored gradient_lib.
 from gradient_lib.config import (  # noqa: E402
     COHORT_TAG,
     NEUROMAPS_DEFAULT_N_PERM_FSLR,

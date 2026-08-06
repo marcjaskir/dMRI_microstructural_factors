@@ -1418,7 +1418,7 @@ def plot3_2x2_brain_maps(
     """Create 2x2 brain maps with output filenames including optional suffix. Returns path to composite PNG or None."""
     try:
         sys.path.insert(0, str(PROJECT_ROOT / "code" / "analysis"))
-        from asymmetry_tle import brain_maps as bm
+        from microstructural_asymmetries import brain_maps as bm
     except Exception as e:
         import traceback
         print("Brain maps skipped (install nilearn for glass brain figures):", e, file=sys.stderr)

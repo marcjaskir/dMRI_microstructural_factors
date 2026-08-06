@@ -107,10 +107,10 @@ _configure_georgia_font()
 DEFAULT_FACTOR_INDICES: List[int] = [1, 2, 3]
 DEPRECATED_FACTOR_INDICES = frozenset({4})
 
+from lib.factor_labels import FACTOR_SHORT_LABELS as _FACTOR_SHORT_LABELS  # noqa: E402
+
 FACTOR_DISPLAY_LABELS: Dict[int, str] = {
-    1: "Overall",
-    2: "Non-Gaussian",
-    3: "Anisotropic",
+    int(fid[1:]): label for fid, label in _FACTOR_SHORT_LABELS.items()
 }
 
 QUADRANT_ORDER = ("glasser_cortex", "4s_subcortex", "wm_association", "wm_projection")

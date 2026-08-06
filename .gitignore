@@ -51,11 +51,15 @@ tests/golden/output/
 *.png
 *.mat
 
-# Large open products (populate locally / Zenodo; do not commit multi-GB trees)
+# Large open products (populate via OSF HDF5 unpack; do not commit multi-GB trees)
 data/open/gam/**
 data/open/analysis/**
 !data/open/gam/.gitkeep
 !data/open/analysis/.gitkeep
+# Manuscript HDF5 + checksum sidecar (download from OSF; do not commit)
+data/open/*.h5
+data/open/*.h5.sha256
+data/open/dmri_microstructural_factors_open*.h5*
 # anon map is controlled
 data/controlled/anon_id_map.csv
 

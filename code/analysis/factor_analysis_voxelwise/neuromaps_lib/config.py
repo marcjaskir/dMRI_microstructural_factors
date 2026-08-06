@@ -14,7 +14,7 @@ from __future__ import annotations
 from pathlib import Path
 
 _CODE_ANALYSIS_DIR = Path(__file__).resolve().parents[2]
-_GRADIENTS_DIR = _CODE_ANALYSIS_DIR / "gradients_voxelwise"
+_GRADIENTS_DIR = Path(__file__).resolve().parents[1]  # factor_analysis_voxelwise (vendored gradient_lib)
 
 PROJECT_ROOT = project_root()
 OUTPUT_PROJECT_ROOT = PROJECT_ROOT / "derivatives/analysis/factor_analysis_voxelwise"

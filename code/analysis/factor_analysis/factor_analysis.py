@@ -98,19 +98,18 @@ COMBINED_HEATMAP_DTI_DKI_GQI_EXCLUDE_SCALARS = frozenset({"gqi_iso"})
 # DPI for ``*_factor_loading_ordered.png`` (Pairwise Correlations + … Factor loading ordered).
 CORR_FACTOR_PCA_FACTOR_ORDERED_DPI = 600
 
-# Human-readable factor names (F2 = non-Gaussian, F3 = anisotropic per loadings interpretation).
+# Human-readable factor names (paper-aligned; F4 retained for legacy 4-factor runs).
+from lib.factor_labels import (  # noqa: E402
+    FACTOR_DIFFUSIVITY_LABELS as _FACTOR_DIFFUSIVITY_LABELS_CORE,
+    FACTOR_SHORT_LABELS as _FACTOR_SHORT_LABELS_CORE,
+)
+
 FACTOR_DIFFUSIVITY_LABELS: Dict[str, str] = {
-    "F1": "Overall diffusivity",
-    "F2": "Non-Gaussian diffusivity",
-    "F3": "Anisotropic diffusivity",
+    **_FACTOR_DIFFUSIVITY_LABELS_CORE,
     "F4": "SDF-based diffusivity",
 }
-
-# Short factor names for the bottom-layout corr + loadings heatmap.
 FACTOR_SHORT_LABELS: Dict[str, str] = {
-    "F1": "Overall",
-    "F2": "Non-Gaussian",
-    "F3": "Anisotropic",
+    **_FACTOR_SHORT_LABELS_CORE,
     "F4": "SDF-based",
 }
 

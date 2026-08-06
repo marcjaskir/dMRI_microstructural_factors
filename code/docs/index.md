@@ -15,15 +15,18 @@ Paths in this docs set refer to modules under `code/` unless noted as `data/open
 
 1. Clone the repository and copy `config.example.yaml` to `config.yaml` at the
    workspace root; set `workspace_root`.
-2. Populate `data/open/` via `python -u code/lib/export_tier1_open.py` (or use
-   shipped/local open products).
+2. Download/unpack the OSF HDF5: `python -u code/lib/fetch_open_data.py`
+   (or pack locally with `python -u code/lib/pack_open_h5.py pack`).
 3. Install the conda environment from `environment.yml`.
-4. Set `PYTHONPATH` to include `code/`.
+4. Set `PYTHONPATH` to include `code/` and run golden tests under `code/tests/golden/`.
 
 ## Repository structure
 
 | Path | Role |
 |------|------|
 | `code/` | Pipelines, analyses, `lib/paths.py`, docs, tests |
-| `code/lib/export_tier1_open.py` | De-identify and populate `data/open/` |
-| `data/open/` | Publishable analysis products |
+| `code/lib/pack_open_h5.py` | Pack/unpack manuscript-reproduction HDF5 |
+| `code/lib/fetch_open_data.py` | Download OSF HDF5 into `data/open/` |
+| `code/lib/export_tier1_open.py` | Lab-only de-identify export into `data/open/` |
+| `code/lib/factor_labels.py` | Canonical F1/F2/F3 paper labels |
+| `data/open/` | Publishable products (small committed trees + OSF unpack) |

@@ -1,60 +1,91 @@
 # Open analysis products
 
-This directory holds the **minimum open dataset** for reproducing manuscript
-figures from post-GAM residual z-scores onward. No subject IDs, age, or sex.
+Publishable products for reproducing manuscript figures/tables from post-GAM
+residual **z-scores** onward. No subject IDs, age, or sex.
 
-## Layout
+Distribution model: **one OSF-hosted HDF5**, unpacked once into this directory.
+
+## Preferred workflow (OSF)
+
+```bash
+# In config.yaml set open_h5_osf_url (or export DMRI_MICRO_OSF_URL)
+python -u code/lib/fetch_open_data.py
+```
+
+This downloads `dmri_microstructural_factors_open_v1.h5` into `data/open/` and
+unpacks CSV/JSON/TSV tables beside this README. The HDF5 itself is gitignored.
+
+**OSF placeholder (replace after upload):**
+
+```
+OSF_URL=https://osf.io/XXXXX/
+```
+
+Upload checklist: file name `dmri_microstructural_factors_open_v1.h5`, root attr
+`schema_version=1`, publish SHA256 in this README once available.
+
+Local core pack checksum (regenerate after re-pack):
+
+```
+29bd25546c0f1b5babfaab01f74a54bbf2cc09b584332e7d2ecc4e23c7a3deb3  dmri_microstructural_factors_open_v1.h5
+```
+
+## Layout after unpack
 
 ```
 data/open/
-  atlases/       # Label TSVs, tract metadata, centroids (no NIfTI volumes)
+  dmri_microstructural_factors_open_v1.h5   # cache (gitignored)
+  atlases/       # Label TSVs, tract metadata, centroids (also small files may be committed)
   metadata/      # Scalar label/color JSON only (no demographics)
-  gam/           # Post-GAM residual z-scores
-  analysis/      # Factor loadings/scores, asymmetry, gradients
-  inclusion/     # Anonymized cohort table
+  inclusion/     # Anonymized cohort tables
+  gam/           # Selected post-GAM residual z tables
+  analysis/      # Factor loadings/scores, LE gradients, asymmetry digests
 ```
 
-## Column schemas
+Committed in git: this README, small `atlases/` / `metadata/` / `inclusion/`
+stubs. Large trees and the HDF5 are local/OSF only.
 
-### `gam/**/*.csv`
+## HDF5 schema
 
-| Column | Required | Notes |
-|--------|----------|-------|
-| `anon_id` | yes | Stable anonymous subject key |
-| `group` | yes | e.g. penn_controls, hcpya, penn_epilepsy |
-| `*_z` / `node*_z` | yes | Residual z-scores used by factor/asymmetry analyses |
+Root attributes:
 
-Do **not** include: age, sex, scanner/`bat`, real BIDS IDs.
+| Attr | Meaning |
+|------|---------|
+| `schema_version` | `1` |
+| `paper_citation` | Manuscript citation stub |
+| `created_utc` | Pack timestamp |
+| `profile` | `core` or `full_csv` |
+| `osf_url` | Download URL / placeholder |
+| `n_files` | Number of packed payloads |
+| `sha256` | Archive checksum |
 
-### `inclusion/*.csv`
+Group `/files/<id>`: gzip-compressed file bytes with attrs `relpath` (posix path
+under `data/open/`), `content_type`, `sha256`, `nbytes`.
 
-| Column | Required | Notes |
-|--------|----------|-------|
-| `anon_id` | yes | Matches `gam` keys |
-| `group` | yes | Cohort label |
-| `laterality` | for TLE | left / right (ipsi/contra) |
-| `lobe` | for TLE | e.g. temporal filter |
+### Column rules
 
-Do **not** include: age, sex, real RID, clinical outcomes.
+| Product | Keep | Never include |
+|---------|------|----------------|
+| GAM / factor z | `anon_id`, `group`, `*_z` / `node*_z` | age, sex, scanner/`bat`, real BIDS IDs |
+| Inclusion | `anon_id`, `group`, `laterality`, `lobe` | age, sex, RID, outcomes |
+| Gradients / asymmetry | ROI labels, G1/G2, Cohen’s d, Mahalanobis digests | demographics, `anon_id_map` |
 
-### `analysis/`
+### Excluded from the archive
 
-Factor loadings, factor scores/z, tract/region asymmetry summaries, gradient
-CSVs — keyed by `anon_id` / `group` only.
+NIfTI / voxelwise volumes, HTML reports, exploratory PNGs, diffusion-map
+(`diffusion_embedding`) trees, reversible `anon_id_map`, age/sex/scanner columns.
 
-## How to populate
+## Lab-only: build the pack
 
-From the repo root (with source derivatives available):
+From a populated open tree (e.g. after `export_tier1_open.py`):
 
 ```bash
-python -u code/lib/export_tier1_open.py
+python -u code/lib/pack_open_h5.py pack --profile core
+python -u code/lib/pack_open_h5.py check
+python -u code/lib/pack_open_h5.py unpack   # round-trip
 ```
 
-This maps real `sub` → `anon_id`, drops age/sex/scanner/clinical columns from
-GAM CSVs, and writes products into the paths above. The reversible ID map is
-kept only in a local controlled workspace (not shipped).
-
-Large trees (`gam/`, `analysis/`) are gitignored; keep them local or deposit on
-Zenodo. Small products (`atlases/`, `metadata/`, `inclusion/`) can be committed.
+`core` covers golden tests + manuscript digests. `full_csv` adds broader GAM /
+normative covariance CSVs (much larger).
 
 See root `README.md` and `code/docs/reproducibility.md`.

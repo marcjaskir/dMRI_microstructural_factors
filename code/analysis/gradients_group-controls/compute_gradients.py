@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """
-Controls-only group-level BrainSpace gradient pipeline (diffusion-map + Laplacian eigenmaps).
+Controls-only group-level BrainSpace gradient pipeline.
+
+Manuscript default is **Laplacian eigenmaps** (LE). Diffusion-map (DM) remains available
+via ``--method diffusion_embedding`` for exploratory comparisons but is not used in the paper.
 
 For each method, the unthresholded Pearson affinity is built across the controls wide table
-per factor, then BrainSpace gradients (``GradientMaps`` with ``approach='dm'`` for DM, and
-``LaplacianEigenmaps`` for LE) are computed. Outputs are grouped under
+per factor, then BrainSpace gradients (``LaplacianEigenmaps`` for LE, or ``GradientMaps`` with
+``approach='dm'`` for DM) are computed. Outputs are grouped under
 ``gradients-{K}/`` subdirectories where ``K`` is the gradient subspace size:
 
 * ``gradients-2/`` — CSVs for G1, G2 + 2D scatter figures and ``legend-*.png`` files (G1 colorbar;
@@ -300,8 +303,11 @@ def main() -> None:
     p.add_argument(
         "--method",
         choices=["diffusion_embedding", "laplacian_eigenmodes", "both"],
-        default="both",
-        help="Which pipeline(s) to run.",
+        default="laplacian_eigenmodes",
+        help=(
+            "Which pipeline(s) to run. Default: laplacian_eigenmodes (manuscript). "
+            "Use diffusion_embedding or both only for exploratory DM comparisons."
+        ),
     )
     p.add_argument("--factor-dir", type=Path, default=DEFAULT_FACTOR_SCORES_DIR)
     p.add_argument("--tractometry-root", type=Path, default=DEFAULT_TRACTOMETRY_ROOT)

@@ -11,8 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 _HERE = Path(__file__).resolve().parent
-_CODE_ANALYSIS_DIR = _HERE.parent
-_GRADIENTS_DIR = _CODE_ANALYSIS_DIR / "gradients_voxelwise"
+_GRADIENTS_DIR = _HERE  # vendored gradient_lib lives beside this script
 for path in (_HERE, _GRADIENTS_DIR):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))

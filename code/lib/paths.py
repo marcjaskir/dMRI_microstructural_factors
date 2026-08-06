@@ -140,6 +140,16 @@ def open_dir() -> Path:
     return get_path("data_open_dir")
 
 
+def open_h5_path() -> Path:
+    """Path to the manuscript-reproduction HDF5 under data/open/."""
+    cfg = load_config()
+    name = cfg.get("open_h5_filename") or "dmri_microstructural_factors_open_v1.h5"
+    custom = cfg.get("open_h5_path")
+    if custom:
+        return Path(str(custom)).expanduser().resolve()
+    return open_dir() / str(name)
+
+
 def controlled_dir() -> Path:
     return get_path("data_controlled_dir")
 

@@ -93,16 +93,8 @@ EXCLUDED_SCALARS = [
     "dti_ha", "rdi_rd1", "rdi_rd2", "gqi_iso"
 ]
 
-# Factor label mapping (three factors: gqi_iso excluded from scalars, matching All4_Combined loadings)
-FACTOR_LABELS = {
-    "F1": "Overall",
-    "F2": "Anisotropic",
-    "F3": "Non-Gaussian",
-}
-
-def get_factor_label(factor_name: str) -> str:
-    """Get descriptive label for a factor name."""
-    return FACTOR_LABELS.get(factor_name, factor_name)
+# Factor labels: paper-aligned (F1 overall, F2 non-Gaussian, F3 anisotropic)
+from lib.factor_labels import FACTOR_LABELS, get_factor_label  # noqa: E402
 
 TRACTS_TO_REMOVE = [
     "CBT_L", "CBT_R", "RST_L", "RST_R", "DRTT_L", "DRTT_R",

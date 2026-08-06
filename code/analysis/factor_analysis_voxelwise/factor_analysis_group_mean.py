@@ -46,7 +46,7 @@ DEFAULT_LOADINGS_CSV = (
 DEFAULT_OUTPUT_DIR = WITH_CSF_DIR / "factor_nii" / "loadings-regionwise"
 NORM_MAP_VARIANT = "norm-0-1"
 
-_GRADIENTS_DIR = _CODE_ANALYSIS_DIR / "gradients_voxelwise"
+_GRADIENTS_DIR = Path(__file__).resolve().parent  # vendored gradient_lib
 if str(_GRADIENTS_DIR) not in sys.path:
     sys.path.insert(0, str(_GRADIENTS_DIR))
 

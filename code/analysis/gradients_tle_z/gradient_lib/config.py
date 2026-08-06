@@ -49,10 +49,6 @@ METHOD_TAG = "laplacian_eigenmodes"
 GRADIENTS_K = 2
 COHORT_TAG = "epilepsy"
 
-FACTOR_PANEL_LABELS: dict[str, str] = {
-    "F1": "Overall diffusivity",
-    "F2": "Non-Gaussian diffusivity",
-    "F3": "Anisotropic diffusivity",
-}
+from lib.factor_labels import FACTOR_DIFFUSIVITY_LABELS as FACTOR_PANEL_LABELS  # noqa: E402
 
 NON_REGION_COLS = frozenset({"subject", "group"})
