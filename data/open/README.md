@@ -51,12 +51,12 @@ OSF_URL=https://osf.io/XXXXX/
 ```
 
 Upload checklist: file name `dmri_microstructural_factors_open_v1.h5`, root attr
-`schema_version=1`, publish SHA256 in this README once available.
+`schema_version=2`, publish SHA256 in this README once available.
 
 Local core pack checksum (regenerate after re-pack):
 
 ```
-bbb60b0006889ef1d28f9e45b78c6fa6f9b1abfc739f160f58814aab8f128258  dmri_microstructural_factors_open_v1.h5
+4fbbd397ce23d8ad90eec30c48011dd72b7451f7cb14e203125feab8b806787a  dmri_microstructural_factors_open_v1.h5
 ```
 
 ## Layout
@@ -87,13 +87,13 @@ scalars and 48 HCP1065 WM tracts (24 L/R pairs). Packaging/export uses
 allowlists in `code/lib/manuscript_features.py`; analysis code reads whatever
 is present and does not apply exclusion lists.
 
-## HDF5 schema
+## HDF5 schema (version 2)
 
 Root attributes:
 
 | Attr | Meaning |
 |------|---------|
-| `schema_version` | `1` |
+| `schema_version` | `2` |
 | `paper_citation` | Manuscript citation stub |
 | `created_utc` | Pack timestamp |
 | `profile` | `core` or `full_csv` |
@@ -101,8 +101,32 @@ Root attributes:
 | `n_files` | Number of packed payloads |
 | `sha256` | Archive checksum |
 
-Group `/files/<id>`: gzip-compressed file bytes with attrs `relpath` (posix path
-under `data/open/`), `content_type`, `sha256`, `nbytes`.
+Layout (path-mirrored under `/open/…`, same as unpack tree):
+
+```
+/
+├── catalog          # inventory: relpath, h5_path, nbytes, sha256, content_type
+└── open/
+    ├── inclusion/
+    ├── metadata/
+    ├── atlases/
+    ├── gam/
+    └── analysis/
+        ├── factor_analysis/          # combined FA products (no All4_Combined/ subdir)
+        ├── factor_z-scores/
+        ├── gradients_group-controls/
+        └── …
+```
+
+Leaf datasets are gzip-compressed file bytes with attrs `relpath`, `content_type`,
+`sha256`, `nbytes`. Browse with:
+
+```bash
+python -u code/lib/pack_open_h5.py ls --tree
+# or: h5ls -r data/open/dmri_microstructural_factors_open_v1.h5
+```
+
+Schema v1 archives (`/files/<uuid>`) still unpack for compatibility; new packs are v2 only.
 
 ### Column rules
 
@@ -124,6 +148,7 @@ From a populated open tree (e.g. after `export_tier1_open.py`):
 ```bash
 python -u code/lib/pack_open_h5.py pack --profile core
 python -u code/lib/pack_open_h5.py check
+python -u code/lib/pack_open_h5.py ls --tree
 python -u code/lib/pack_open_h5.py unpack   # round-trip into data/open/
 ```
 

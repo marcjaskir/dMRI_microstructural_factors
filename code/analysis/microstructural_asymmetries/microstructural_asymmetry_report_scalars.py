@@ -145,11 +145,8 @@ MODEL_FALLBACK_COLORS = {
 # NODDI → MAPMRI → DKI → DTI → GQI (``map_`` prefix = MAPMRI).
 RECONSTRUCTION_MODEL_ORDER: Tuple[str, ...] = ("noddi", "map", "dki", "dti", "gqi")
 FACTOR_LOADINGS_ORDERED_CSV = (
-    PROJECT_ROOT
-    / "derivatives"
-    / "analysis"
+    analysis_dir()
     / "factor_analysis"
-    / "All4_Combined"
     / "controls_All4_Combined_scalar_factor_loadings_ordered.csv"
 )
 

@@ -36,7 +36,7 @@ SCALAR_Z_SCORES_OUTPUT_DIR = f"{OUTPUT_PROJECT_ROOT}/scalar_z-scores"
 
 INCLUSION_METADATA_PATH = str(inclusion_dir() / "penn_epilepsy_included_basic_metadata.csv")
 FACTOR_LOADINGS_PATH = (
-    f"{analysis_dir()}/factor_analysis/All4_Combined/"
+    f"{analysis_dir()}/factor_analysis/"
     "controls_All4_Combined_scalar_factor_loadings.csv"
 )
 

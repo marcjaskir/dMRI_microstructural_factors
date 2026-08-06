@@ -153,10 +153,10 @@ def export_manuscript_digests(out_json: Path) -> dict:
 
     root = analysis_dir()
     targets = [
-        ("factor_loadings", root / "factor_analysis/All4_Combined/controls_All4_Combined_scalar_factor_loadings.csv"),
+        ("factor_loadings", root / "factor_analysis/controls_All4_Combined_scalar_factor_loadings.csv"),
         (
             "factor_loadings_ordered",
-            root / "factor_analysis/All4_Combined/controls_All4_Combined_scalar_factor_loadings_ordered.csv",
+            root / "factor_analysis/controls_All4_Combined_scalar_factor_loadings_ordered.csv",
         ),
         ("controls_F1_z", root / "factor_z-scores/factor_z_scores/controls_F1_z_scores.csv"),
         ("controls_F2_z", root / "factor_z-scores/factor_z_scores/controls_F2_z_scores.csv"),

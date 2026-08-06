@@ -87,7 +87,7 @@ OUTPUT_DIR = f"{analysis_dir()}/factor_representation"
 # Factor loadings used to (a) order statistics and (b) assign each statistic to
 # the factor it loads onto most strongly.
 LOADINGS_PATH = (
-    f"{analysis_dir()}/factor_analysis/All4_Combined/"
+    f"{analysis_dir()}/factor_analysis/"
     "controls_All4_Combined_scalar_factor_loadings_ordered.csv"
 )
 
@@ -182,7 +182,7 @@ def load_scalar_gradients(
     return scalars
 
 def load_loadings() -> pd.DataFrame:
-    """Load the All4_Combined factor loadings (factors x scalar columns)."""
+    """Load the combined GM+WM factor loadings (factors × scalar columns)."""
     df = pd.read_csv(LOADINGS_PATH).set_index("factor")
     return df.loc[FACTORS]
 

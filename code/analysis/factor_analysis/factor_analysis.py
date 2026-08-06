@@ -3188,7 +3188,7 @@ def main() -> None:
         run_tracts = run["tracts"]
         subjects_used = master_subjects
 
-        run_output_dir = ospj(OUTPUT_PROJECT_ROOT, run_name)
+        run_output_dir = OUTPUT_PROJECT_ROOT
         os.makedirs(run_output_dir, exist_ok=True)
 
         print(f"\n{'='*80}")

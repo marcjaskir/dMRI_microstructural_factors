@@ -59,6 +59,12 @@ python -u code/lib/pack_open_h5.py unpack
 
 Placeholder until the OSF project exists: `OSF_URL=https://osf.io/XXXXX/`.
 
+Inspect a packed archive (schema v2 path-mirrored groups under `/open/`):
+
+```bash
+python -u code/lib/pack_open_h5.py ls --tree
+```
+
 ### Controlled export (lab only)
 
 From a local controlled workspace (e.g. `structural_tractometry`):

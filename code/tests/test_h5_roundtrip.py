@@ -17,7 +17,7 @@ from lib.pack_open_h5 import check_open_h5, pack_open_h5, unpack_open_h5  # noqa
 
 
 DIGEST_RELPATHS = [
-    "analysis/factor_analysis/All4_Combined/controls_All4_Combined_scalar_factor_loadings.csv",
+    "analysis/factor_analysis/controls_All4_Combined_scalar_factor_loadings.csv",
     "analysis/gradients_group-controls/laplacian_eigenmodes/csv/neuroaxis_correlations_cohort-controls.csv",
     "analysis/microstructural_asymmetries/summary_hcp1065_thirds_mahalanobis.csv",
     "analysis/factor_z-scores/factor_z_scores/controls_F1_z_scores.csv",
@@ -46,13 +46,19 @@ def test_h5_roundtrip_digests() -> None:
         unpack_root = tmp_path / "unpacked"
         pack_open_h5(open_root=open_root, out_h5=h5_path, profile="core")
         check_open_h5(h5_path)
+        import h5py
+
+        with h5py.File(h5_path, "r") as h5:
+            assert str(h5.attrs["schema_version"]) == "2"
+            assert "open" in h5 and "catalog" in h5
+            assert "files" not in h5
         unpack_open_h5(h5_path=h5_path, dest_root=unpack_root)
         after = {rel: _sha256_text(unpack_root / rel) for rel in DIGEST_RELPATHS}
     assert before == after, (
         "Round-trip digest mismatch:\n"
         + json.dumps({"before": before, "after": after}, indent=2)
     )
-    print(f"PASS HDF5 round-trip ({len(DIGEST_RELPATHS)} tables)")
+    print(f"PASS HDF5 round-trip ({len(DIGEST_RELPATHS)} tables, schema=2)")
 
 
 if __name__ == "__main__":

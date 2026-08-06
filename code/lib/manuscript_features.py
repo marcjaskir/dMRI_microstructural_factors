@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-# All4_Combined factor analysis scalars (n=26), loadings column order.
+# Manuscript factor-analysis scalars (n=26), loadings column order.
 MANUSCRIPT_SCALARS: tuple[str, ...] = (
     "dki_ad",
     "dki_ak",

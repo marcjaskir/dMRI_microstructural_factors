@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Apply All4_Combined control loadings to GAM residual z-scores to produce:
+Apply control loadings (combined GM+WM factor analysis) to GAM residual z-scores to produce:
 
 - wide **factor scores** (`factor_scores/{controls,epilepsy}_F{1,2,3}_scores.csv`)
 - control-normative **factor z** (`factor_z_scores/{controls,epilepsy}_F{1,2,3}_z_scores.csv`)

@@ -31,7 +31,7 @@ from .zscores import write_factor_z_scores
 def main(argv: Optional[Sequence[str]] = None) -> None:
     parser = argparse.ArgumentParser(
         description=(
-            "Apply All4_Combined loadings to GAM residual z → wide factor scores, "
+            "Apply combined GM+WM factor loadings to GAM residual z → wide factor scores, "
             "control-normative factor z, and per-scalar z CSVs."
         )
     )

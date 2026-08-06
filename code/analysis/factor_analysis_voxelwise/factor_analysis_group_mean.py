@@ -40,7 +40,7 @@ DEFAULT_SCALAR_DIR = WITH_CSF_DIR / "scalar_nii"
 DEFAULT_MASK_NII = WITH_CSF_DIR / f"{FILE_PREFIX}_mni_t1w_mask_used.nii.gz"
 DEFAULT_LOADINGS_CSV = (
     PROJECT_ROOT
-    / "derivatives/analysis/factor_analysis/All4_Combined"
+    / "derivatives/analysis/factor_analysis"
     / "controls_All4_Combined_scalar_factor_loadings.csv"
 )
 DEFAULT_OUTPUT_DIR = WITH_CSF_DIR / "factor_nii" / "loadings-regionwise"
