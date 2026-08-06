@@ -17,8 +17,7 @@ dMRI_microstructural_factors/
 **Open data for manuscript reproduction:** download from OSF
 ([https://osf.io/xsr7y](https://osf.io/xsr7y)) and place under `data/open/` so
 `analysis/` and `gam/` exist beside the committed `atlases/` / `metadata/` /
-`inclusion/` stubs. Copy `config.example.yaml` → `config.yaml` and set
-`workspace_root` (see [`config.example.yaml`](config.example.yaml)).
+`inclusion/` stubs.
 
 ## Data availability and privacy
 
@@ -63,6 +62,28 @@ HCP Young Adult / Aging BIDS conversion uses
 Docs: [`code/docs/pipeline.md`](code/docs/pipeline.md),
 [`code/docs/analysis.md`](code/docs/analysis.md),
 [`code/docs/reproducibility.md`](code/docs/reproducibility.md).
+
+## Quick start
+
+```bash
+git clone git@github.com:marcjaskir/dMRI_microstructural_factors.git
+cd dMRI_microstructural_factors
+cp config.example.yaml config.yaml
+# Edit config.yaml: set workspace_root (open_osf_url defaults to https://osf.io/xsr7y)
+
+conda env create -f environment.yml
+conda activate dmri_microstructural_factors
+
+export PYTHONPATH="$PWD/code:$PYTHONPATH"
+
+# Download open data from OSF (https://osf.io/xsr7y), e.g. the open zip, then:
+mkdir -p data/open
+unzip /path/to/dmri_microstructural_factors_open_v1.zip -d data/open
+# Or sync OSF storage files into data/open/ so analysis/ and gam/ are present
+```
+
+All filesystem roots are defined in `config.yaml` (see
+[`config.example.yaml`](config.example.yaml)).
 
 ## Citation
 
