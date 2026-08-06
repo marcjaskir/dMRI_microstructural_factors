@@ -20,7 +20,7 @@ GAM normative z-scores; **Laplacian eigenmaps** (G1/G2); Cohen’s d and
 |--------|---------|--------------|
 | [factor_analysis](../analysis/factor_analysis/) | Control FA/PCA on GAM z (GM + WM) | `factor_analysis.py` |
 | [factor_z-scores](../analysis/factor_z-scores/) | Apply loadings; patient/control factor z | `factor_z-scores.py` |
-| [factor_representation](../analysis/factor_representation/) | Factor representation Upset plots | `factor_representation_upset.py` |
+| [factor_representation](../analysis/factor_representation/) | Statistic vs factor-score representation | `factor_representation.py` |
 | [factor_analysis_voxelwise](../analysis/factor_analysis_voxelwise/) | Voxelwise FA (supplement) | `factor_analysis_voxelwise.py` |
 | [gradients_group-controls](../analysis/gradients_group-controls/) | Control **Laplacian eigenmaps** (BrainSpace) | `compute_gradients.py` |
 | [gradients_tle_z](../analysis/gradients_tle_z/) | TLE z-aligned gradients on control LE axes | `compute_gradients_tle_z.py` |

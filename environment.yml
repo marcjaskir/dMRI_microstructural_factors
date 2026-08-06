@@ -30,7 +30,6 @@ dependencies:
   - tqdm>=4.66
   - joblib>=1.3
   - pillow>=10.0
-  - upsetplot>=0.9
   - pytest>=7.0
   - coloredlogs>=15.0
   # R (GAM / CovBat scripts)

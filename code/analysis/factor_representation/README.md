@@ -2,19 +2,21 @@
 
 ## Purpose
 
-Upset plots of factor representation across tissues.
+Measure how well model statistics (NODDI, MAP-MRI, DKI) represent whole-brain
+factor-score gradients (overall / non-Gaussian / anisotropic diffusivity).
 
 ## Entry points
 
-factor_representation_upset.py
+`factor_representation.py`
 
 ## Inputs
 
-factor_analysis, factor_z-scores
+`factor_analysis`, `factor_z-scores`
 
 ## Outputs
 
-derivatives/analysis/factor_representation
+`derivatives/analysis/factor_representation` — similarity / triplet CSVs and
+factor-bar figures
 
 ## Configuration
 
