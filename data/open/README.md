@@ -27,7 +27,7 @@ Upload checklist: file name `dmri_microstructural_factors_open_v1.h5`, root attr
 Local core pack checksum (regenerate after re-pack):
 
 ```
-29bd25546c0f1b5babfaab01f74a54bbf2cc09b584332e7d2ecc4e23c7a3deb3  dmri_microstructural_factors_open_v1.h5
+bbb60b0006889ef1d28f9e45b78c6fa6f9b1abfc739f160f58814aab8f128258  dmri_microstructural_factors_open_v1.h5
 ```
 
 ## Layout after unpack
@@ -44,6 +44,11 @@ data/open/
 
 Committed in git: this README, small `atlases/` / `metadata/` / `inclusion/`
 stubs. Large trees and the HDF5 are local/OSF only.
+
+Open products contain only the **manuscript feature set**: 26 microstructural
+scalars and 48 HCP1065 WM tracts (24 L/R pairs). Packaging/export uses
+allowlists in `code/lib/manuscript_features.py`; analysis code reads whatever
+is present and does not apply exclusion lists.
 
 ## HDF5 schema
 

@@ -139,7 +139,13 @@ def export_gam_csv(src: Path, dst: Path, mapping: dict[str, str]) -> None:
 
 
 def export_gam_tree(src_root: Path, dst_root: Path, mapping: dict[str, str], workers: int = 16) -> int:
-    files = list(src_root.rglob("*_gam.csv"))
+    from lib.manuscript_features import gam_relpath_is_manuscript
+
+    files = [
+        p
+        for p in src_root.rglob("*_gam.csv")
+        if gam_relpath_is_manuscript(p.relative_to(src_root).as_posix())
+    ]
     pending = []
     for src in files:
         rel = src.relative_to(src_root)
@@ -238,6 +244,8 @@ def export_analysis_dir(name: str, mapping: dict[str, str]) -> None:
 
 
 def export_atlases() -> None:
+    from lib.manuscript_features import MANUSCRIPT_WM_TRACT_SET
+
     src = SRC / "data" / "atlases"
     dst = OPEN / "atlases"
     for path in src.rglob("*"):
@@ -250,6 +258,13 @@ def export_atlases() -> None:
         rel = path.relative_to(src)
         out = dst / rel
         out.parent.mkdir(parents=True, exist_ok=True)
+        if path.name == "HCP1065_tract_metadata.csv":
+            df = pd.read_csv(path)
+            if "label" in df.columns:
+                df = df[df["label"].astype(str).isin(MANUSCRIPT_WM_TRACT_SET)].copy()
+            out.parent.mkdir(parents=True, exist_ok=True)
+            df.to_csv(out, index=False)
+            continue
         shutil.copy2(path, out)
     # centroids
     cent = SRC / "derivatives" / "atlas_centroids"
@@ -262,26 +277,10 @@ def export_atlases() -> None:
                 shutil.copy2(path, out)
 
 
-# Scalars omitted from the manuscript All4_Combined factor analysis (n=26 retained).
-MANUSCRIPT_EXCLUDED_SCALARS = frozenset(
-    {
-        "map_li",
-        "map_am",
-        "dti_txx",
-        "dti_txy",
-        "dti_txz",
-        "dti_tyy",
-        "dti_tyz",
-        "dti_tzz",
-        "dti_ha",
-        "rdi_rd1",
-        "rdi_rd2",
-        "gqi_iso",
-    }
-)
-
 
 def export_metadata() -> None:
+    from lib.manuscript_features import MANUSCRIPT_SCALARS, filter_metadata_dict
+
     src = SRC / "data" / "metadata"
     dst = OPEN / "metadata"
     for name in [
@@ -295,7 +294,10 @@ def export_metadata() -> None:
             continue
         with p.open(encoding="utf-8") as fh:
             data = json.load(fh)
-        filtered = {k: v for k, v in data.items() if k not in MANUSCRIPT_EXCLUDED_SCALARS}
+        filtered = filter_metadata_dict(data)
+        if len(filtered) != len(MANUSCRIPT_SCALARS):
+            missing = [s for s in MANUSCRIPT_SCALARS if s not in filtered]
+            print(f"warn: {name} missing manuscript scalars: {missing}")
         dst.mkdir(parents=True, exist_ok=True)
         with (dst / name).open("w", encoding="utf-8") as fh:
             json.dump(filtered, fh, indent=2)

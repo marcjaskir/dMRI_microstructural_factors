@@ -75,12 +75,6 @@ RANDOM_RESOLUTIONS = [110,156]
 # Subject loop parallelism (always parallel; must be >= 2)
 SUBJECT_WORKERS = 32
 
-# Scalars to skip when computing region means
-EXCLUDED_SCALARS = [
-    "map_li", "map_am", "dti_txx", "dti_txy", "dti_txz", "dti_tyy", "dti_tyz", "dti_tzz",
-    "dti_ha", "rdi_rd1", "rdi_rd2",
-]
-
 # Atlases to compute, in run order: "4S", "Glasser", "HCP1065", "random" (each runs all its resolutions/versions)
 ATLAS_INCLUSION = ["4S", "Glasser", "HCP1065", "random"]
 # ATLAS_INCLUSION = ["Glasser", "random"]
@@ -444,10 +438,7 @@ def _run():
     if SUBJECT_WORKERS < 2:
         raise ValueError("SUBJECT_WORKERS must be >= 2 (parallel subject loop only).")
     scalar_to_dir, scalar_to_file = _load_metadata()
-    scalar_labels = [
-        s for s in scalar_to_file.keys()
-        if s not in EXCLUDED_SCALARS
-    ]
+    scalar_labels = list(scalar_to_file.keys())
     groups = _discover_groups()
     if not groups:
         print("No groups found under", _QSIRECON_DIR)

@@ -87,20 +87,8 @@ def get_group_from_subject_id(sub: str) -> Optional[str]:
         return "hcpya"
     return None
 
-# Scalar / tract exclusions — keep in sync with factor_analysis.py
-EXCLUDED_SCALARS = [
-    "map_li", "map_am", "dti_txx", "dti_txy", "dti_txz", "dti_tyy", "dti_tyz", "dti_tzz",
-    "dti_ha", "rdi_rd1", "rdi_rd2", "gqi_iso"
-]
-
 # Factor labels: paper-aligned (F1 overall, F2 non-Gaussian, F3 anisotropic)
 from lib.factor_labels import FACTOR_LABELS, get_factor_label  # noqa: E402
-
-TRACTS_TO_REMOVE = [
-    "CBT_L", "CBT_R", "RST_L", "RST_R", "DRTT_L", "DRTT_R",
-    "EMC_L", "EMC_R", "C_PHP_L", "C_PHP_R", "AF_L", "AF_R", "SLF3_L", "SLF3_R",
-    "SLF2_L", "SLF2_R", "FAT_L", "FAT_R",
-]
 
 # Order microstructural statistics by these scalar prefixes when plotting
 SCALAR_PREFIX_ORDER = ["dti", "rdi", "dki", "gqi", "noddi", "map"]
@@ -117,11 +105,10 @@ MIN_CONTROLS_FOR_ROI_Z = 2
 # ============================================================================
 
 def load_scalar_labels() -> List[str]:
-    """Load and filter scalar labels."""
+    """Load scalar labels from JSON (all keys present)."""
     path = ospj(METADATA_DIR, "scalar_labels_to_filenames.json")
     with open(path) as f:
-        all_labels = list(json.load(f).keys())
-    return [label for label in all_labels if label not in EXCLUDED_SCALARS]
+        return list(json.load(f).keys())
 
 
 def load_clinical_metadata() -> pd.DataFrame | None:
@@ -286,7 +273,6 @@ def get_tracts_by_type(tract_type: str) -> List[str]:
     if meta.empty or "label" not in meta.columns or "type" not in meta.columns:
         return []
     tracts = meta.loc[meta["type"].astype(str) == tract_type, "label"].astype(str).tolist()
-    tracts = [t for t in tracts if t not in TRACTS_TO_REMOVE]
     available_bases: Set[str] = set(_list_subdirs(WM_PROFILE_DIR_PYAFQ))
     return sorted([t for t in tracts if t in available_bases])
 
@@ -298,7 +284,7 @@ def discover_all_gm_regions() -> List[str]:
 
 
 def discover_all_wm_tracts() -> List[str]:
-    """Association + projection WM tracts on pyAFQ, minus TRACTS_TO_REMOVE (matches All4_Combined)."""
+    """Association + projection WM tracts on pyAFQ (matches All4_Combined)."""
     assoc = get_tracts_by_type("association")
     proj = get_tracts_by_type("projection")
     return sorted(list(dict.fromkeys(assoc + proj)))
@@ -686,7 +672,7 @@ def save_scalar_z_scores(
     """
     os.makedirs(SCALAR_Z_SCORES_OUTPUT_DIR, exist_ok=True)
     scalar_labels = order_scalars_by_prefix(load_scalar_labels())
-    tracts_f = [t for t in all_tracts if t not in TRACTS_TO_REMOVE]
+    tracts_f = list(all_tracts)
 
     def _one_table(
         scalar: str,
@@ -1908,8 +1894,6 @@ def compute_and_save_all_factor_scores(
     # Discover all regions and tracts
     all_regions = discover_all_gm_regions()
     all_tracts = discover_all_wm_tracts()
-    # Filter out excluded tracts
-    all_tracts = [t for t in all_tracts if t not in TRACTS_TO_REMOVE]
     
     # Output directory (flat CSVs: epilepsy_Fk_scores.csv, controls_Fk_scores.csv)
     os.makedirs(output_dir, exist_ok=True)
@@ -5044,8 +5028,6 @@ def create_factor1_top10_loadings_plot(
         if tissue_type in ["all", "wm"]:
             # Process WM tract segments (end1, core, end2)
             for tract in all_tracts:
-                if tract in TRACTS_TO_REMOVE:
-                    continue
                 gam_path = ospj(WM_PROFILE_DIR_PYAFQ, tract, f"{tract}_{scalar}_stat-mean_gam.csv")
                 if not os.path.exists(gam_path):
                     gam_path = ospj(WM_PROFILE_DIR_PYAFQ, tract, f"{tract}_{scalar}_gam.csv")
@@ -5361,8 +5343,6 @@ def create_factor1_top10_loadings_plot_sorted(
         if tissue_type in ["all", "wm"]:
             # Process WM tracts - compute one value per tract segment (end1, core, end2)
             for tract in all_tracts:
-                if tract in TRACTS_TO_REMOVE:
-                    continue
                 gam_path = ospj(WM_PROFILE_DIR_PYAFQ, tract, f"{tract}_{scalar}_stat-mean_gam.csv")
                 if not os.path.exists(gam_path):
                     gam_path = ospj(WM_PROFILE_DIR_PYAFQ, tract, f"{tract}_{scalar}_gam.csv")
@@ -9752,8 +9732,6 @@ def main() -> None:
     all_regions = discover_all_gm_regions()
     all_tracts = discover_all_wm_tracts()
     print(f"  Discovered {len(all_regions)} GM regions, {len(all_tracts)} WM tracts")
-    # Filter out excluded tracts
-    all_tracts = [t for t in all_tracts if t not in TRACTS_TO_REMOVE]
     
     if not all_regions or not all_tracts:
         print("No regions or tracts found; aborting.")

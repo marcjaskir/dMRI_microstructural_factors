@@ -39,19 +39,10 @@ GM_GLASSER_PROFILE_DIR = ospj(PROJECT_ROOT, "derivatives", "gam", "mni_micro", "
 WM_PROFILE_DIR = ospj(PROJECT_ROOT, "derivatives", "gam", "pyafq", "HCP1065")
 HCP1065_TRACT_METADATA_PATH = ospj(PROJECT_ROOT, "data", "atlases", "HCP1065", "HCP1065_tract_metadata.csv")
 
-EXCLUDED_SCALARS = [
-    "map_li", "map_am", "dti_txx", "dti_txy", "dti_txz", "dti_tyy", "dti_tyz", "dti_tzz",
-    "dti_ha", "rdi_rd1", "rdi_rd2",
-]
 N_NODES = 100
 END1_NODES = list(range(1, 35))
 CORE_NODES = list(range(35, 67))
 END2_NODES = list(range(67, 101))
-
-TRACTS_TO_REMOVE = [
-    "CBT_L", "CBT_R", "RST_L", "RST_R", "DRTT_L", "DRTT_R",
-    "EMC_L", "EMC_R", "C_PHP_L", "C_PHP_R",
-]
 
 # Controls + patients: same parcel list and imputation for all
 GROUPS_ALL = ["penn_controls", "hcpya", "hcpaging", "penn_epilepsy"]
@@ -78,8 +69,7 @@ def get_group_for_subject(sub: str, group_from_gam: str | None) -> str:
 def load_scalar_labels() -> List[str]:
     path = ospj(METADATA_DIR, "scalar_labels_to_filenames.json")
     with open(path) as f:
-        all_labels = list(json.load(f).keys())
-    return [label for label in all_labels if label not in EXCLUDED_SCALARS]
+        return list(json.load(f).keys())
 
 
 def get_mni_micro_gm_profile_dir_for_region(region_name: str, default_4s156_dir: str) -> str:
@@ -110,7 +100,7 @@ def get_tracts() -> List[str]:
         tracts = meta["label"].astype(str).tolist()
     else:
         tracts = []
-    return sorted([t for t in tracts if t not in TRACTS_TO_REMOVE])
+    return sorted(tracts)
 
 
 def load_region_scalar_data(

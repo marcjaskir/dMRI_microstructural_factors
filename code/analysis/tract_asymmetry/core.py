@@ -22,7 +22,7 @@ def _parse_segment(s: str) -> str:
 
 
 def _tract_base(tract_label: str) -> str:
-    """Strip _L or _R suffix for tract base (e.g. AF_L -> AF)."""
+    """Strip _L or _R suffix for tract base (e.g. ILF_L -> ILF)."""
     if tract_label.endswith("_L"):
         return tract_label[:-2]
     if tract_label.endswith("_R"):
@@ -41,7 +41,6 @@ class TractAsymmetry:
         base_dir: Path,
         metadata_path: Path,
         gam_dir: Path,
-        excluded_scalars: List[str],
         inclusion_path: Optional[Path] = None,
         gam_stat: str = DEFAULT_GAM_STAT,
         normative_dir: Optional[Path] = None,
@@ -49,7 +48,6 @@ class TractAsymmetry:
         self.base_dir = Path(base_dir)
         self.metadata_path = Path(metadata_path)
         self.gam_dir = Path(gam_dir)
-        self.excluded_scalars = excluded_scalars
         self.inclusion_path = Path(inclusion_path) if inclusion_path is not None else (
             self.base_dir / "results" / "inclusion" / "penn_epilepsy_included_basic_metadata_tle.csv"
         )
@@ -121,10 +119,10 @@ class TractAsymmetry:
 
     @property
     def scalars(self) -> List[str]:
-        """List of scalar names from GAM (excluding excluded_scalars). Supports _stat-mean_gam and _stat-standard_deviation_gam stems."""
+        """List of scalar names from GAM. Supports _stat-mean_gam and _stat-standard_deviation_gam stems."""
         if self._scalars is not None:
             return self._scalars
-        sample_tract = "AF_L"
+        sample_tract = "ILF_L"
         all_scalars = []
         prefix = f"{sample_tract}_"
         for p in (self.gam_dir / sample_tract).iterdir():
@@ -140,14 +138,13 @@ class TractAsymmetry:
                     break
             if scalar is None:
                 continue
-            if scalar not in self.excluded_scalars:
-                all_scalars.append(scalar)
+            all_scalars.append(scalar)
         self._scalars = sorted(set(all_scalars))
         return self._scalars
 
     def get_subjects_with_gam(self) -> List[str]:
         """Subjects present in GAM (sample tract). Uses current gam_stat convention."""
-        sample_tract = "AF_L"
+        sample_tract = "ILF_L"
         stat_suffix = f"_stat-{self.gam_stat}_gam" if self.gam_stat in ("mean", "standard_deviation") else "_gam"
         sample_gam = self.gam_dir / sample_tract / f"{sample_tract}_dki_ad{stat_suffix}.csv"
         if not sample_gam.exists():

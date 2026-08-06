@@ -6,11 +6,6 @@ from typing import Dict, List
 
 import pandas as pd
 
-EXCLUDED_SCALARS = [
-    "map_li", "map_am", "dti_txx", "dti_txy", "dti_txz",
-    "dti_tyy", "dti_tyz", "dti_tzz", "dti_ha", "rdi_rd1", "rdi_rd2",
-]
-
 
 def get_paths(base_dir: Path) -> Dict[str, Path]:
     """Return path dict. GAM mni_micro for Glasser, 4S156, HCP1065; 4S TSV for cortex/subcortex split."""

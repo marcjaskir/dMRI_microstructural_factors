@@ -49,20 +49,6 @@ ATLAS_TOP_N = 20
 # Top N regions in truncated LaTeX summary fragments (*_top25.tex, etc.).
 SUMMARY_TEX_TOP_N = 25
 
-# Skip these tracts from tract-level volumetric asymmetry analyses (WM).
-# Provided as tract labels with hemisphere suffix; we also derive tract bases without suffix.
-EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACTS = [
-    "AF_L",
-    "AF_R",
-    "FAT_L",
-    "FAT_R",
-    "SLF3_L",
-    "SLF3_R",
-]
-EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACT_BASES = {
-    t[:-2] for t in EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACTS if t.endswith(("_L", "_R"))
-}  # e.g. "AF_L" -> "AF"
-
 # CIT168-style 4S subcortex parcel abbreviations -> prose labels for LaTeX tables.
 FOUR_S_SUBCORTEX_TEX_ABBREV_LABELS: Dict[str, str] = {
     "Ca": "Caudate nucleus",
@@ -265,32 +251,6 @@ def _wm_roi_to_tract_segment(roi_id: str) -> Tuple[str, str]:
     if "_" not in roi_id:
         return roi_id, ""
     return roi_id.rsplit("_", 1)[0], roi_id.rsplit("_", 1)[1]
-
-
-def _wm_roi_tract_base_key(roi_id: str) -> str:
-    """Hemisphere-agnostic HCP1065 tract key (``AF_L_core`` / ``AF_core`` -> ``AF``)."""
-    tract_with_hemi, _ = _wm_roi_to_tract_segment(str(roi_id).strip())
-    return _wm_tract_base_key(tract_with_hemi)
-
-
-def _is_excluded_volumetric_asymmetry_wm_roi(roi_id: str) -> bool:
-    """True for WM roi_id / label belonging to EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACTS."""
-    return _wm_roi_tract_base_key(roi_id) in EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACT_BASES
-
-
-def _exclude_volumetric_asymmetry_tracts(df: pd.DataFrame) -> pd.DataFrame:
-    """Drop WM rows whose tract base is in EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACT_BASES."""
-    if df.empty:
-        return df
-    if "roi_type" not in df.columns or "roi_id" not in df.columns:
-        return df
-    mask_wm = df["roi_type"] == "wm"
-    if not mask_wm.any():
-        return df
-    excluded = df["roi_id"].map(
-        lambda rid: _is_excluded_volumetric_asymmetry_wm_roi(str(rid)) if pd.notna(rid) else False
-    )
-    return df[~(mask_wm & excluded)].copy()
 
 
 def _load_4s_label_to_index() -> Tuple[Dict[str, int], Dict[str, str]]:
@@ -512,8 +472,6 @@ def get_atlas_data(
         for roi_id, mean_d in by_roi.items():
             if pd.isna(mean_d):
                 continue
-            if _is_excluded_volumetric_asymmetry_wm_roi(str(roi_id)):
-                continue
             tract_base, segment = _wm_roi_to_tract_segment(roi_id)
             out["hcp1065_thirds"].append((tract_base, segment, float(mean_d)))
         out["hcp1065_thirds"] = sorted(out["hcp1065_thirds"], key=lambda x: x[2], reverse=True)
@@ -522,8 +480,6 @@ def get_atlas_data(
         tract_means = by_tract.groupby("tract_base")["cohens_d"].mean()
         for tract_base, mean_d in tract_means.items():
             if pd.isna(mean_d):
-                continue
-            if _is_excluded_volumetric_asymmetry_wm_roi(str(tract_base)):
                 continue
             out["hcp1065_whole"].append((str(tract_base), float(mean_d)))
         out["hcp1065_whole"] = sorted(out["hcp1065_whole"], key=lambda x: x[1], reverse=True)
@@ -735,18 +691,6 @@ def build_summary_table_dataframes_mahal(
 
     wm_long = full_long[full_long["roi_type"] == "wm"]
     wm_cohens = cohens_df[cohens_df["roi_type"] == "wm"]
-    if not wm_long.empty:
-        wm_long = wm_long[
-            ~wm_long["roi_id"].map(
-                lambda rid: _is_excluded_volumetric_asymmetry_wm_roi(str(rid))
-            )
-        ].copy()
-    if not wm_cohens.empty:
-        wm_cohens = wm_cohens[
-            ~wm_cohens["roi_id"].map(
-                lambda rid: _is_excluded_volumetric_asymmetry_wm_roi(str(rid))
-            )
-        ].copy()
     if not wm_long.empty and not wm_cohens.empty:
         roi_stats = wm_long.groupby("roi_id").apply(
             lambda g: pd.Series(_roi_stats_for_summary_mahal(g)),
@@ -1608,8 +1552,6 @@ def main() -> int:
     cohens_df, full_long = compute_cohens_d_mahal(tract_df, region_df, "raw")
 
     # Exclude requested tracts from tract-level WM analyses.
-    cohens_df = _exclude_volumetric_asymmetry_tracts(cohens_df)
-    full_long = _exclude_volumetric_asymmetry_tracts(full_long)
 
     save_summary_tables_per_atlas_mahal(full_long, cohens_df, tract_base_to_type, OUTPUT_DIR, "_mahalanobis")
     save_summary_tables_tex_per_atlas_mahal(full_long, cohens_df, tract_base_to_type, OUTPUT_DIR)

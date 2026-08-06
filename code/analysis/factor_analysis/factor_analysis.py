@@ -76,24 +76,12 @@ HCP1065_TRACT_METADATA_PATH = f"{PROJECT_ROOT}/data/atlases/HCP1065/HCP1065_trac
 
 OUTPUT_PROJECT_ROOT = f"{analysis_dir()}/factor_analysis"
 
-EXCLUDED_SCALARS = ["map_li", "map_am", "dti_txx", "dti_txy", "dti_txz", "dti_tyy", "dti_tyz", "dti_tzz", "dti_ha", "rdi_rd1", "rdi_rd2", "gqi_iso"]
-# COLINEAR_SCALRS = ["rdi_rd1", "rdi_rd2", "dki_mk", "dki_rd", "map_pa", "map_ngperp", "map_rtap", "dti_md", "dti_ad", "dti_fa", "dti_rd"]
-
-# Tracts to exclude from analysis
-TRACTS_TO_REMOVE = [
-    "CBT_L", "CBT_R", "RST_L", "RST_R", "DRTT_L", "DRTT_R", 
-    "EMC_L", "EMC_R", "C_PHP_L", "C_PHP_R", "AF_L", "AF_R", "SLF3_L", "SLF3_R",
-    "SLF2_L", "SLF2_R", "FAT_L", "FAT_R"
-]
-# Some segmentation failures (lose 9 subjects), but included: "CPT_F_L", "CPT_F_R", "CST_L", "CST_R"
 
 # Order microstructural statistics by these scalar prefixes when plotting
 SCALAR_PREFIX_ORDER = ["dti", "rdi", "dki", "gqi", "noddi", "map"]
 
 # Combined heatmap subset: DTI, DKI, GQI only (excludes NODDI, MAP-MRI ``map_*``, RDI ``rdi_*``).
 COMBINED_HEATMAP_DTI_DKI_GQI_PREFIXES = frozenset({"dti", "dki", "gqi"})
-# Further omit specific scalars from the DTI/DKI/GQI correlation-only figure (e.g. isotropic diffusion).
-COMBINED_HEATMAP_DTI_DKI_GQI_EXCLUDE_SCALARS = frozenset({"gqi_iso"})
 
 # DPI for ``*_factor_loading_ordered.png`` (Pairwise Correlations + … Factor loading ordered).
 CORR_FACTOR_PCA_FACTOR_ORDERED_DPI = 600
@@ -188,11 +176,10 @@ os.makedirs(OUTPUT_PROJECT_ROOT, exist_ok=True)
 # ============================================================================
 
 def load_scalar_labels() -> List[str]:
-    """Load and filter scalar labels."""
+    """Load scalar labels from JSON (all keys present)."""
     path = ospj(METADATA_DIR, "scalar_labels_to_filenames.json")
     with open(path) as f:
-        all_labels = list(json.load(f).keys())
-    return [label for label in all_labels if label not in EXCLUDED_SCALARS]
+        return list(json.load(f).keys())
 
 def _list_subdirs(base_dir: str) -> List[str]:
     if not os.path.isdir(base_dir):
@@ -239,7 +226,6 @@ def get_tracts_by_type(tract_type: str) -> List[str]:
         return []
 
     tracts = meta.loc[meta["type"].astype(str) == tract_type, "label"].astype(str).tolist()
-    tracts = [t for t in tracts if t not in TRACTS_TO_REMOVE]
 
     # Further filter: keep only tract bases that exist in the pyAFQ pipeline outputs.
     # (We use pyafq node-wise GAM outputs for WM segments.)
@@ -1089,7 +1075,6 @@ def plot_corr_factor_loadings_and_pca_components_combined(
     loadings_annotation_fontsize: int = 8,
     cbar_label_fontsize: int = 14,
     cbar_tick_fontsize: int = 14,
-    exclude_scalar_names: Optional[Set[str]] = None,
     subplots_left: Optional[float] = None,
 ) -> None:
     """
@@ -1128,9 +1113,6 @@ def plot_corr_factor_loadings_and_pca_components_combined(
     cbar_label_fontsize, cbar_tick_fontsize:
       - Color bar label and tick sizes.
 
-    exclude_scalar_names:
-      - Optional set of scalar column names to drop after other filters (e.g. ``gqi_iso``).
-
     subplots_left:
       - Matplotlib ``subplots_adjust(left=...)``. If None, uses a wider default when
         ``include_factor_pca_blocks`` is False so y-axis labels are not clipped.
@@ -1157,25 +1139,6 @@ def plot_corr_factor_loadings_and_pca_components_combined(
         loadings_df = loadings_df[keep].copy()
         pca_loadings_df = pca_loadings_df[keep].copy()
 
-    if exclude_scalar_names:
-        excl = set(exclude_scalar_names)
-        keep = [c for c in corr_df.columns if c not in excl]
-        keep = order_scalars_by_prefix(keep)
-        if len(keep) < 2:
-            fig, ax = plt.subplots(figsize=(6, 3))
-            ax.axis("off")
-            msg = f"Too few scalars after exclude_scalar_names (n={len(keep)}); need ≥2."
-            ax.text(0.5, 0.5, msg, ha="center", va="center", transform=ax.transAxes, fontsize=12)
-            out_dir = os.path.dirname(output_path)
-            if out_dir:
-                os.makedirs(out_dir, exist_ok=True)
-            fig.savefig(output_path, dpi=150, bbox_inches="tight")
-            plt.close(fig)
-            print(f"Warning: combined heatmap subset skipped ({msg}) -> {output_path}")
-            return
-        corr_df = corr_df.loc[keep, keep].copy()
-        loadings_df = loadings_df[keep].copy()
-        pca_loadings_df = pca_loadings_df[keep].copy()
 
     prefix_cols = order_scalars_by_prefix(corr_df.columns)
     corr_df = corr_df.loc[prefix_cols, prefix_cols]
@@ -2751,7 +2714,6 @@ def create_html_factor_report(
     n_regions: int,
     n_tracts: int,
     n_scalars: int,
-    excluded_tracts: List[str],
     loadings_csv_path: str,
     variance_plot_path: str,
     corr_heatmap_path: str,
@@ -2801,9 +2763,6 @@ def create_html_factor_report(
         else None
     )
     factor_pca_summary_src = image_src(factor_pca_combined_summary_plot_path) if factor_pca_combined_summary_plot_path else None
-
-    # Format excluded tracts for display
-    excluded_tracts_str = ", ".join(excluded_tracts) if excluded_tracts else "None"
 
     # Conditional wording for atlas set and subject inclusion
     if atlas_set_label:
@@ -2920,15 +2879,6 @@ def create_html_factor_report(
             padding: 2px 6px;
             border-radius: 3px;
         }}
-        .excluded-tracts {{
-            font-family: monospace;
-            font-size: 11px;
-            background-color: #fff3cd;
-            padding: 10px;
-            border-radius: 5px;
-            border-left: 4px solid #ffc107;
-            margin: 10px 0;
-        }}
     </style>
 </head>
 <body>
@@ -2983,14 +2933,6 @@ def create_html_factor_report(
             <strong>WM Atlas:</strong> {WM_ATLAS}<br/>
             {f'<strong>Atlas set:</strong> {atlas_set_display}<br/>' if atlas_set_display else ''}
         </p>
-        <div class="excluded-tracts">
-            <strong>Excluded Scalars ({len(EXCLUDED_SCALARS)}):</strong><br/>
-            {', '.join(EXCLUDED_SCALARS)}
-        </div>
-        <div class="excluded-tracts">
-            <strong>Excluded WM Tracts ({len(excluded_tracts)}):</strong><br/>
-            {excluded_tracts_str}
-        </div>
         <p class="summary-kv">
             <strong>Subject Inclusion Criteria:</strong> {subject_criteria}<br/>
             <strong>WM Tract Data:</strong> For each WM tract, pyafq GAM node z-scores are divided into segments (end1/core/end2) using the node definitions, and segment means are used as 3 features per tract.<br/>
@@ -3554,7 +3496,6 @@ def main() -> None:
                     corr_factor_pca_components_plot_path_factor_ordered_dti_dki_gqi,
                     row_order="max_factor_loading",
                     allowed_prefixes=COMBINED_HEATMAP_DTI_DKI_GQI_PREFIXES,
-                    exclude_scalar_names=COMBINED_HEATMAP_DTI_DKI_GQI_EXCLUDE_SCALARS,
                     include_factor_pca_blocks=False,
                     axis_tick_fontsize=16,
                     corr_annotation_fontsize=11,
@@ -3668,7 +3609,6 @@ def main() -> None:
             n_regions=len(run_regions),
             n_tracts=len(run_tracts),
             n_scalars=len(all_scalars),
-            excluded_tracts=TRACTS_TO_REMOVE,
             loadings_csv_path=loadings_csv_path,
             variance_plot_path=variance_plot_path,
             corr_heatmap_path=corr_and_loadings_path,

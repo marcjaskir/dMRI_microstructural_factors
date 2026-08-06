@@ -62,7 +62,6 @@ def main() -> int:
         base_dir=base_dir,
         metadata_path=paths["metadata_path"],
         gam_dir=paths["gam_dir"],
-        excluded_scalars=cfg.EXCLUDED_SCALARS,
         inclusion_path=paths["inclusion_path"],
         normative_dir=normative_dir,
     )

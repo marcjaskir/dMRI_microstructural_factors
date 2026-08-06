@@ -133,32 +133,6 @@ def _configure_matplotlib_georgia() -> None:
 
 _configure_matplotlib_georgia()
 
-# Excluded from analyses (mathematical dependencies, missing data, or lack of interpretability)
-EXCLUDED_SCALARS = [
-    "map_li", "map_am", "dti_txx", "dti_txy", "dti_txz",
-    "dti_tyy", "dti_tyz", "dti_tzz", "dti_ha", "rdi_rd1", "rdi_rd2", "gqi_iso",
-]
-
-
-def _filter_excluded_scalars(df: pd.DataFrame) -> pd.DataFrame:
-    if df.empty or "scalar" not in df.columns:
-        return df
-    return df[~df["scalar"].isin(EXCLUDED_SCALARS)].copy()
-
-# Skip these tracts from tract-level volumetric asymmetry analyses (WM).
-# Provided as tract labels with hemisphere suffix; we also derive tract bases without suffix.
-EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACTS = [
-    "AF_L",
-    "AF_R",
-    "FAT_L",
-    "FAT_R",
-    "SLF3_L",
-    "SLF3_R",
-]
-EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACT_BASES = {
-    t[:-2] for t in EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACTS if t.endswith(("_L", "_R"))
-}  # e.g. "AF_L" -> "AF"
-
 MODEL_FALLBACK_COLORS = {
     "dki": "#7A297F",
     "dti": "#C43031",
@@ -395,35 +369,6 @@ def _wm_roi_to_tract_segment(roi_id: str) -> Tuple[str, str]:
     return roi_id.rsplit("_", 1)[0], roi_id.rsplit("_", 1)[1]
 
 
-def _wm_roi_tract_base_key(roi_id: str) -> str:
-    """Hemisphere-agnostic HCP1065 tract key (``AF_L_core`` / ``AF_core`` -> ``AF``)."""
-    tract_with_hemi, _ = _wm_roi_to_tract_segment(str(roi_id).strip())
-    t = str(tract_with_hemi).strip()
-    if t.endswith("_L") or t.endswith("_R"):
-        return t[:-2]
-    return t
-
-
-def _is_excluded_volumetric_asymmetry_wm_roi(roi_id: str) -> bool:
-    """True for WM roi_id / label belonging to EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACTS."""
-    return _wm_roi_tract_base_key(roi_id) in EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACT_BASES
-
-
-def _exclude_volumetric_asymmetry_tracts(df: pd.DataFrame) -> pd.DataFrame:
-    """Drop WM rows whose tract base is in EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACT_BASES."""
-    if df.empty:
-        return df
-    if "roi_type" not in df.columns or "roi_id" not in df.columns:
-        return df
-    mask_wm = df["roi_type"] == "wm"
-    if not mask_wm.any():
-        return df
-    excluded = df["roi_id"].map(
-        lambda rid: _is_excluded_volumetric_asymmetry_wm_roi(str(rid)) if pd.notna(rid) else False
-    )
-    return df[~(mask_wm & excluded)].copy()
-
-
 def get_combined_long(
     tract_df: pd.DataFrame,
     region_df: pd.DataFrame,
@@ -458,7 +403,7 @@ def compute_cohens_d_per_roi_scalar(
     full = get_combined_long(tract_df, region_df)
     if full.empty:
         return pd.DataFrame(columns=["roi_id", "roi_type", "scalar", "cohens_d", "atlas"])
-    return _filter_excluded_scalars(_compute_cohens_d_from_combined(full))
+    return _compute_cohens_d_from_combined(full)
 
 
 def _compute_cohens_d_from_combined(full: pd.DataFrame) -> pd.DataFrame:
@@ -1024,8 +969,6 @@ def get_atlas_data(
         for roi_id, mean_abs_d in by_roi.items():
             if pd.isna(mean_abs_d):
                 continue
-            if _is_excluded_volumetric_asymmetry_wm_roi(str(roi_id)):
-                continue
             tract_base, segment = _wm_roi_to_tract_segment(roi_id)
             out["hcp1065_thirds"].append((tract_base, segment, float(mean_abs_d)))
         out["hcp1065_thirds"] = sorted(out["hcp1065_thirds"], key=lambda x: x[2], reverse=True)
@@ -1035,8 +978,6 @@ def get_atlas_data(
         tract_means = by_tract.groupby("tract_base")["cohens_d"].apply(lambda s: np.abs(s).mean())
         for tract_base, mean_abs_d in tract_means.items():
             if pd.isna(mean_abs_d):
-                continue
-            if _is_excluded_volumetric_asymmetry_wm_roi(str(tract_base)):
                 continue
             out["hcp1065_whole"].append((str(tract_base), float(mean_abs_d)))
         out["hcp1065_whole"] = sorted(out["hcp1065_whole"], key=lambda x: x[1], reverse=True)
@@ -1060,7 +1001,6 @@ def _cohens_d_summary_by_label(
     label_col: str,
 ) -> pd.DataFrame:
     """Per ``label_col``: mean signed d, mean |d|, signed d at peak |d|, peak |d|, peak scalar."""
-    cohens_sub = _filter_excluded_scalars(cohens_sub)
     empty_cols = [
         "label",
         "mean_cohens_d",
@@ -1240,7 +1180,7 @@ def compute_factor_z_cohens_df(
     wm_mask = out["roi_type"] == "wm"
     if wm_mask.any():
         out.loc[wm_mask, "roi_id"] = out.loc[wm_mask, "label"]
-    return _exclude_volumetric_asymmetry_tracts(out)
+    return out
 
 
 def _factor_cohens_wide_by_label(
@@ -1363,7 +1303,7 @@ def load_mahalanobis_cohens_df(
     cohens_df, _ = compute_cohens_d_mahal(tract_df, region_df, variant)
     if cohens_df.empty:
         return cohens_df
-    return _exclude_volumetric_asymmetry_tracts(cohens_df)
+    return cohens_df
 
 
 def _mahal_cohens_summary_by_label(
@@ -1393,7 +1333,6 @@ def build_summary_table_dataframes(
 ) -> Dict[str, pd.DataFrame]:
     """Build per-atlas summary tables: Mahalanobis d, largest factor d, largest scalar d."""
     out: Dict[str, pd.DataFrame] = {}
-    cohens_df = _filter_excluded_scalars(cohens_df)
     if full_long.empty or cohens_df.empty:
         return out
 
@@ -1473,17 +1412,6 @@ def build_summary_table_dataframes(
     wm_mahal = cohens_mahal[cohens_mahal["roi_type"] == "wm"] if not cohens_mahal.empty else empty_mahal
     wm_factor = cohens_factor[cohens_factor["roi_type"] == "wm"] if not cohens_factor.empty else empty_factor
 
-    def _drop_excluded_wm(df: pd.DataFrame) -> pd.DataFrame:
-        if df.empty or "roi_id" not in df.columns:
-            return df
-        return df[
-            ~df["roi_id"].map(lambda rid: _is_excluded_volumetric_asymmetry_wm_roi(str(rid)))
-        ].copy()
-
-    wm_long = _drop_excluded_wm(wm_long)
-    wm_cohens = _drop_excluded_wm(wm_cohens)
-    wm_mahal = _drop_excluded_wm(wm_mahal)
-    wm_factor = _drop_excluded_wm(wm_factor)
 
     if not wm_long.empty and not wm_cohens.empty:
         roi_stats = wm_long.groupby("roi_id").apply(lambda g: pd.Series(_roi_stats_for_summary(g)))
@@ -2141,17 +2069,16 @@ def _canonical_scalars_for_plots(
     scalar_labels: Dict[str, str],
     plot_df: pd.DataFrame,
 ) -> List[str]:
-    """X-axis order for bar/strip plots: sorted ``scalar_labels`` keys (minus EXCLUDED), then any data-only scalars.
+    """X-axis order for bar/strip plots: sorted ``scalar_labels`` keys, then any data-only scalars.
 
     Matches radar-style fixed ordering so scalars without ROI-level Cohen's d rows still appear as empty categories.
     """
     if scalar_labels:
-        keys = [s for s in sorted(scalar_labels.keys()) if s not in EXCLUDED_SCALARS]
+        keys = sorted(scalar_labels.keys())
         in_data = set(plot_df["scalar"].dropna().unique())
-        extra = sorted(s for s in in_data if s not in EXCLUDED_SCALARS and s not in keys)
+        extra = sorted(s for s in in_data if s not in keys)
         return keys + extra
-    avail = sorted(pd.unique(plot_df["scalar"].dropna()))
-    return [s for s in avail if s not in EXCLUDED_SCALARS]
+    return sorted(pd.unique(plot_df["scalar"].dropna()))
 
 
 def scalar_reconstruction_model_prefix(scalar: str) -> Optional[str]:
@@ -2274,7 +2201,7 @@ def _plot1_whole_brain_prep(
     """
     if df.empty:
         return None
-    plot_df = df[~df["scalar"].isin(EXCLUDED_SCALARS)].copy()
+    plot_df = df.copy()
     plot_df["abs_cohens_d"] = np.abs(plot_df["cohens_d"])
     plot_df = plot_df.dropna(subset=["abs_cohens_d"])
     if plot_df.empty:
@@ -2556,7 +2483,6 @@ def plot2_2x2_radar(
     scalars_ordered = sorted(scalar_labels.keys()) if scalar_labels else []
     if not scalars_ordered and not df_quad.empty:
         scalars_ordered = sorted(df_quad["scalar"].unique().tolist())
-    scalars_ordered = [s for s in scalars_ordered if s not in EXCLUDED_SCALARS]
     # Global max |Cohen's d| across quadrants for identical radial axes
     global_max_abs = 0.01
     for (quad_key, _) in quadrants:
@@ -2712,7 +2638,7 @@ def _plot2_quadrants_prep(
     tract_base_to_type: Dict[str, str],
 ) -> Tuple[pd.DataFrame, List[Tuple[str, str]]]:
     """Build quadrant-labeled dataframe and fixed quadrant list for 2×2 plots."""
-    df_quad = add_quadrant_column(df[~df["scalar"].isin(EXCLUDED_SCALARS)], tract_base_to_type)
+    df_quad = add_quadrant_column(df, tract_base_to_type)
     df_quad = df_quad.copy()
     df_quad["abs_cohens_d"] = np.abs(df_quad["cohens_d"])
     df_quad = df_quad.dropna(subset=["abs_cohens_d"])
@@ -3367,7 +3293,6 @@ def main() -> int:
         return 1
 
     # Exclude requested tracts from tract-level WM analyses.
-    cohens_df = _exclude_volumetric_asymmetry_tracts(cohens_df)
 
     scalar_labels: Dict[str, str] = {}
     if SCALAR_LABELS_PATH.exists():
@@ -3380,7 +3305,6 @@ def main() -> int:
     atlas_data = get_atlas_data(cohens_df, tract_base_to_type)
 
     full_long = get_combined_long(tract_df, region_df)
-    full_long = _exclude_volumetric_asymmetry_tracts(full_long)
     cohens_df_mahal = load_mahalanobis_cohens_df(
         subcortical_bases, cortical_bases_4s, glasser_bases
     )
@@ -3415,7 +3339,6 @@ def main() -> int:
     plot1_whole_brain_strips(cohens_df, plot1_strips_path, scalar_labels, scalar_colors)
     by_scalar1 = cohens_df.groupby("scalar")["cohens_d"].apply(lambda s: np.abs(s).mean())
     scalars_ordered = sorted(scalar_labels.keys()) if scalar_labels else sorted(cohens_df["scalar"].unique().tolist())
-    scalars_ordered = [s for s in scalars_ordered if s not in EXCLUDED_SCALARS]
     scalar_to_d1 = {s: by_scalar1.get(s, float("nan")) for s in scalars_ordered}
     plot_radar_mean_abs_cohend(
         scalars_ordered,
@@ -3424,7 +3347,7 @@ def main() -> int:
         plot1_radar_path,
         title="Mean absolute asymmetries\nWhole-brain (fixed scalar order)",
     )
-    cdf_wb = cohens_df[~cohens_df["scalar"].isin(EXCLUDED_SCALARS)].copy()
+    cdf_wb = cohens_df.copy()
     cdf_wb["abs_cohens_d"] = np.abs(cdf_wb["cohens_d"])
     scalars_wb_sorted = _sort_scalars_by_mean_abs_desc(scalars_ordered, cdf_wb)
     scalar_to_d1_sorted = {s: scalar_to_d1.get(s, float("nan")) for s in scalars_wb_sorted}

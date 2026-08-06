@@ -27,7 +27,6 @@ import pandas as pd
 from microstructural_asymmetry_report_mahalanobis import (
     PROJECT_ROOT,
     _get_4s_subcortical_bases,
-    _is_excluded_volumetric_asymmetry_wm_roi,
     _load_glasser_parc,
     _wm_roi_to_tract_segment,
 )
@@ -310,8 +309,6 @@ def region_group_for_cohens_row(
 ) -> Optional[str]:
     rid = str(roi_id).strip()
     if roi_type == "wm":
-        if _is_excluded_volumetric_asymmetry_wm_roi(rid):
-            return None
         tract_lab = _wm_tract_hemi_label_for_group(rid)
         if tract_lab and tract_lab in tract_to_group:
             return tract_to_group[tract_lab]

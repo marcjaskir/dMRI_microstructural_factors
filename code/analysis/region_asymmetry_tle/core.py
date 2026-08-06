@@ -110,7 +110,7 @@ def get_hcp1065_bilateral_pairs(gam_hcp1065_dir: Path) -> List[Tuple[str, str, s
 
 
 def get_scalars_for_atlas(gam_dir: Path, region: str, stat: str = "mean") -> List[str]:
-    """Discover scalar names from GAM dir: files {region}_{scalar}_stat-{stat}_gam.csv, exclude config EXCLUDED_SCALARS."""
+    """Discover scalar names from GAM dir: files {region}_{scalar}_stat-{stat}_gam.csv."""
     gam_dir = Path(gam_dir)
     region_dir = gam_dir / region
     if not region_dir.is_dir():
@@ -125,8 +125,7 @@ def get_scalars_for_atlas(gam_dir: Path, region: str, stat: str = "mean") -> Lis
         if not name.startswith(prefix) or not name.endswith(suffix):
             continue
         scalar = name[len(prefix) : -len(suffix)]
-        if scalar not in cfg.EXCLUDED_SCALARS:
-            scalars.append(scalar)
+        scalars.append(scalar)
     return sorted(set(scalars))
 
 

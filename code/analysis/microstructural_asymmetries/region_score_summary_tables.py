@@ -16,7 +16,6 @@ import pandas as pd
 from microstructural_asymmetry_report_mahalanobis import (
     _format_4s_subcortex_tex_label,
     _format_tex_wm_thirds_label,
-    _is_excluded_volumetric_asymmetry_wm_roi,
     _load_glasser_additional_metadata,
     _load_subject_group,
     _load_tract_label_to_pretty_name,
@@ -250,8 +249,6 @@ def build_mahalanobis_ipsi_contra_long(
             if group not in ("left_TLE", "right_TLE"):
                 continue
             tract_base, segment = _wm_roi_to_tract_segment(str(r["roi_id"]))
-            if _is_excluded_volumetric_asymmetry_wm_roi(str(r["roi_id"])):
-                continue
             if not _hcp1065_wm_tract_allowed(tract_base, tract_base_to_type):
                 continue
             roi_key = f"{tract_base}_{segment}"
@@ -315,8 +312,6 @@ def build_factor_z_ipsi_contra_long(
                 if _is_wm_factor_z_column(col):
                     roi_key = _wm_factor_column_to_roi_key(col)
                     if roi_key is None:
-                        continue
-                    if _is_excluded_volumetric_asymmetry_wm_roi(roi_key):
                         continue
                     tract_base, _seg = _wm_roi_to_tract_segment(roi_key)
                     if not _hcp1065_wm_tract_allowed(tract_base, tract_base_to_type):

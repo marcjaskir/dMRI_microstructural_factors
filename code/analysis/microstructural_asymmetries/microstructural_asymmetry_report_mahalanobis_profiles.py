@@ -45,18 +45,6 @@ TRACT_METADATA_PATH = PROJECT_ROOT / "data" / "atlases" / "HCP1065" / "HCP1065_t
 OUTPUT_DIR = analysis_dir() / "microstructural_asymmetries"
 INCLUSION_PATH = PROJECT_ROOT / "results" / "inclusion" / "penn_epilepsy_included_basic_metadata.csv"
 
-EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACTS = [
-    "AF_L",
-    "AF_R",
-    "FAT_L",
-    "FAT_R",
-    "SLF3_L",
-    "SLF3_R",
-]
-EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACT_BASES = {
-    t[:-2] for t in EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACTS if t.endswith(("_L", "_R"))
-}
-
 
 def _load_subject_group() -> Dict[str, str]:
     """Load TLE inclusion CSV; return sub -> 'left_TLE' or 'right_TLE' from laterality column."""
@@ -432,8 +420,6 @@ def main() -> int:
     tract_base_to_type = _load_tract_metadata()
     tract_base_to_end_locs = _load_tract_end_locs()
     node_df = load_tract_mahal_node()
-    if not node_df.empty and "tract" in node_df.columns:
-        node_df = node_df[~node_df["tract"].isin(EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACT_BASES)].copy()
     if node_df.empty:
         print("No *_asym_mahal_node.csv files found or schema mismatch; nothing to compute.", file=sys.stderr)
         out_html = OUTPUT_DIR / "microstructural_asymmetry_report_mahalanobis_profiles.html"

@@ -43,7 +43,7 @@ OUTPUT_COV_FNAME = "cov.csv"
 OUTPUT_INVCOV_FNAME = "invcov.csv"
 OUTPUT_COV_MINCOVDET_FNAME = "cov_mincovdet.csv"
 OUTPUT_INVCOV_MINCOVDET_FNAME = "invcov_mincovdet.csv"
-SAMPLE_TRACT = "AF_L"
+SAMPLE_TRACT = "ILF_L"
 
 
 def get_paths(base_dir: Path) -> Dict[str, Path]:
@@ -55,7 +55,7 @@ def get_paths(base_dir: Path) -> Dict[str, Path]:
 
 
 def get_scalars(gam_dir: Path, stat: str) -> List[str]:
-    """Discover scalar names from GAM dir (sample tract). Exclude EXCLUDED_SCALARS."""
+    """Discover scalar names from GAM dir (sample tract)."""
     prefix = f"{SAMPLE_TRACT}_"
     suffix = f"_stat-{stat}_gam"
     all_scalars: List[str] = []
@@ -69,8 +69,7 @@ def get_scalars(gam_dir: Path, stat: str) -> List[str]:
         if not stem.startswith(prefix) or not stem.endswith(suffix):
             continue
         scalar = stem[len(prefix) : -len(suffix)]
-        if scalar not in cfg.EXCLUDED_SCALARS:
-            all_scalars.append(scalar)
+        all_scalars.append(scalar)
     return sorted(set(all_scalars))
 
 
@@ -343,7 +342,7 @@ def main() -> int:
         nargs="*",
         default=None,
         metavar="TRACT",
-        help="Restrict to these tract labels (e.g. AF_L AF_R); default: all tracts in GAM dir.",
+        help="Restrict to these tract labels (e.g. ILF_L ILF_R); default: all tracts in GAM dir.",
     )
     args = parser.parse_args()
 
@@ -361,7 +360,6 @@ def main() -> int:
         base_dir=base_dir,
         metadata_path=paths["metadata_path"],
         gam_dir=gam_dir,
-        excluded_scalars=cfg.EXCLUDED_SCALARS,
         gam_stat=args.stat,
     )
     ta.load_metadata()

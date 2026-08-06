@@ -25,16 +25,6 @@ run_covbat_harmonization <- function(covbat_inputs_dir, tract, train_prop = 0.9)
 
   for (measure in valid_measures) {
 
-    # Skip the measure map_li
-    # Skip excluded scalars as listed in project context
-    EXCLUDED_SCALARS <- c(
-      "map_li", "map_am", "dti_txx", "dti_txy", "dti_txz",
-      "dti_tyy", "dti_tyz", "dti_tzz", "dti_ha", "rdi_rd1", "rdi_rd2"
-    )
-    if (measure %in% EXCLUDED_SCALARS) {
-      next
-    }
-
     # Bat and covar are shared for mean and standard_deviation
     bat_fpath <- file.path(covbat_inputs_dir, tract, paste0(tract, "_", measure, "_bat.csv"))
     covar_fpath <- file.path(covbat_inputs_dir, tract, paste0(tract, "_", measure, "_covar.csv"))

@@ -17,13 +17,15 @@ Enough to reproduce factor analysis digests, **Laplacian eigenmaps** gradients,
 and asymmetry reports:
 
 - Post-GAM residual z-scores (`anon_id`, `group`, `*_z`) for kept analyses
+  (manuscript scalars/tracts only; see `lib/manuscript_features.py`)
 - Factor loadings / scores / factor z
 - Control LE gradient products (G1/G2, neuroaxis correlations)
 - Tract/region asymmetry summaries and group Cohen’s d / Mahalanobis digests
 - Atlas label tables and anonymized inclusion (`laterality`, `lobe`; no age/sex)
 
 **Intentionally omitted:** raw dMRI, CovBat covariates (age/sex/scanner),
-reversible ID maps, NIfTI volumes, HTML dumps, diffusion-map gradient trees.
+reversible ID maps, NIfTI volumes, HTML dumps, diffusion-map gradient trees,
+and microstructural scalars / WM tracts outside the manuscript analysis set.
 
 ### OSF HDF5 (preferred distribution)
 

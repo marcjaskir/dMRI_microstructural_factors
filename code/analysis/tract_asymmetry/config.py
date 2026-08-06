@@ -11,11 +11,6 @@ END1_NODES = list(range(1, 35))   # nodes 1-34
 CORE_NODES = list(range(35, 67))  # nodes 35-66
 END2_NODES = list(range(67, 101))  # nodes 67-100
 
-EXCLUDED_SCALARS = [
-    "map_li", "map_am", "dti_txx", "dti_txy", "dti_txz",
-    "dti_tyy", "dti_tyz", "dti_tzz", "dti_ha", "rdi_rd1", "rdi_rd2",
-]
-
 
 def get_paths(base_dir: Path) -> Dict[str, Path]:
     """Return path dict relative to base_dir. Output: tract_asymmetry."""

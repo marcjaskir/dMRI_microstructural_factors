@@ -26,10 +26,16 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable, Iterator
 
+WORKSPACE = Path(__file__).resolve().parents[2]
+CODE = WORKSPACE / "code"
+if str(CODE) not in sys.path:
+    sys.path.insert(0, str(CODE))
+
 import h5py
 import numpy as np
 
-WORKSPACE = Path(__file__).resolve().parents[2]
+from lib.manuscript_features import open_relpath_is_manuscript
+
 OPEN = WORKSPACE / "data" / "open"
 DEFAULT_H5_NAME = "dmri_microstructural_factors_open_v1.h5"
 SCHEMA_VERSION = "1"
@@ -143,6 +149,9 @@ def iter_pack_files(open_root: Path, globs: Iterable[str]) -> Iterator[Path]:
     for pattern in globs:
         for path in sorted(open_root.glob(pattern)):
             if not path.is_file() or _should_skip(path):
+                continue
+            rel = path.relative_to(open_root).as_posix()
+            if not open_relpath_is_manuscript(rel):
                 continue
             resolved = path.resolve()
             if resolved in seen:

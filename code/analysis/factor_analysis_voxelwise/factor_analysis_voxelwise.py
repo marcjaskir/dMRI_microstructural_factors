@@ -80,17 +80,11 @@ DEFAULT_OUTLIER_IQR_MULTIPLIER = 1.5
 MIN_FINITE_VOXELS_FOR_IQR = 4
 FIXED_FACTOR_COUNTS = (3, 4)
 
-EXCLUDED_SCALARS = [
-    "map_li", "map_am", "dti_txx", "dti_txy", "dti_txz", "dti_tyy", "dti_tyz", "dti_tzz",
-    "dti_ha", "rdi_rd1", "rdi_rd2", "gqi_iso",
-]
-
 
 def import_factor_analysis_helpers() -> None:
     """Import heavy FA/plotting dependencies only when modeling is requested."""
     sys.path.insert(0, str(FA_DIR))
     from factor_analysis import (  # noqa: PLC0415
-        COMBINED_HEATMAP_DTI_DKI_GQI_EXCLUDE_SCALARS as _COMBINED_EXCLUDE,
         COMBINED_HEATMAP_DTI_DKI_GQI_PREFIXES as _COMBINED_PREFIXES,
         CORR_FACTOR_PCA_FACTOR_ORDERED_DPI as _ORDERED_DPI,
         create_html_factor_report as _create_html_factor_report,
@@ -107,7 +101,6 @@ def import_factor_analysis_helpers() -> None:
 
     globals().update(
         {
-            "COMBINED_HEATMAP_DTI_DKI_GQI_EXCLUDE_SCALARS": _COMBINED_EXCLUDE,
             "COMBINED_HEATMAP_DTI_DKI_GQI_PREFIXES": _COMBINED_PREFIXES,
             "CORR_FACTOR_PCA_FACTOR_ORDERED_DPI": _ORDERED_DPI,
             "create_html_factor_report": _create_html_factor_report,
@@ -155,7 +148,7 @@ def load_scalar_metadata() -> Tuple[List[str], Dict[str, str], Dict[str, str]]:
         scalar_to_file = json.load(f)
     with open(SCALAR_DIRS_JSON) as f:
         scalar_to_dir = json.load(f)
-    scalar_labels = [s for s in scalar_to_file if s not in EXCLUDED_SCALARS]
+    scalar_labels = list(scalar_to_file.keys())
     missing = [s for s in scalar_labels if s not in scalar_to_dir]
     if missing:
         raise ValueError(f"Scalars missing qsirecon directory metadata: {missing}")
@@ -847,7 +840,6 @@ def run_fixed_factor_outputs(
         n_regions=n_voxels,
         n_tracts=0,
         n_scalars=len(scalar_labels),
-        excluded_tracts=[],
         loadings_csv_path=str(loadings_path),
         variance_plot_path=str(summary_path),
         corr_heatmap_path=str(corr_loadings_path),

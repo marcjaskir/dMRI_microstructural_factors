@@ -22,22 +22,6 @@ SCALAR_FILES_JSON = METADATA_DIR / "scalar_labels_to_filenames.json"
 SCALAR_DIRS_JSON = METADATA_DIR / "scalar_labels_to_directories.json"
 MNI_SUFFIX = "space-MNI152NLin2009cAsym"
 
-# Match factor_analysis_voxelwise excluded scalars so manifests align with controls.
-EXCLUDED_SCALARS = [
-    "map_li",
-    "map_am",
-    "dti_txx",
-    "dti_txy",
-    "dti_txz",
-    "dti_tyy",
-    "dti_tyz",
-    "dti_tzz",
-    "dti_ha",
-    "rdi_rd1",
-    "rdi_rd2",
-    "gqi_iso",
-]
-
 
 @dataclass(frozen=True)
 class SubjectSession:
@@ -55,7 +39,7 @@ def load_scalar_metadata() -> tuple[list[str], dict[str, str], dict[str, str]]:
         scalar_to_file = json.load(f)
     with open(SCALAR_DIRS_JSON, encoding="utf-8") as f:
         scalar_to_dir = json.load(f)
-    scalar_labels = [s for s in scalar_to_file if s not in EXCLUDED_SCALARS]
+    scalar_labels = list(scalar_to_file.keys())
     missing = [s for s in scalar_labels if s not in scalar_to_dir]
     if missing:
         raise ValueError(f"Scalars missing qsirecon directory metadata: {missing}")

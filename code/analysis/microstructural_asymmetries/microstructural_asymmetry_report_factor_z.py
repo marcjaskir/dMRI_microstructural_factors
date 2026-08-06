@@ -41,7 +41,6 @@ if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))
 
 from microstructural_asymmetry_report_mahalanobis import (  # noqa: E402
-    EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACT_BASES,
     INCLUSION_PATH,
     _cohens_d_paired,
     _get_4s_subcortical_base_to_labels,
@@ -247,8 +246,6 @@ def build_roi_pairs(
         if not tract_hemi.endswith("_L"):
             continue
         base_key = _wm_tract_base_key(tract_hemi)
-        if base_key in EXCLUDED_VOLUMETRIC_ASYMMETRY_TRACT_BASES:
-            continue
         ttype = tract_base_to_type.get(base_key)
         if ttype == "association":
             q = "wm_association"
@@ -502,7 +499,7 @@ def filter_cohens_for_factor_quadrant(
         sub = pd.DataFrame()
     if sub.empty:
         return sub
-    sub = sub[~sub["scalar"].isin(mrs.EXCLUDED_SCALARS)].copy()
+    sub = sub.copy()
     sub["abs_cohens_d"] = np.abs(sub["cohens_d"])
     sub = sub.dropna(subset=["abs_cohens_d"])
     return sub
@@ -954,7 +951,6 @@ def run(factor_indices: List[int], output_dir: Path, dpi: int) -> None:
             subcortical_bases, cortical_bases_4s, glasser_bases_mrs
         )
         cohens_df = mrs.compute_cohens_d_per_roi_scalar(tract_df, region_df)
-        cohens_df = mrs._exclude_volumetric_asymmetry_tracts(cohens_df)
         _, tract_bt = mrs._load_tract_metadata()
         cohens_df = mrs.add_quadrant_column(cohens_df, tract_bt)
     except Exception as exc:
