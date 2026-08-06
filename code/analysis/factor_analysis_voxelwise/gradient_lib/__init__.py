@@ -1,1 +1,1 @@
-"""Voxelwise Laplacian gradient pipeline for controls factor score maps."""
+"""Helpers for voxelwise factor-score maps (group-mean projection)."""
