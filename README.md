@@ -15,24 +15,16 @@ dMRI_microstructural_factors/
 ```
 
 **Open data for manuscript reproduction:** download from OSF
-([https://osf.io/xsr7y](https://osf.io/xsr7y)) and place under `data/open/` so
-`analysis/` and `gam/` exist beside the committed `atlases/` / `metadata/` /
-`inclusion/` stubs.
+([https://osf.io/xsr7y](https://osf.io/xsr7y)) and place under `data/open/`
 
 ## Data availability and privacy
 
 Manuscript reproduction uses an **OSF-hosted `data/open/` archive**
-([https://osf.io/xsr7y](https://osf.io/xsr7y)) of anonymized tabular products:
-inclusion (`anon_id`, laterality/lobe), manuscript-allowlisted GAM residual-z
-tables (`pyafq/` + `mni_micro/`), factor loadings/z, Laplacian-eigenmap gradient
-CSVs, and asymmetry digests. No participant age, sex, scanner covariates, or
-real IDs.
+([https://osf.io/xsr7y](https://osf.io/xsr7y)) of anonymized data necessary for replication
 
 See [`data/open/README.md`](data/open/README.md) and
 [`code/docs/reproducibility.md`](code/docs/reproducibility.md) for layout and
-what is intentionally omitted (raw dMRI, CovBat covariates). Controlled export
-(lab only): `python -u code/lib/export_tier1_open.py --core` from
-`structural_tractometry`.
+what is intentionally omitted (raw dMRI, CovBat covariates).
 
 ## Pipeline overview
 
@@ -79,7 +71,6 @@ export PYTHONPATH="$PWD/code:$PYTHONPATH"
 # Download open data from OSF (https://osf.io/xsr7y), e.g. the open zip, then:
 mkdir -p data/open
 unzip /path/to/dmri_microstructural_factors_open_v1.zip -d data/open
-# Or sync OSF storage files into data/open/ so analysis/ and gam/ are present
 ```
 
 All filesystem roots are defined in `config.yaml` (see
