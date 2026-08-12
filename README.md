@@ -63,7 +63,8 @@ Additional Docs: [`code/docs/pipeline.md`](code/docs/pipeline.md),
 git clone git@github.com:marcjaskir/dMRI_microstructural_factors.git
 cd dMRI_microstructural_factors
 cp config.example.yaml config.yaml
-# Edit config.yaml: set workspace_root (open_osf_url defaults to https://osf.io/xsr7y)
+
+# At this point, edit config.yaml to specify desired local paths
 
 conda env create -f environment.yml
 conda activate dmri_microstructural_factors
