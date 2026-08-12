@@ -3,7 +3,7 @@
 De-identified products for manuscript reproduction.
 
 **Distribution:** OSF project **[https://osf.io/xsr7y](https://osf.io/xsr7y)** hosts
-the `data/open/` tree (typically as `dmri_microstructural_factors_open_v1.zip`)
+the `data/open/` tree (`dmri_microstructural_factors_open_v1.zip`)
 
 ## Layout
 
