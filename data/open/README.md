@@ -17,5 +17,4 @@ data/open/
 
 ## Privacy
 
-Open CSVs use `anon_id` only. The reversible map stays in
-`data/controlled/anon_id_map.csv` (gitignored).
+Open CSVs use `anon_id` only.
