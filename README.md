@@ -51,7 +51,9 @@ HCP-YA:                                     →  qsirecon
 HCP Young Adult / Aging BIDS conversion uses
 [HCPLifespan2BIDS](https://github.com/ellisdg/HCPLifespan2BIDS) (not vendored here).
 
-Docs: [`code/docs/pipeline.md`](code/docs/pipeline.md),
+All steps after GAM fitting are under code/analysis.
+
+Additional Docs: [`code/docs/pipeline.md`](code/docs/pipeline.md),
 [`code/docs/analysis.md`](code/docs/analysis.md),
 [`code/docs/reproducibility.md`](code/docs/reproducibility.md).
 
