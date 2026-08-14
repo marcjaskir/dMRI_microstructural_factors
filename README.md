@@ -14,13 +14,10 @@ dMRI_microstructural_factors/
   README.md
 ```
 
-**Open data for manuscript reproduction:** download from OSF
-([https://osf.io/xsr7y](https://osf.io/xsr7y)) and place under `data/open/`
-
 ## Data availability and privacy
 
-Manuscript reproduction uses an **OSF-hosted `data/open/` archive**
-([https://osf.io/xsr7y](https://osf.io/xsr7y)) of anonymized data necessary for replication
+**Open data for manuscript reproduction:** download from OSF
+([https://osf.io/xsr7y](https://osf.io/xsr7y)) and place under `data/open/`
 
 See [`data/open/README.md`](data/open/README.md) and
 [`code/docs/reproducibility.md`](code/docs/reproducibility.md) for layout and
