@@ -49,7 +49,7 @@ HCP-YA:                                     →  qsirecon
 ```
 
 HCP Young Adult / Aging BIDS conversion uses
-[HCPLifespan2BIDS](https://github.com/ellisdg/HCPLifespan2BIDS) (not vendored here).
+[HCPLifespan2BIDS](https://github.com/ellisdg/HCPLifespan2BIDS).
 
 All steps after GAM fitting are under code/analysis.
 
