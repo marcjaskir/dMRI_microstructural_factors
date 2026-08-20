@@ -84,4 +84,4 @@ bioRxiv 2026.08.11.740985; doi: https://doi.org/10.64898/2026.08.11.740985
 
 
 ## Study overview figure from Jaskir et. al 2016
-<img width="7643" height="9555" alt="Fig1_Study_Overview" src="https://github.com/user-attachments/assets/d90bb01d-faf4-4dff-9abc-1a5a114deea1" />
+<img width="3821" height="4777" alt="Fig1_Study_Overview" src="https://github.com/user-attachments/assets/d90bb01d-faf4-4dff-9abc-1a5a114deea1" />
