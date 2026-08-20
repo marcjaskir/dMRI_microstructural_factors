@@ -76,11 +76,12 @@ unzip /path/to/dmri_microstructural_factors_open_v1.zip -d data/open
 All filesystem roots are defined in `config.yaml` (see
 [`config.example.yaml`](config.example.yaml)).
 
-## Study overview figure from Jaskir et. al 2016
-<img width="7643" height="9555" alt="Fig1_Study_Overview" src="https://github.com/user-attachments/assets/d90bb01d-faf4-4dff-9abc-1a5a114deea1" />
-
 ## Citation
 
 Mapping Whole-Brain Factors of Microstructural Similarity with Diffusion MRI
 Marc Jaskir, Alfredo Lucas, Daniel J. Zhou, William K.S. Ojemann, Justin Chin, Mariam Josyula, Nina Petillo, Emily Zhang, Briana Macedo, Nishant Sinha, Tyler M. Moore, Sandhitsu R. Das, Joel M. Stein, Matthew Cieslak, Theodore D. Satterthwaite, Kathryn A. Davis
 bioRxiv 2026.08.11.740985; doi: https://doi.org/10.64898/2026.08.11.740985
+
+
+## Study overview figure from Jaskir et. al 2016
+<img width="7643" height="9555" alt="Fig1_Study_Overview" src="https://github.com/user-attachments/assets/d90bb01d-faf4-4dff-9abc-1a5a114deea1" />
