@@ -5,7 +5,7 @@ Factors of Microstructural Similarity with Diffusion MRI.
 
 ## Pipeline overview
 - **Penn + HCP-Aging:** BIDS → qsiprep → freesurfer → qsirecon
-- **HCP-YA:** → qsirecon (skip qsiprep/freesurfer; use existing HCP derivatives)
+- **HCP-YA:** → qsirecon (minimally preprocessed publicly released data were used)
 
 ```
 Penn / HCP-Aging:  BIDS  →  qsiprep  →  freesurfer  →  qsirecon
