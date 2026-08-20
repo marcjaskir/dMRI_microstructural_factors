@@ -19,9 +19,6 @@ dMRI_microstructural_factors/
 **Open data for manuscript reproduction:** download from OSF
 ([https://osf.io/xsr7y](https://osf.io/xsr7y)) and place under `data/open/`
 
-See [`data/open/README.md`](data/open/README.md) and
-[`code/docs/reproducibility.md`](code/docs/reproducibility.md) for additional details.
-
 ## Pipeline overview
 
 Cohort-specific ingress differs before the shared tractography path:
