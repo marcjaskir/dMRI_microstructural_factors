@@ -76,6 +76,9 @@ unzip /path/to/dmri_microstructural_factors_open_v1.zip -d data/open
 All filesystem roots are defined in `config.yaml` (see
 [`config.example.yaml`](config.example.yaml)).
 
+## Study overview figure from Jaskir et. al 2016
+<img width="7643" height="9555" alt="Fig1_Study_Overview" src="https://github.com/user-attachments/assets/d90bb01d-faf4-4dff-9abc-1a5a114deea1" />
+
 ## Citation
 
 Mapping Whole-Brain Factors of Microstructural Similarity with Diffusion MRI
