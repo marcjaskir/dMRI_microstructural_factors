@@ -3,26 +3,7 @@
 Code and data for reproducing results of Jaskir et al. 2026, Mapping Whole-Brain
 Factors of Microstructural Similarity with Diffusion MRI.
 
-## Repository layout
-
-```
-dMRI_microstructural_factors/
-  code/                 # All pipelines and analyses
-  data/
-    open/               # Small committed trees + OSF-synced analysis/gam
-  config.example.yaml
-  README.md
-```
-
-## Data availability and privacy
-
-**Open data for manuscript reproduction:** download from OSF
-([https://osf.io/xsr7y](https://osf.io/xsr7y)) and place under `data/open/`
-
 ## Pipeline overview
-
-Cohort-specific ingress differs before the shared tractography path:
-
 - **Penn + HCP-Aging:** BIDS → qsiprep → freesurfer → qsirecon
 - **HCP-YA:** → qsirecon (skip qsiprep/freesurfer; use existing HCP derivatives)
 
@@ -50,6 +31,11 @@ Additional code documentation:
 * [`code/docs/pipeline.md`](code/docs/pipeline.md),
 * [`code/docs/analysis.md`](code/docs/analysis.md),
 * [`code/docs/reproducibility.md`](code/docs/reproducibility.md).
+
+## Data
+
+**Open data for manuscript reproduction:** download from OSF
+([https://osf.io/xsr7y](https://osf.io/xsr7y)) and place under `data/open/`
 
 ## Quick start
 
