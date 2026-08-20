@@ -20,8 +20,7 @@ dMRI_microstructural_factors/
 ([https://osf.io/xsr7y](https://osf.io/xsr7y)) and place under `data/open/`
 
 See [`data/open/README.md`](data/open/README.md) and
-[`code/docs/reproducibility.md`](code/docs/reproducibility.md) for layout and
-what is intentionally omitted (raw dMRI, CovBat covariates).
+[`code/docs/reproducibility.md`](code/docs/reproducibility.md) for code layout and additional documentation.
 
 ## Pipeline overview
 
