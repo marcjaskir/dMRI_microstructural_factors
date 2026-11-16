@@ -1,14 +1,4 @@
-import sys
-from pathlib import Path
-_p = Path(__file__).resolve()
-while _p != _p.parent and not (_p / "lib" / "paths.py").exists():
-    _p = _p.parent
-if str(_p) not in sys.path:
-    sys.path.insert(0, str(_p))
-from lib.paths import project_root, data_dir, derivatives_dir, results_dir, gam_dir, analysis_dir, atlas_dir, inclusion_dir, open_metadata_dir, controlled_metadata_dir, controlled_derivatives_dir
-PROJECT_ROOT = project_root()
-"""
-Microstructural asymmetry report: separate bar-plot and strip-plot figures (whole-brain and 2×2 by quadrant) for |Cohen's d| by scalar;
+"""Microstructural asymmetry report: separate bar-plot and strip-plot figures (whole-brain and 2×2 by quadrant) for |Cohen's d| by scalar;
 whole-brain map of mean |Cohen's d| per region (nilearn glass brain).
 Uses tract_asymmetry (WM) and region_asymmetry_tle (GM: Glasser, 4S cortex, 4S subcortex; WM: HCP1065).
 Atlases: 4S subcortex, 4S cortex (Schaefer100), Glasser, HCP1065 whole-tracts, HCP1065 along-tract thirds.
@@ -22,8 +12,28 @@ import sys
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence, Set, Tuple
 
-import numpy as np
-import pandas as pd
+_p = Path(__file__).resolve()
+while _p != _p.parent and not (_p / "lib" / "paths.py").exists():
+    _p = _p.parent
+if str(_p) not in sys.path:
+    sys.path.insert(0, str(_p))
+
+from lib.paths import (  # noqa: E402
+    analysis_dir,
+    atlas_dir,
+    controlled_derivatives_dir,
+    controlled_metadata_dir,
+    data_dir,
+    derivatives_dir,
+    gam_dir,
+    inclusion_dir,
+    open_metadata_dir,
+    project_root,
+    results_dir,
+)
+
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
 
 # -----------------------------------------------------------------------------
 # Paths and config

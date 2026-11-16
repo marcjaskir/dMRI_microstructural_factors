@@ -1,14 +1,4 @@
-import sys
-from pathlib import Path
-_p = Path(__file__).resolve()
-while _p != _p.parent and not (_p / "lib" / "paths.py").exists():
-    _p = _p.parent
-if str(_p) not in sys.path:
-    sys.path.insert(0, str(_p))
-from lib.paths import project_root, data_dir, derivatives_dir, results_dir, gam_dir, analysis_dir, atlas_dir, inclusion_dir, open_metadata_dir, controlled_metadata_dir, controlled_derivatives_dir
-PROJECT_ROOT = project_root()
-"""
-Factor score asymmetry report: z-score epilepsy factor scores per ROI vs controls,
+"""Factor score asymmetry report: z-score epilepsy factor scores per ROI vs controls,
 then paired ipsi-contra Cohen's d per ROI; summarize by tissue quadrant (1×4 bar plot).
 
 Per tissue quadrant, factor F1–F3 bars (left) and microstructural scalar bars (right)
@@ -30,11 +20,31 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
-import matplotlib
-import matplotlib.pyplot as plt
-from matplotlib import font_manager as fm
-import numpy as np
-import pandas as pd
+_p = Path(__file__).resolve()
+while _p != _p.parent and not (_p / "lib" / "paths.py").exists():
+    _p = _p.parent
+if str(_p) not in sys.path:
+    sys.path.insert(0, str(_p))
+
+from lib.paths import (  # noqa: E402
+    analysis_dir,
+    atlas_dir,
+    controlled_derivatives_dir,
+    controlled_metadata_dir,
+    data_dir,
+    derivatives_dir,
+    gam_dir,
+    inclusion_dir,
+    open_metadata_dir,
+    project_root,
+    results_dir,
+)
+
+import matplotlib  # noqa: E402
+import matplotlib.pyplot as plt  # noqa: E402
+from matplotlib import font_manager as fm  # noqa: E402
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
 if str(_SCRIPT_DIR) not in sys.path:
@@ -858,7 +868,13 @@ def _write_combined_factor_scalar_bar_figures(
             print(f"Wrote {single_path}")
 
 
-def run(factor_indices: List[int], output_dir: Path, dpi: int) -> None:
+def run(
+    factor_indices: List[int],
+    output_dir: Path,
+    dpi: int,
+    *,
+    swarm_only: bool = False,
+) -> None:
     glasser_bases = _get_glasser_bases()
     subcortical_base_to_labels = _get_4s_subcortical_base_to_labels()
     _meta, tract_base_to_type = _load_tract_metadata()
@@ -976,6 +992,18 @@ def run(factor_indices: List[int], output_dir: Path, dpi: int) -> None:
 
     print_barplot_value_ranges(d_by_factor, factor_indices, cohens_df)
 
+    if use_combined:
+        _write_grouped_model_shorter_boxplot_swarm(
+            d_by_factor,
+            factor_indices,
+            cohens_df,
+            scalar_colors,
+            output_dir,
+            dpi,
+        )
+    if swarm_only:
+        return
+
     x_labels = [FACTOR_DISPLAY_LABELS[k] for k in sorted(factor_indices)]
 
     if use_combined:
@@ -1074,6 +1102,212 @@ def run(factor_indices: List[int], output_dir: Path, dpi: int) -> None:
                 print(f"Wrote {single_path}")
 
 
+def _swarm_offsets(y: np.ndarray, *, max_spread: float = 0.28) -> np.ndarray:
+    """Simple 1-D beeswarm x-offsets (no seaborn dependency required)."""
+    y = np.asarray(y, dtype=float)
+    n = int(y.size)
+    if n == 0:
+        return y
+    yr = float(np.ptp(y)) if n > 1 else 1.0
+    bin_width = max(yr / 40.0, 1e-6)
+    order = np.argsort(y)
+    x = np.zeros(n, dtype=float)
+    placed: List[Tuple[float, float]] = []
+    step = max_spread / 8.0
+    for idx in order:
+        yi = float(y[idx])
+        candidates = [0.0]
+        for k in range(1, 9):
+            candidates.extend([k * step, -k * step])
+        chosen = 0.0
+        for cx in candidates:
+            ok = True
+            for py, px in placed:
+                if abs(py - yi) < bin_width and abs(px - cx) < step * 0.95:
+                    ok = False
+                    break
+            if ok:
+                chosen = cx
+                break
+        x[idx] = chosen
+        placed.append((yi, chosen))
+    return x
+
+
+def _boxplot_swarm_on_axis(
+    ax: plt.Axes,
+    series: List[np.ndarray],
+    *,
+    colors: List[str],
+    x_labels: List[str],
+    ylabel: Optional[str],
+    title: Optional[str],
+    box_width: float,
+) -> None:
+    """Transparent boxes + visible swarm of per-ROI Cohen's d values."""
+    n = len(series)
+    positions = np.arange(n, dtype=float)
+    for i, (vals, color) in enumerate(zip(series, colors)):
+        v = np.asarray(vals, dtype=float)
+        v = v[np.isfinite(v)]
+        if v.size == 0:
+            continue
+        xoff = _swarm_offsets(v, max_spread=min(0.28, 0.45 * box_width))
+        ax.scatter(
+            i + xoff,
+            v,
+            s=10,
+            c=color,
+            alpha=0.55,
+            edgecolors="white",
+            linewidths=0.15,
+            zorder=3,
+        )
+    bp = ax.boxplot(
+        [np.asarray(v, dtype=float)[np.isfinite(np.asarray(v, dtype=float))] for v in series],
+        positions=positions,
+        widths=box_width,
+        showfliers=False,
+        patch_artist=True,
+        manage_ticks=False,
+        medianprops={"color": "#1c1a17", "linewidth": 1.8},
+        whiskerprops={"color": "#1c1a17", "linewidth": 1.1},
+        capprops={"color": "#1c1a17", "linewidth": 1.1},
+        boxprops={"linewidth": 1.2},
+        zorder=4,
+    )
+    for patch, color in zip(bp["boxes"], colors):
+        patch.set_facecolor(color)
+        patch.set_alpha(0.25)
+        patch.set_edgecolor(color)
+        patch.set_linewidth(1.4)
+    ax.axhline(0.0, color="k", linewidth=0.9, zorder=0)
+    ax.set_xticks(positions)
+    ax.set_xticklabels(x_labels, rotation=45, ha="right")
+    for tick, color in zip(ax.get_xticklabels(), colors):
+        tick.set_color(color)
+    if ylabel is not None:
+        ax.set_ylabel(ylabel)
+    if title is not None:
+        ax.set_title(title)
+    pad = _xlim_side_pad(box_width)
+    ax.set_xlim(-pad, max(n - 1, 0) + pad)
+    _omit_top_right_spines(ax)
+
+
+def _write_grouped_model_shorter_boxplot_swarm(
+    d_by_factor: Dict[int, List[Tuple[str, float]]],
+    factor_indices: List[int],
+    cohens_df: pd.DataFrame,
+    scalar_colors: Dict[str, str],
+    output_dir: Path,
+    dpi: int,
+) -> List[Path]:
+    """Write per-quadrant grouped-model shorter boxplot+swarm PNGs.
+
+    Same axis order as ``*_grouped-model_shorter`` bars (factors left; scalars by
+    reconstruction model), but all ROI-level Cohen's d points shown with
+    transparent boxes. Filenames end in ``_boxplot_swarm.png``.
+    """
+    if cohens_df.empty:
+        return []
+    written: List[Path] = []
+    # Shared y-limits across tissue panels (data-driven, clipped to a sensible range).
+    all_vals: List[float] = []
+    for q in QUADRANT_ORDER:
+        for fk in sorted(factor_indices):
+            all_vals.extend(
+                float(d) for qq, d in d_by_factor.get(fk, []) if qq == q and np.isfinite(d)
+            )
+        sub = filter_cohens_for_factor_quadrant(cohens_df, q)
+        if not sub.empty:
+            all_vals.extend(
+                float(v)
+                for v in sub["cohens_d"].dropna().astype(float).to_numpy()
+            )
+    if all_vals:
+        lo = float(np.nanpercentile(all_vals, 1))
+        hi = float(np.nanpercentile(all_vals, 99))
+        pad = 0.05 * max(hi - lo, 0.2)
+        ylim = (lo - pad, hi + pad)
+    else:
+        ylim = (-0.8, 0.7)
+
+    height = _FZ_TISSUE_PANEL_HEIGHT_IN * 0.75
+    factor_keys = sorted(factor_indices)
+    x_labels_f = [FACTOR_DISPLAY_LABELS[k] for k in factor_keys]
+    colors_f = [BAR_COLOR] * len(factor_keys)
+
+    with plt.rc_context(rc=PLOT_RC_TISSUE_PANELS):
+        for q in QUADRANT_ORDER:
+            factor_series = [
+                np.asarray(
+                    [d for qq, d in d_by_factor.get(fk, []) if qq == q and np.isfinite(d)],
+                    dtype=float,
+                )
+                for fk in factor_keys
+            ]
+            sub = filter_cohens_for_factor_quadrant(cohens_df, q)
+            if sub.empty:
+                continue
+            scalars_ord = mrs.sort_scalars_in_quadrant_by_reconstruction_model(sub)
+            if not scalars_ord:
+                continue
+            scalar_series = [
+                sub.loc[sub["scalar"] == s, "cohens_d"].dropna().astype(float).to_numpy()
+                for s in scalars_ord
+            ]
+            colors_s = [
+                mrs._scalar_color(s, scalar_colors, MODEL_FALLBACK_COLORS) for s in scalars_ord
+            ]
+            tick_lab_s = [mrs._scalar_abbrev(s) for s in scalars_ord]
+
+            w_factor = _panel_width_inches(len(factor_keys))
+            fig_w = _side_by_side_figsize_inches(w_factor)
+            fig, (ax_f, ax_s) = plt.subplots(
+                1,
+                2,
+                figsize=(fig_w, height),
+                sharey=True,
+                gridspec_kw=_side_by_side_gridspec_kw(),
+            )
+            _boxplot_swarm_on_axis(
+                ax_f,
+                factor_series,
+                colors=colors_f,
+                x_labels=x_labels_f,
+                ylabel="Cohen's d",
+                title=None,
+                box_width=_bar_width_for_n(len(factor_keys)),
+            )
+            _boxplot_swarm_on_axis(
+                ax_s,
+                scalar_series,
+                colors=colors_s,
+                x_labels=tick_lab_s,
+                ylabel=None,
+                title=None,
+                box_width=_bar_width_for_n(len(scalars_ord)),
+            )
+            ax_s.tick_params(labelleft=False)
+            ax_f.set_ylim(ylim)
+            ax_s.set_ylim(ylim)
+            # Visual divider between factor and scalar panels (spine of shared gap).
+            ax_f.spines["right"].set_visible(True)
+            ax_f.spines["right"].set_color("#b0a89c")
+            ax_f.spines["right"].set_linewidth(1.0)
+            fig.subplots_adjust(left=0.09, right=0.98, top=0.98, bottom=0.22, wspace=_FZ_INNER_WSPACE)
+            out_path = (
+                output_dir
+                / f"factor_score_z_ipsi_contra_cohens_d_{q}_grouped-model_shorter_boxplot_swarm.png"
+            )
+            fig.savefig(out_path, dpi=dpi, bbox_inches="tight", facecolor="white")
+            plt.close(fig)
+            written.append(out_path)
+            print(f"Wrote {out_path}")
+    return written
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument(
@@ -1089,6 +1323,11 @@ def main() -> int:
         help="Comma-separated factor indices (default: 1,2,3; F4 is deprecated and omitted)",
     )
     p.add_argument("--dpi", type=int, default=150)
+    p.add_argument(
+        "--swarm-only",
+        action="store_true",
+        help="Only write grouped-model shorter boxplot+swarm tissue panels (skip bar figures)",
+    )
     args = p.parse_args()
     factors = [int(x.strip()) for x in args.factors.split(",") if x.strip()]
     dropped = [f for f in factors if f in DEPRECATED_FACTOR_INDICES]
@@ -1100,7 +1339,7 @@ def main() -> int:
     factors = [f for f in factors if f not in DEPRECATED_FACTOR_INDICES]
     if not factors:
         factors = list(DEFAULT_FACTOR_INDICES)
-    run(factors, args.output_dir, args.dpi)
+    run(factors, args.output_dir, args.dpi, swarm_only=args.swarm_only)
     return 0
 
 
