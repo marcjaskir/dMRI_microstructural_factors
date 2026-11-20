@@ -169,6 +169,20 @@ PLOT_RC_TISSUE_PANELS = {
     **PLOT_RC,
 }
 
+# Slightly smaller type / denser layout for boxplot+swarm tissue panels.
+SWARM_PLOT_FONT_SIZE = 24
+PLOT_RC_SWARM = {
+    **PLOT_RC,
+    "font.size": SWARM_PLOT_FONT_SIZE,
+    "axes.labelsize": SWARM_PLOT_FONT_SIZE,
+    "axes.titlesize": SWARM_PLOT_FONT_SIZE,
+    "xtick.labelsize": SWARM_PLOT_FONT_SIZE,
+    "ytick.labelsize": SWARM_PLOT_FONT_SIZE,
+    "legend.fontsize": SWARM_PLOT_FONT_SIZE,
+}
+SWARM_WIDTH_SCALE = 0.78  # narrower than bar-panel side-by-side figures
+SWARM_TOP_N_SCALARS = 10
+
 # Columns that are not ROI measurements (controls CSVs may include e.g. group)
 NON_ROI_COLUMNS = frozenset({"subject", "group"})
 
@@ -1003,6 +1017,14 @@ def run(
             output_dir,
             dpi,
         )
+        _write_top_abs_boxplot_swarm(
+            d_by_factor,
+            factor_indices,
+            cohens_df,
+            scalar_colors,
+            output_dir,
+            dpi,
+        )
     if swarm_only:
         return
 
@@ -1198,24 +1220,12 @@ def _boxplot_swarm_on_axis(
     _omit_top_right_spines(ax)
 
 
-def _write_grouped_model_shorter_boxplot_swarm(
+def _swarm_shared_ylim(
     d_by_factor: Dict[int, List[Tuple[str, float]]],
     factor_indices: List[int],
     cohens_df: pd.DataFrame,
-    scalar_colors: Dict[str, str],
-    output_dir: Path,
-    dpi: int,
-) -> List[Path]:
-    """Write per-quadrant grouped-model shorter boxplot+swarm PNGs.
-
-    Same axis order as ``*_grouped-model_shorter`` bars (factors left; scalars by
-    reconstruction model), but all ROI-level Cohen's d points shown with
-    transparent boxes. Filenames end in ``_boxplot_swarm.png``.
-    """
-    if cohens_df.empty:
-        return []
-    written: List[Path] = []
-    # Shared y-limits across tissue panels: full data range + pad (no winsorize / percentile clip).
+) -> Tuple[float, float]:
+    """Shared y-limits across tissue swarm panels: full data range + pad."""
     all_vals: List[float] = []
     for q in QUADRANT_ORDER:
         for fk in sorted(factor_indices):
@@ -1232,18 +1242,54 @@ def _write_grouped_model_shorter_boxplot_swarm(
     if all_vals:
         lo = float(np.min(all_vals))
         hi = float(np.max(all_vals))
-        # Generous pad so extreme swarm points / box whiskers are not flush with the frame.
         pad = 0.10 * max(hi - lo, 0.2)
-        ylim = (lo - pad, hi + pad)
-    else:
-        ylim = (-0.8, 0.7)
+        return (lo - pad, hi + pad)
+    return (-0.8, 0.7)
 
-    height = _FZ_TISSUE_PANEL_HEIGHT_IN * 0.75
+
+def _swarm_side_by_side_layout(
+    n_factors: int, n_scalars: int
+) -> Tuple[float, float, Dict[str, object]]:
+    """Narrower figsize + width ratios for factor | scalar swarm panels."""
+    w_factor = _panel_width_inches(n_factors) * SWARM_WIDTH_SCALE
+    # Keep scalar panel proportional to category count (not a fixed ×8).
+    width_ratio = max(2.2, (n_scalars / max(n_factors, 1)) * 0.95)
+    fig_w = w_factor * (1.0 + width_ratio)
+    height = _FZ_TISSUE_PANEL_HEIGHT_IN * 0.70
+    gridspec_kw = {
+        "width_ratios": [1, width_ratio],
+        "wspace": _FZ_INNER_WSPACE,
+    }
+    return fig_w, height, gridspec_kw
+
+
+def _write_factor_scalar_boxplot_swarm_panels(
+    d_by_factor: Dict[int, List[Tuple[str, float]]],
+    factor_indices: List[int],
+    cohens_df: pd.DataFrame,
+    scalar_colors: Dict[str, str],
+    output_dir: Path,
+    dpi: int,
+    *,
+    scalar_order_mode: str,
+    filename_suffix: str,
+    top_n: Optional[int] = None,
+) -> List[Path]:
+    """Write per-quadrant factor+scalar boxplot+swarm PNGs.
+
+    ``scalar_order_mode``:
+      - ``reconstruction_model``: NODDI→MAP→DKI→DTI→GQI (grouped-model)
+      - ``abs_mean_signed``: decreasing |mean Cohen's d| (optionally ``top_n``)
+    """
+    if cohens_df.empty:
+        return []
+    written: List[Path] = []
+    ylim = _swarm_shared_ylim(d_by_factor, factor_indices, cohens_df)
     factor_keys = sorted(factor_indices)
     x_labels_f = [FACTOR_DISPLAY_LABELS[k] for k in factor_keys]
     colors_f = [BAR_COLOR] * len(factor_keys)
 
-    with plt.rc_context(rc=PLOT_RC_TISSUE_PANELS):
+    with plt.rc_context(rc=PLOT_RC_SWARM):
         for q in QUADRANT_ORDER:
             factor_series = [
                 np.asarray(
@@ -1255,7 +1301,12 @@ def _write_grouped_model_shorter_boxplot_swarm(
             sub = filter_cohens_for_factor_quadrant(cohens_df, q)
             if sub.empty:
                 continue
-            scalars_ord = mrs.sort_scalars_in_quadrant_by_reconstruction_model(sub)
+            if scalar_order_mode == "reconstruction_model":
+                scalars_ord = mrs.sort_scalars_in_quadrant_by_reconstruction_model(sub)
+            else:
+                scalars_ord = sort_scalars_in_quadrant_by_desc_abs_mean_signed_d(sub)
+                if top_n is not None:
+                    scalars_ord = scalars_ord[: int(top_n)]
             if not scalars_ord:
                 continue
             scalar_series = [
@@ -1267,14 +1318,15 @@ def _write_grouped_model_shorter_boxplot_swarm(
             ]
             tick_lab_s = [mrs._scalar_abbrev(s) for s in scalars_ord]
 
-            w_factor = _panel_width_inches(len(factor_keys))
-            fig_w = _side_by_side_figsize_inches(w_factor)
+            fig_w, height, gridspec_kw = _swarm_side_by_side_layout(
+                len(factor_keys), len(scalars_ord)
+            )
             fig, (ax_f, ax_s) = plt.subplots(
                 1,
                 2,
                 figsize=(fig_w, height),
                 sharey=True,
-                gridspec_kw=_side_by_side_gridspec_kw(),
+                gridspec_kw=gridspec_kw,
             )
             _boxplot_swarm_on_axis(
                 ax_f,
@@ -1297,20 +1349,64 @@ def _write_grouped_model_shorter_boxplot_swarm(
             ax_s.tick_params(labelleft=False)
             ax_f.set_ylim(ylim)
             ax_s.set_ylim(ylim)
-            # Visual divider between factor and scalar panels (spine of shared gap).
             ax_f.spines["right"].set_visible(True)
             ax_f.spines["right"].set_color("#b0a89c")
             ax_f.spines["right"].set_linewidth(1.0)
-            fig.subplots_adjust(left=0.09, right=0.98, top=0.98, bottom=0.22, wspace=_FZ_INNER_WSPACE)
+            fig.subplots_adjust(left=0.10, right=0.98, top=0.98, bottom=0.24, wspace=_FZ_INNER_WSPACE)
             out_path = (
                 output_dir
-                / f"factor_score_z_ipsi_contra_cohens_d_{q}_grouped-model_shorter_boxplot_swarm.png"
+                / f"factor_score_z_ipsi_contra_cohens_d_{q}{filename_suffix}.png"
             )
             fig.savefig(out_path, dpi=dpi, bbox_inches="tight", facecolor="white")
             plt.close(fig)
             written.append(out_path)
             print(f"Wrote {out_path}")
     return written
+
+
+def _write_grouped_model_shorter_boxplot_swarm(
+    d_by_factor: Dict[int, List[Tuple[str, float]]],
+    factor_indices: List[int],
+    cohens_df: pd.DataFrame,
+    scalar_colors: Dict[str, str],
+    output_dir: Path,
+    dpi: int,
+) -> List[Path]:
+    """Write per-quadrant grouped-model shorter boxplot+swarm PNGs."""
+    return _write_factor_scalar_boxplot_swarm_panels(
+        d_by_factor,
+        factor_indices,
+        cohens_df,
+        scalar_colors,
+        output_dir,
+        dpi,
+        scalar_order_mode="reconstruction_model",
+        filename_suffix="_grouped-model_shorter_boxplot_swarm",
+    )
+
+
+def _write_top_abs_boxplot_swarm(
+    d_by_factor: Dict[int, List[Tuple[str, float]]],
+    factor_indices: List[int],
+    cohens_df: pd.DataFrame,
+    scalar_colors: Dict[str, str],
+    output_dir: Path,
+    dpi: int,
+    *,
+    top_n: int = SWARM_TOP_N_SCALARS,
+) -> List[Path]:
+    """Factors + top-N scalars by |mean Cohen's d| (model colors, not model order)."""
+    return _write_factor_scalar_boxplot_swarm_panels(
+        d_by_factor,
+        factor_indices,
+        cohens_df,
+        scalar_colors,
+        output_dir,
+        dpi,
+        scalar_order_mode="abs_mean_signed",
+        filename_suffix=f"_top{int(top_n)}_abs_boxplot_swarm",
+        top_n=int(top_n),
+    )
 
 
 def main() -> int:
@@ -1331,7 +1427,10 @@ def main() -> int:
     p.add_argument(
         "--swarm-only",
         action="store_true",
-        help="Only write grouped-model shorter boxplot+swarm tissue panels (skip bar figures)",
+        help=(
+            "Only write boxplot+swarm tissue panels "
+            "(grouped-model + top-|d|; skip bar figures)"
+        ),
     )
     args = p.parse_args()
     factors = [int(x.strip()) for x in args.factors.split(",") if x.strip()]
