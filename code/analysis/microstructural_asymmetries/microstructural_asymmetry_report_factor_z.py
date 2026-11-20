@@ -1212,7 +1212,7 @@ def _write_grouped_model_shorter_boxplot_swarm(
     if cohens_df.empty:
         return []
     written: List[Path] = []
-    # Shared y-limits across tissue panels (data-driven, clipped to a sensible range).
+    # Shared y-limits across tissue panels: full data range + pad (no winsorize / percentile clip).
     all_vals: List[float] = []
     for q in QUADRANT_ORDER:
         for fk in sorted(factor_indices):
@@ -1226,8 +1226,8 @@ def _write_grouped_model_shorter_boxplot_swarm(
                 for v in sub["cohens_d"].dropna().astype(float).to_numpy()
             )
     if all_vals:
-        lo = float(np.nanpercentile(all_vals, 1))
-        hi = float(np.nanpercentile(all_vals, 99))
+        lo = float(np.min(all_vals))
+        hi = float(np.max(all_vals))
         pad = 0.05 * max(hi - lo, 0.2)
         ylim = (lo - pad, hi + pad)
     else:
