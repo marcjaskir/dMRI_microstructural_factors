@@ -1162,6 +1162,7 @@ def _boxplot_swarm_on_axis(
             edgecolors="white",
             linewidths=0.15,
             zorder=3,
+            clip_on=False,
         )
     bp = ax.boxplot(
         [np.asarray(v, dtype=float)[np.isfinite(np.asarray(v, dtype=float))] for v in series],
@@ -1228,7 +1229,8 @@ def _write_grouped_model_shorter_boxplot_swarm(
     if all_vals:
         lo = float(np.min(all_vals))
         hi = float(np.max(all_vals))
-        pad = 0.05 * max(hi - lo, 0.2)
+        # Generous pad so extreme swarm points / box whiskers are not flush with the frame.
+        pad = 0.10 * max(hi - lo, 0.2)
         ylim = (lo - pad, hi + pad)
     else:
         ylim = (-0.8, 0.7)
