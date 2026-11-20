@@ -510,6 +510,8 @@ def filter_cohens_for_factor_quadrant(
     if sub.empty:
         return sub
     sub = sub.copy()
+    if "scalar" in sub.columns:
+        sub = sub[~sub["scalar"].astype(str).map(mrs.is_excluded_plot_scalar)]
     sub["abs_cohens_d"] = np.abs(sub["cohens_d"])
     sub = sub.dropna(subset=["abs_cohens_d"])
     return sub
@@ -527,7 +529,7 @@ def sort_scalars_in_quadrant_by_desc_abs_mean_signed_d(sub: pd.DataFrame) -> Lis
     seen: Set[str] = set()
     for s in sub["scalar"].dropna().unique():
         t = str(s)
-        if t in seen:
+        if t in seen or mrs.is_excluded_plot_scalar(t):
             continue
         v = sub.loc[sub["scalar"] == t, "cohens_d"].dropna().astype(float)
         if len(v) == 0:
@@ -1222,9 +1224,10 @@ def _write_grouped_model_shorter_boxplot_swarm(
             )
         sub = filter_cohens_for_factor_quadrant(cohens_df, q)
         if not sub.empty:
+            keep = ~sub["scalar"].astype(str).map(mrs.is_excluded_plot_scalar)
             all_vals.extend(
                 float(v)
-                for v in sub["cohens_d"].dropna().astype(float).to_numpy()
+                for v in sub.loc[keep, "cohens_d"].dropna().astype(float).to_numpy()
             )
     if all_vals:
         lo = float(np.min(all_vals))

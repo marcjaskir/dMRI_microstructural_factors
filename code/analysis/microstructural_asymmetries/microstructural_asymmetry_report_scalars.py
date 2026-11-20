@@ -154,6 +154,8 @@ MODEL_FALLBACK_COLORS = {
 
 # NODDI → MAPMRI → DKI → DTI → GQI (``map_`` prefix = MAPMRI).
 RECONSTRUCTION_MODEL_ORDER: Tuple[str, ...] = ("noddi", "map", "dki", "dti", "gqi")
+# Dropped from factor analysis / asymmetry plots (not in All4_Combined loadings).
+EXCLUDED_PLOT_SCALARS: Set[str] = {"gqi_iso"}
 FACTOR_LOADINGS_ORDERED_CSV = (
     analysis_dir()
     / "factor_analysis"
@@ -2079,13 +2081,20 @@ def _canonical_scalars_for_plots(
     """X-axis order for bar/strip plots: sorted ``scalar_labels`` keys, then any data-only scalars.
 
     Matches radar-style fixed ordering so scalars without ROI-level Cohen's d rows still appear as empty categories.
+    Excludes ``EXCLUDED_PLOT_SCALARS`` (e.g. ``gqi_iso``).
     """
     if scalar_labels:
-        keys = sorted(scalar_labels.keys())
-        in_data = set(plot_df["scalar"].dropna().unique())
-        extra = sorted(s for s in in_data if s not in keys)
+        keys = sorted(k for k in scalar_labels.keys() if not is_excluded_plot_scalar(k))
+        in_data = set(plot_df["scalar"].dropna().astype(str).unique())
+        extra = sorted(
+            s for s in in_data if s not in keys and not is_excluded_plot_scalar(s)
+        )
         return keys + extra
-    return sorted(pd.unique(plot_df["scalar"].dropna()))
+    return sorted(
+        s
+        for s in pd.unique(plot_df["scalar"].dropna().astype(str))
+        if not is_excluded_plot_scalar(str(s))
+    )
 
 
 def scalar_reconstruction_model_prefix(scalar: str) -> Optional[str]:
@@ -2106,6 +2115,11 @@ def load_factor_loading_scalar_order(
     return [c for c in cols if c != "factor"]
 
 
+def is_excluded_plot_scalar(scalar: str) -> bool:
+    """True for scalars omitted from factor analysis / asymmetry figure axes."""
+    return str(scalar) in EXCLUDED_PLOT_SCALARS
+
+
 def sort_scalars_by_reconstruction_model(
     present: Sequence[str],
     reference_order: Optional[Sequence[str]] = None,
@@ -2118,6 +2132,7 @@ def sort_scalars_by_reconstruction_model(
         reference_order = load_factor_loading_scalar_order()
     model_rank = {m: i for i, m in enumerate(RECONSTRUCTION_MODEL_ORDER)}
     ref_rank = {s: i for i, s in enumerate(reference_order)}
+    kept = [str(s) for s in present if not is_excluded_plot_scalar(str(s))]
 
     def _sort_key(s: str) -> Tuple[int, int, str]:
         model = scalar_reconstruction_model_prefix(s) or ""
@@ -2125,7 +2140,7 @@ def sort_scalars_by_reconstruction_model(
         sr = ref_rank.get(s, len(reference_order) + 1)
         return (mr, sr, s)
 
-    return sorted(present, key=_sort_key)
+    return sorted(kept, key=_sort_key)
 
 
 def sort_scalars_in_quadrant_by_reconstruction_model(
@@ -2139,7 +2154,7 @@ def sort_scalars_in_quadrant_by_reconstruction_model(
     seen: Set[str] = set()
     for s in sub["scalar"].dropna().unique():
         t = str(s)
-        if t in seen:
+        if t in seen or is_excluded_plot_scalar(t):
             continue
         v = sub.loc[sub["scalar"] == t, "cohens_d"].dropna().astype(float)
         if len(v) == 0:
@@ -2151,6 +2166,7 @@ def sort_scalars_in_quadrant_by_reconstruction_model(
 
 def _sort_scalars_by_mean_abs_desc(scalars: List[str], plot_df: pd.DataFrame) -> List[str]:
     """Order scalars by mean |Cohen's d| in ``plot_df`` (descending); scalars with no rows last (alphabetically)."""
+    scalars = [s for s in scalars if not is_excluded_plot_scalar(str(s))]
     if not scalars:
         return []
     scored: List[Tuple[int, float, str]] = []
